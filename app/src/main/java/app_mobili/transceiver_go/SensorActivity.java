@@ -2,11 +2,21 @@ package app_mobili.transceiver_go;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
@@ -37,6 +47,26 @@ public class SensorActivity extends Activity implements SensorEventListener {
         else
             PressureView.setText("no info retrieved :(");
 
+        // Load the original image from the drawable resource
+        Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.circle);
+
+        // Define the desired width and height for the resized image
+        int desiredWidth = 50;
+        int desiredHeight = 50;
+
+        // Create a new resized bitmap
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, false);
+
+        // draw colored indicator
+        ImageView imageView = new ImageView(this);
+        // Set the resized bitmap to the ImageView
+        imageView.setImageBitmap(resizedBitmap);
+        imageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 50));
+        imageView.setScaleType(ImageView.ScaleType.CENTER);
+
+        // add colour indicator to the layout
+        LinearLayout parentLayout = findViewById(R.id.circleLayout);
+        parentLayout.addView(imageView);
 
     }
 
@@ -56,6 +86,43 @@ public class SensorActivity extends Activity implements SensorEventListener {
                     + "Version: " + pressure.getVersion() + "\n"
                     + "Value: " + millibarsOfPressure;
             PressureView.setText(sensorInfo);
+
+            // this code is just to edit the image accordingly and print it on screen
+            Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.circle);
+            int desiredWidth = 50;
+            int desiredHeight = 50;
+            Bitmap resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, false);
+            ColorMatrix colorMatrix = new ColorMatrix();
+            if(millibarsOfPressure > 720) // green
+                colorMatrix.setRotate(1, 180); // Green
+            else if(millibarsOfPressure > 360){ // yellow
+                colorMatrix.set(new float[] {
+                        1.8f, 0f, 0f, 0f, 0f,  // Red channel
+                        1f, 0.6f, 0f, 0f, 0f,  // Green channel
+                        0f, 0f, 0f, 0f, 0f,  // Blue channel
+                        0f, 0f, 0f, 1f, 0f   // Alpha channel
+                });
+            }
+            else
+                colorMatrix.setRotate(0, 180); // Red
+
+            ColorFilter colorFilter = new ColorMatrixColorFilter(colorMatrix);
+
+            // Apply the color filter to the bitmap
+            Paint paint = new Paint();
+            paint.setColorFilter(colorFilter);
+
+            // Create a canvas and draw the bitmap with the applied color filter
+            Canvas canvas = new Canvas(resizedBitmap);
+            canvas.drawBitmap(resizedBitmap, 0, 0, paint);
+
+            ImageView imageView = new ImageView(this);
+            LinearLayout parentLayout = findViewById(R.id.circleLayout);
+            imageView.setImageBitmap(resizedBitmap);
+            parentLayout.removeAllViewsInLayout();
+            parentLayout.addView(imageView);
+
+
         }
         else
             PressureView.setText("no info retrieved :(");
