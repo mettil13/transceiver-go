@@ -20,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
+
 public class SensorActivity extends Activity implements SensorEventListener {
     private SensorManager sensorManager;
     private Sensor pressure;
@@ -33,6 +34,7 @@ public class SensorActivity extends Activity implements SensorEventListener {
         // a particular sensor.
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         pressure = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
+
         TextView PressureView = findViewById(R.id.PressureView);
         if(pressure != null) {
             // formatting info to print :)

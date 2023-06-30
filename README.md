@@ -10,3 +10,7 @@ the colour of the circle changes based on the pressure detected by the sensor, a
 - 720+ millibars -> Green
 - 360+ millibars -> Yellow
 - otherwise -> Red
+
+#### Version 0.2
+the app has a new textview on it's MainActivity Layout. this view will reflect wifi signal information which updates every .5 seconds (on paper lol).
+it will also detect if the Wifi is active or not. :>
