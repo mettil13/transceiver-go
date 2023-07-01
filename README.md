@@ -14,3 +14,7 @@ the colour of the circle changes based on the pressure detected by the sensor, a
 #### Version 0.2
 the app has a new textview on it's MainActivity Layout. this view will reflect wifi signal information which updates every .5 seconds (on paper lol).
 it will also detect if the Wifi is active or not. :>
+
+#### Version 0.2.5
+adjusted buttons and added Audio listeners, pretty much works like the pressure one, but without the cute colored circle.
+uses different update system, updating every tic.

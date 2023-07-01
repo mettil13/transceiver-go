@@ -28,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView wifiSignalTextView;
     private WifiManager wifiManager;
-    private WifiReceiver wifiReceiver;
 
     private Handler handler;
     private Runnable updateSignalRunnable;
@@ -51,18 +50,15 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        Button soundButton = findViewById(R.id.toSoundView);
+        soundButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, SoundActivity.class);
+            startActivity(intent);
+        });
 
         wifiSignalTextView = findViewById(R.id.wifiSignalTextView);
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
-        wifiReceiver = new WifiReceiver(wifiSignalTextView);
-/* unused because: (see below)
-        // Register the BroadcastReceiver
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(WifiManager.RSSI_CHANGED_ACTION);
-        intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
-        registerReceiver(wifiReceiver, intentFilter);
-*/
         // RSSI doesn't work as expected on my OnePlus Nord, so i'll try using an handler
         handler = new Handler();
 
