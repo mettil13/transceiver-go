@@ -18,12 +18,20 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.content.pm.PackageManager;
+import android.telephony.PhoneStateListener;
+import android.telephony.SignalStrength;
+import android.telephony.TelephonyManager;
 
+import androidx.core.app.ActivityCompat;
 
 
 public class SensorActivity extends Activity implements SensorEventListener {
     private SensorManager sensorManager;
     private Sensor pressure;
+
+    private TelephonyManager telephonyManager;
+    private PhoneStateListener phoneStateListener;
 
     @Override
     public final void onCreate(Bundle savedInstanceState) {
@@ -34,6 +42,33 @@ public class SensorActivity extends Activity implements SensorEventListener {
         // a particular sensor.
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         pressure = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
+
+        // telephony shenanigans
+        telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+
+        TextView signal = new TextView(this);
+
+        // gotta use the deprecated method bc we support API as far as 24, we'll use the newest method and check the API version with an if in the future
+        phoneStateListener = new PhoneStateListener() {
+            @Override
+            public void onSignalStrengthsChanged(SignalStrength signalStrength) {
+                super.onSignalStrengthsChanged(signalStrength);
+                // Get the signal strength values
+                int gsmSignalStrength = signalStrength.getGsmSignalStrength();
+                int cdmaSignalStrength = signalStrength.getCdmaDbm();
+                int evdoSignalStrength = signalStrength.getEvdoDbm();
+
+                // Print the signal strength information
+                String signalInfo = "GSM Signal Strength: " + gsmSignalStrength + "\n" +
+                        "CDMA Signal Strength: " + cdmaSignalStrength + "\n" +
+                        "EVDO Signal Strength: " + evdoSignalStrength;
+
+                signal.setText(signalInfo);
+                LinearLayout textLayout = findViewById(R.id.circleLayout);
+                textLayout.addView(signal);
+            }
+
+        };
 
         TextView PressureView = findViewById(R.id.PressureView);
         if(pressure != null) {
@@ -135,6 +170,9 @@ public class SensorActivity extends Activity implements SensorEventListener {
         // Register a listener for the sensor.
         super.onResume();
         sensorManager.registerListener(this, pressure, SensorManager.SENSOR_DELAY_NORMAL);
+
+        telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+
     }
 
     @Override
@@ -142,5 +180,7 @@ public class SensorActivity extends Activity implements SensorEventListener {
         // Be sure to unregister the sensor when the activity pauses.
         super.onPause();
         sensorManager.unregisterListener(this);
+        // Unregister the SignalStrengthChangedListener to stop receiving signal strength updates
+        telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
     }
 }
