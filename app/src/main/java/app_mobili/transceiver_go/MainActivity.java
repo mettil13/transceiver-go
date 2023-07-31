@@ -3,28 +3,23 @@ package app_mobili.transceiver_go;
 import androidx.appcompat.app.AppCompatActivity;
 
 // imports for sensor usages :)
-import java.util.List;
-
-import android.content.Context;
 import android.content.Intent;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
-import android.net.wifi.WifiInfo;
-import android.os.Handler;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
+
+    NetworkSignalStrength networkSignalStrength;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main); //loads main layout
+
+        networkSignalStrength = new NetworkSignalStrength(this);
+
 
         // button that switches view to SensorView :D
         Button myButton = findViewById(R.id.toSensorView);
@@ -39,8 +34,17 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        // Class starts to listen to LTE & UMTS signal
+        networkSignalStrength.startMonitoringSignalStrength();
 
+        TextView signalView = findViewById(R.id.SignalView);
+        signalView.setText(getString(R.string.click)); // click the button!
 
+        Button buttonLTE = findViewById(R.id.buttonLTE);
+        buttonLTE.setOnClickListener(v -> signalView.setText(
+                "LTE: " + networkSignalStrength.getLteSignalStrength() +
+                "\nUMTS: " + networkSignalStrength.getUmtsSignalStrength() + "\n")
+        );
 
     }
 
@@ -56,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        networkSignalStrength.stopMonitoringSignalStrength();
         super.onDestroy();
     }
 }

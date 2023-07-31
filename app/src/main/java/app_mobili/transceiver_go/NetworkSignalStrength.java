@@ -1,20 +1,18 @@
 package app_mobili.transceiver_go;
 
 import android.content.Context;
-import android.os.Build;
 import android.telephony.PhoneStateListener;
 import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 
 public class NetworkSignalStrength extends Sensor{
-    private TelephonyManager telephonyManager;
+    private final TelephonyManager telephonyManager;
     private int lteSignalStrength = -1; // Default value when not available
     private int umtsSignalStrength = -1; // Default value when not available
 
 
     // constructor
     public NetworkSignalStrength(Context context) {
-        Sensor.setContext(context);
         telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
     }
 

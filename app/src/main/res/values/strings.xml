@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">transceiver-go</string>
+    <string name="click">click the button!</string>
 </resources>

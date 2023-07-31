@@ -23,3 +23,7 @@ uses different update system, updating every tic.
 added telephony signal info in the SensorActivity, although it gets displayed in a shitty display and deleted if the circle needs to update,
 it doesn't matter, it works. i'm done finally lol. we just need to process the data and create dependencies for the whole app and map.
 that'll be fun.
+
+#### Version 0.4
+added class NetworkSignalStrength and superclass Sensor, refactored Main and kept the old one as Legacy, tested the new classes.
+Click the new button on the Main screen to show network information :)

@@ -1,4 +1,4 @@
-package app_mobili.transceiver_go;
+/*package app_mobili.transceiver_go;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -121,3 +121,5 @@ public class MainActivityLegacy extends AppCompatActivity {
         // unregisterReceiver(wifiReceiver);
     }
 }
+
+ */
