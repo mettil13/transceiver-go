@@ -11,6 +11,7 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
 
     NetworkSignalStrength networkSignalStrength;
+    WifiSignalStrength wifiSignalStrength;
 
 
     @Override
@@ -19,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main); //loads main layout
 
         networkSignalStrength = new NetworkSignalStrength(this);
+        wifiSignalStrength = new WifiSignalStrength(this);
 
 
         // button that switches view to SensorView :D
@@ -46,6 +48,18 @@ public class MainActivity extends AppCompatActivity {
                 "\nUMTS: " + networkSignalStrength.getUmtsSignalStrength() + "\n")
         );
 
+        wifiSignalStrength.startUpdatingSignal();
+
+        TextView wifiView = findViewById(R.id.WifiView);
+        signalView.setText(getString(R.string.click)); // click the button!
+
+        Button buttonWifi = findViewById(R.id.buttonWifi);
+        buttonWifi.setOnClickListener(v -> wifiView.setText(
+                "Signal Strength (dBm): " + wifiSignalStrength.getSignalStrength() +
+                        "\nSignal Level: " + wifiSignalStrength.getSignalLevel() + "/5\n")
+        );
+
+
     }
 
     @Override
@@ -61,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         networkSignalStrength.stopMonitoringSignalStrength();
+        wifiSignalStrength.stopUpdatingSignal();
         super.onDestroy();
     }
 }

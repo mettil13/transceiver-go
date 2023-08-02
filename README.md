@@ -27,3 +27,7 @@ that'll be fun.
 #### Version 0.4
 added class NetworkSignalStrength and superclass Sensor, refactored Main and kept the old one as Legacy, tested the new classes.
 Click the new button on the Main screen to show network information :)
+
+#### Version 0.5 Beta
+added class WifiSignalStrength, works the same way as NetworkSignalStrength, but with wifi info (yay!)
+the class is as now untested, i'll need to test it. i also added corrisponding working test buttons and text, i just need to test it.

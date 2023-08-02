@@ -57,25 +57,51 @@
 
     <Button
         android:id="@+id/buttonLTE"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="115dp"
+        android:layout_height="57dp"
         android:layout_marginTop="28dp"
         android:text="get LTE/UMTS signal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.077"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/wifiSignalTextView"
-        app:layout_constraintVertical_bias="0.012" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/SignalView"
-        android:layout_width="213dp"
-        android:layout_height="79dp"
+        android:layout_width="113dp"
+        android:layout_height="69dp"
         android:text="TextView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.08"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/buttonLTE"
-        app:layout_constraintVertical_bias="0.101" />
+        app:layout_constraintVertical_bias="0.066" />
+
+    <Button
+        android:id="@+id/buttonWifi"
+        android:layout_width="105dp"
+        android:layout_height="52dp"
+        android:text="Get Wifi"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.666"
+        app:layout_constraintStart_toEndOf="@+id/buttonLTE"
+        app:layout_constraintTop_toBottomOf="@+id/wifiSignalTextView"
+        app:layout_constraintVertical_bias="0.075" />
+
+    <TextView
+        android:id="@+id/WifiView"
+        android:layout_width="103dp"
+        android:layout_height="63dp"
+        android:text="push the button above!"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.672"
+        app:layout_constraintStart_toEndOf="@+id/SignalView"
+        app:layout_constraintTop_toBottomOf="@+id/buttonWifi"
+        app:layout_constraintVertical_bias="0.067" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
