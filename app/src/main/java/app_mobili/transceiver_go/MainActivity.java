@@ -57,6 +57,18 @@ public class MainActivity extends AppCompatActivity {
                         "\nSignal Level: " + wifiSignalStrength.getSignalLevel() + "/5\n")
         );
 
+        TextView noiseView = findViewById(R.id.noiseView);
+        Button buttonNoise = findViewById(R.id.noiseButton);
+        NoiseStrength noiseStrength = new NoiseStrength(this);
+
+        buttonNoise.setOnClickListener(v -> {
+
+            noiseView.setText(
+                            "Noise level: " + (int) noiseStrength.getNoiseLevel() +
+                                    "/100\n");
+        }
+        );
+
 
     }
 

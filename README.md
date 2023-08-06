@@ -31,3 +31,8 @@ Click the new button on the Main screen to show network information :)
 #### Version 0.5 Beta
 added class WifiSignalStrength, works the same way as NetworkSignalStrength, but with wifi info (yay!)
 the class is as now untested, i'll need to test it. i also added corrisponding working test buttons and text, i just need to test it.
+
+#### Version 0.6
+refactored WifiSigalStrength to listen only when asked instead of periodically, and added the NoiseStrength Class, which listens to
+the current noise level for 10 ms and returns an arbitrary scale of 1 - 100 noise level!
+Testing features for the newly added classes are also featured.

@@ -104,4 +104,29 @@
         app:layout_constraintTop_toBottomOf="@+id/buttonWifi"
         app:layout_constraintVertical_bias="0.067" />
 
+    <Button
+        android:id="@+id/noiseButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="29dp"
+        android:text="Get Noise"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.083"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/SignalView"
+        app:layout_constraintVertical_bias="0.017" />
+
+    <TextView
+        android:id="@+id/noiseView"
+        android:layout_width="111dp"
+        android:layout_height="67dp"
+        android:text="Noise will appear here!"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.076"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/noiseButton"
+        app:layout_constraintVertical_bias="0.141" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
