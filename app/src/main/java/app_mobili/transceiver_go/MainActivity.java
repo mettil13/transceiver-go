@@ -48,8 +48,6 @@ public class MainActivity extends AppCompatActivity {
                 "\nUMTS: " + networkSignalStrength.getUmtsSignalStrength() + "\n")
         );
 
-        wifiSignalStrength.startUpdatingSignal();
-
         TextView wifiView = findViewById(R.id.WifiView);
         signalView.setText(getString(R.string.click)); // click the button!
 
@@ -75,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         networkSignalStrength.stopMonitoringSignalStrength();
-        wifiSignalStrength.stopUpdatingSignal();
         super.onDestroy();
     }
 }
