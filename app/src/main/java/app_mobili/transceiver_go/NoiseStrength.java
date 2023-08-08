@@ -19,7 +19,6 @@ public class NoiseStrength extends Sensor {
     private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
     private boolean isRecording = false;
     private final int bufferSize;
-    private final Context context;
     private static final int DURATION_MS = 10; // 1 second duration for recording
 
     private double noise = -1;
