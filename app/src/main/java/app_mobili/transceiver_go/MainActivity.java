@@ -2,8 +2,6 @@ package app_mobili.transceiver_go;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-// imports for sensor usages :)
-import android.content.Intent;
 import android.widget.Button;
 import android.os.Bundle;
 import android.widget.TextView;
@@ -21,20 +19,6 @@ public class MainActivity extends AppCompatActivity {
 
         networkSignalStrength = new NetworkSignalStrength(this);
         wifiSignalStrength = new WifiSignalStrength(this);
-
-
-        // button that switches view to SensorView :D
-        Button myButton = findViewById(R.id.toSensorView);
-        myButton.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, SensorActivity.class);
-            startActivity(intent);
-        });
-
-        Button soundButton = findViewById(R.id.toSoundView);
-        soundButton.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, SoundActivity.class);
-            startActivity(intent);
-        });
 
         // Class starts to listen to LTE & UMTS signal
         networkSignalStrength.startMonitoringSignalStrength();
