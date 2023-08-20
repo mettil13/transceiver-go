@@ -2,39 +2,66 @@ package app_mobili.transceiver_go;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+import app_mobili.transceiver_go.databinding.ActivityMainBinding;
+
+public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SupportMapFragment mappaTestFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mappaTest);
+        Fragment mainMap = new FragmentMainMap();
+        Fragment gameMap = new FragmentGameMap();
+        Fragment somethingElse = new FragmentSomethingElse();
+
+
+        //((SupportMapFragment) mainMap.getChildFragmentManager().findFragmentById(R.id.mainMap)).getMapAsync(this);
+        /*
+        SupportMapFragment mappaTestFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mainMap);
         if(mappaTestFragment != null) {
             mappaTestFragment.getMapAsync(this);
         }
+        */
+        ActivityMainBinding binding;
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        binding.bottomNavigationView.setOnItemSelectedListener(item -> {
+            switch (item.getItemId()){
+                case R.id.mapButton:
+                    replaceFragment(R.id.fragmentContainer, mainMap);
+                    break;
+                case R.id.gameButton:
+                    replaceFragment(R.id.fragmentContainer, gameMap);
+                    break;
+                case R.id.somethingElseButton:
+                    replaceFragment(R.id.fragmentContainer, somethingElse);
+                    break;
+            }
+            return true;
+        });
+
     }
 
-    @Override
-    public void onMapReady(@NonNull GoogleMap googleMap) {
-        Polyline polyline1 = googleMap.addPolyline(new PolylineOptions()
-                .clickable(false)
-                .add(
-                        new LatLng(42, 11),
-                        new LatLng(42, 31),
-                        new LatLng(30, 21),
-                        new LatLng(42, 11)
 
-                ));
+
+    private void replaceFragment(int containerId, Fragment newFragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.setReorderingAllowed(true);
+        fragmentTransaction.replace(containerId, newFragment);
+        fragmentTransaction.commit();
     }
+
 }
