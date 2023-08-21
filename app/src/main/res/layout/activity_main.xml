@@ -31,7 +31,7 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
-        android:id="@+id/wifiSignalTextView"
+        android:id="@+id/aaa"
         android:layout_width="268dp"
         android:layout_height="63dp"
         android:text="TextView"
@@ -65,7 +65,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.077"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/wifiSignalTextView"
+        app:layout_constraintTop_toBottomOf="@+id/aaa"
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
@@ -89,7 +89,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.666"
         app:layout_constraintStart_toEndOf="@+id/buttonLTE"
-        app:layout_constraintTop_toBottomOf="@+id/wifiSignalTextView"
+        app:layout_constraintTop_toBottomOf="@+id/aaa"
         app:layout_constraintVertical_bias="0.075" />
 
     <TextView

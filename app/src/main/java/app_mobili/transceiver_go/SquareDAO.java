@@ -1,7 +1,5 @@
 package app_mobili.transceiver_go;
 
-import android.util.Pair;
-
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -18,12 +16,15 @@ public interface SquareDAO {
     void updateSquare(Square square);
     @Delete
     void deleteSquare(Square square);
-    @Query("select * from square")
+    @Query("select * from Square")
     List<Square> getAllSquares();
-    @Query("select * from square where `X,Y`==:coordinates ")
-    Square getSquare(Pair<Float,Float> coordinates);
 
-    // only returns the square if it exists, otherwise square should be added manually
-    @Query("SELECT * FROM square WHERE (`Length` == :l) ORDER BY ABS(`X,Y` - :x) + ABS(`X,Y` - :y) LIMIT 1")
-    Square returnClosestSquare(float x, float y, int l);
+    // only returns the square if it exists, otherwise returns a null object reference, BEWARE!
+    @Query("select * from Square where `X`==:x AND `Y`==:y AND `Length`==:l LIMIT 1")
+    Square getSquare(int x, int y, int l);
+
+    // only returns the square if it exists, otherwise returns a null object reference, BEWARE!
+    @Query("SELECT * FROM Square WHERE (`Length` == :l) AND (ABS(`X` - :x) <= (:l/2)) AND (ABS(`Y` - :y) <= (:l/2)) ORDER BY ABS(`X` - :x) + ABS(`Y` - :y) LIMIT 1")
+    Square getYourSquare(int x, int y, int l);
+
 }

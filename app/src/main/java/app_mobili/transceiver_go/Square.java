@@ -2,6 +2,7 @@ package app_mobili.transceiver_go;
 
 import android.util.Pair;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -9,10 +10,17 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "Square")
 public class Square {
     @PrimaryKey()
-    @ColumnInfo(name="X,Y")
-    // X,Y,L coordinates 0 = X , 1 = Y
-    Pair<Float,Float> coordinates;
-    @PrimaryKey()
+    @NonNull
+    @ColumnInfo(name="SquareID")
+    // X,Y,L coordinates
+    String coordinates;
+
+    //square centre coordinates can't be non integer numbers so i'll keep 'em this way
+    @ColumnInfo(name="X")
+    int x;
+    @ColumnInfo(name="Y")
+    int y;
+    @NonNull
     @ColumnInfo(name="Length")
     int length;
     @ColumnInfo(name="Network Signal Strength")
@@ -26,16 +34,24 @@ public class Square {
     int networkAverageCounter = 1;
 
 
-    // X,Y,L coordinates 0 = X , 1 = Y, 2 = L (length)
+    public Square(){
+
+    }
+    // X,Y coordinates 0 = X , 1 = Y
     // L values are measured in Meters and have to be integers
     public Square(float x, float y, int l){
         // coordinates provided will get rounded to nearest square coordinates
         Pair<Integer,Integer> block = new Pair<>(Math.round(x/l),Math.round(y/l));
-
         // then to find the X,Y coordinates of square (M,N) we multiply by the requested length l
         // to mathematically get the center of the square we want
-        coordinates = new Pair<>((float) block.first * l,(float) block.second * l);
+        this.x = block.first * l;
+        this.y = block.second * l;
         length = l;
+
+        // i'm sorry this primary key has to be a string with this format, but this is the best
+        // solution for readability than a meaningless integer id.
+        coordinates =this.x+"."+this.y+"/"+this.length;
+
         network = -1;
         wifi = -1;
         noise = -1;
@@ -70,5 +86,18 @@ public class Square {
 
     public void updateNoise(int noise) {
         this.noise = (this.noise*noiseAverageCounter + noise)/ ++noiseAverageCounter;
+    }
+
+    @Override
+    public String toString() {
+        return "Square{" +
+                "coordinates='" + coordinates + '\'' +
+                ", x=" + x +
+                ", y=" + y +
+                ", length=" + length +
+                ", network=" + network +
+                ", wifi=" + wifi +
+                ", noise=" + noise +
+                '}';
     }
 }
