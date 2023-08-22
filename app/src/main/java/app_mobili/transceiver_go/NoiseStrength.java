@@ -21,14 +21,14 @@ public class NoiseStrength extends Sensor {
     private final int bufferSize;
     private static final int DURATION_MS = 10; // 1 second duration for recording
 
-    private double noise = -1;
+    private int noise = -1;
 
     public NoiseStrength(Context context) {
         this.context = context;
         bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT);
     }
 
-    public double getNoiseLevel() {
+    public int getNoiseLevel() {
         // Check for the RECORD_AUDIO permission at runtime
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -85,6 +85,6 @@ public class NoiseStrength extends Sensor {
         double dB = 20 * Math.log10(rms / Short.MAX_VALUE);
 
         // Normalize the dB value to a range of 0 to 100 (or any other scale you prefer)
-        noise = Math.min(Math.max((dB + 100) / 2, 0), 100);
+        noise = (int) Math.min(Math.max((dB + 100) / 2, 0), 100);
     }
 }

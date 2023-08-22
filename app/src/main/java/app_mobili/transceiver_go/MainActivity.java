@@ -1,6 +1,12 @@
 package app_mobili.transceiver_go;
 
+import static java.sql.Types.NULL;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import android.widget.Button;
 import android.os.Bundle;
@@ -11,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
     NetworkSignalStrength networkSignalStrength;
     WifiSignalStrength wifiSignalStrength;
 
+    SquareDatabase squaredb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +60,20 @@ public class MainActivity extends AppCompatActivity {
         }
         );
 
+        RoomDatabase.Callback myCallback = new RoomDatabase.Callback() {
+            @Override
+            public void onCreate(@NonNull SupportSQLiteDatabase db) {
+                super.onCreate(db);
+            }
+
+            @Override
+            public void onOpen(@NonNull SupportSQLiteDatabase db) {
+                super.onOpen(db);
+            }
+        };
+
+        // setting the database
+        squaredb = Room.databaseBuilder(this, SquareDatabase.class, "squaredb").addCallback(myCallback).build();
 
     }
 
