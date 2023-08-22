@@ -72,18 +72,9 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+        // setting the database
         squaredb = Room.databaseBuilder(this, SquareDatabase.class, "squaredb").addCallback(myCallback).build();
 
-
-        new Thread(() -> {
-            Square s1 = new Square(50,50,5);
-            squaredb.getSquareDAO().updateSquare(s1);
-            s1 = squaredb.getSquareDAO().getYourSquare(52,52,5);
-
-            System.out.println(s1.toString());
-
-
-        }).start();
     }
 
     @Override
