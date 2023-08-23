@@ -20,20 +20,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         Fragment mainMap = new FragmentMainMap();
         Fragment gameMap = new FragmentGameMap();
         Fragment somethingElse = new FragmentSomethingElse();
 
-
-        //((SupportMapFragment) mainMap.getChildFragmentManager().findFragmentById(R.id.mainMap)).getMapAsync(this);
-        /*
-        SupportMapFragment mappaTestFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mainMap);
-        if(mappaTestFragment != null) {
-            mappaTestFragment.getMapAsync(this);
-        }
-        */
         ActivityMainBinding binding;
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -51,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
+        replaceFragment(R.id.fragmentContainer, mainMap);
 
     }
 

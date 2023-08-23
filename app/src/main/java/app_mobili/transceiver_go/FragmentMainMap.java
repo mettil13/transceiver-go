@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.VisibleRegion;
 
 /**
@@ -72,7 +74,16 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
     public void onCameraMove() {
         map.clear();
         VisibleRegion viewPort = map.getProjection().getVisibleRegion();
-        MapTile tile = new MapTile(map.getCameraPosition().target.latitude, map.getCameraPosition().target.longitude, viewPort.farLeft.longitude - viewPort.farRight.longitude);
+        double viewPortRange;
+        if(viewPort.farLeft.longitude > 90 && viewPort.farRight.longitude < -90){ // in case one border has negative longitude and the other one has positive longitude and they are both near 180
+            viewPortRange = (180 - viewPort.farLeft.longitude) + (180 + viewPort.farRight.longitude);
+        }
+        else {
+            viewPortRange = viewPort.farLeft.longitude - viewPort.farRight.longitude;
+        }
+        viewPortRange = Math.abs(viewPortRange);
+        MapTile tile = new MapTile(map.getCameraPosition().target.latitude, map.getCameraPosition().target.longitude,  viewPortRange);
         tile.drawTile(map, 0xff000000, 0x66000000);
+        Log.println(Log.ASSERT, "", viewPort.farLeft.longitude + " " + viewPort.farRight.longitude + " " + viewPortRange);
     }
 }
