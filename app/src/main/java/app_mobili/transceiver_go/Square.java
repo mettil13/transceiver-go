@@ -7,6 +7,11 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
+
 @Entity(tableName = "Square")
 public class Square {
     @PrimaryKey()
@@ -17,44 +22,81 @@ public class Square {
 
     //square centre coordinates can't be non integer numbers so i'll keep 'em this way
     @ColumnInfo(name="X")
-    int x;
+    protected int latitude;
     @ColumnInfo(name="Y")
-    int y;
+    protected int longitude;
     @NonNull
     @ColumnInfo(name="Length")
-    int length;
+    protected int sideLength;
     @ColumnInfo(name="Network Signal Strength")
-    int network;
+    protected int network;
     @ColumnInfo(name="Wifi Signal Strength")
-    int wifi;
+    protected int wifi;
     @ColumnInfo(name="Noise Strength")
-    int noise;
-    int noiseAverageCounter = 1;
-    int wifiAverageCounter = 1;
-    int networkAverageCounter = 1;
+    protected int noise;
+    protected int noiseAverageCounter = 1;
+    protected int wifiAverageCounter = 1;
+    protected int networkAverageCounter = 1;
 
-
+    // Empty constructor for room
     public Square(){
 
     }
+
     // X,Y coordinates 0 = X , 1 = Y
     // L values are measured in Meters and have to be integers
-    public Square(float x, float y, int l){
+    public Square(double latitude, double longitude, int sideLength){
+        // first we make sure that the provided coordinates are valid
+        latitude = toValidLatitude(latitude);
+        longitude = toValidLongitude(longitude);
         // coordinates provided will get rounded to nearest square coordinates
-        Pair<Integer,Integer> block = new Pair<>(Math.round(x/l),Math.round(y/l));
+        Pair<Integer,Integer> block = new Pair<>(Math.round((float)latitude / sideLength),Math.round((float)longitude / sideLength)); // now latitude and longitude can be casted to float because they are real earth coordinates
         // then to find the X,Y coordinates of square (M,N) we multiply by the requested length l
         // to mathematically get the center of the square we want
-        this.x = block.first * l;
-        this.y = block.second * l;
-        length = l;
+        this.latitude = block.first * sideLength;
+        this.longitude = block.second * sideLength;
+        this.sideLength = sideLength;
 
         // i'm sorry this primary key has to be a string with this format, but this is the best
         // solution for readability than a meaningless integer id.
-        coordinates =this.x+"."+this.y+"/"+this.length;
+        coordinates =this.latitude +"."+this.longitude +"/"+this.sideLength;
 
         network = -1;
         wifi = -1;
         noise = -1;
+    }
+
+    public Polygon drawTile(GoogleMap googleMap, int strokeColor, int fillColor) {
+        LatLng upLeft = new LatLng(toValidLatitude(latitude - (double)sideLength / 2), toValidLongitude(longitude + (double)sideLength / 2));
+        LatLng downLeft = new LatLng(toValidLatitude(latitude + (double)sideLength / 2), toValidLongitude(longitude + (double)sideLength / 2));
+        LatLng downRight = new LatLng(toValidLatitude(latitude + (double)sideLength / 2), toValidLongitude(longitude - (double)sideLength / 2));
+        LatLng upRight = new LatLng(toValidLatitude(latitude - (double)sideLength / 2), toValidLongitude(longitude - (double)sideLength / 2));
+        Polygon tile = googleMap.addPolygon(new PolygonOptions().add(upLeft, downLeft, downRight, upRight));
+        tile.setStrokeColor(strokeColor);
+        tile.setFillColor(fillColor);
+        return tile;
+    }
+
+    protected double toValidLatitude(double latitude) {
+        if (latitude > 89.99) { // check if latitude is a valid number, 90 degrees glitches the map, so we use 89.99 instead
+            latitude = 89.99;
+        } else if (latitude < -89.99) {
+            latitude = -89.99;
+        }
+
+        return latitude;
+    }
+
+    protected double toValidLongitude(double longitude) {
+        while (longitude > 180) { // check if longitude is a valid number, if it's bigger than 180 it gets converted into negative longitude
+            longitude = -180 + (longitude - 180);
+        }
+
+        while (longitude < -180) {
+            longitude = 180 + (longitude + 180);
+        }
+
+        return longitude;
     }
 
     // NOTE: Set functions reset the average counters of a square
@@ -92,9 +134,9 @@ public class Square {
     public String toString() {
         return "Square{" +
                 "coordinates='" + coordinates + '\'' +
-                ", x=" + x +
-                ", y=" + y +
-                ", length=" + length +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", length=" + sideLength +
                 ", network=" + network +
                 ", wifi=" + wifi +
                 ", noise=" + noise +

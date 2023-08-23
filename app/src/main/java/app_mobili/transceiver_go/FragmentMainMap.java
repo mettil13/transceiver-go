@@ -82,8 +82,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
             viewPortRange = viewPort.farLeft.longitude - viewPort.farRight.longitude;
         }
         viewPortRange = Math.abs(viewPortRange);
-        MapTile tile = new MapTile(map.getCameraPosition().target.latitude, map.getCameraPosition().target.longitude,  viewPortRange);
+        Square tile = new Square(map.getCameraPosition().target.latitude, map.getCameraPosition().target.longitude,  (int)viewPortRange);
         tile.drawTile(map, 0xff000000, 0x66000000);
-        Log.println(Log.ASSERT, "", viewPort.farLeft.longitude + " " + viewPort.farRight.longitude + " " + viewPortRange);
     }
 }
