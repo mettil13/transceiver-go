@@ -1,95 +1,59 @@
 package app_mobili.transceiver_go;
 
-import static java.sql.Types.NULL;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.Room;
-import androidx.room.RoomDatabase;
-import androidx.sqlite.db.SupportSQLiteDatabase;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
-import android.widget.Button;
 import android.os.Bundle;
-import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+
+import app_mobili.transceiver_go.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
-
-    NetworkSignalStrength networkSignalStrength;
-    WifiSignalStrength wifiSignalStrength;
-
-    SquareDatabase squaredb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main); //loads main layout
 
-        networkSignalStrength = new NetworkSignalStrength(this);
-        wifiSignalStrength = new WifiSignalStrength(this);
+        Fragment mainMap = new FragmentMainMap();
+        Fragment gameMap = new FragmentGameMap();
+        Fragment somethingElse = new FragmentSomethingElse();
 
-        // Class starts to listen to LTE & UMTS signal
-        networkSignalStrength.startMonitoringSignalStrength();
-
-        TextView signalView = findViewById(R.id.SignalView);
-        signalView.setText(getString(R.string.click)); // click the button!
-
-        Button buttonLTE = findViewById(R.id.buttonLTE);
-        buttonLTE.setOnClickListener(v -> signalView.setText(
-                "LTE: " + networkSignalStrength.getLteSignalStrength() +
-                "\nUMTS: " + networkSignalStrength.getUmtsSignalStrength() + "\n")
-        );
-
-        TextView wifiView = findViewById(R.id.WifiView);
-        signalView.setText(getString(R.string.click)); // click the button!
-
-        Button buttonWifi = findViewById(R.id.buttonWifi);
-        buttonWifi.setOnClickListener(v -> wifiView.setText(
-                "Signal Strength (dBm): " + wifiSignalStrength.getSignalStrength() +
-                        "\nSignal Level: " + wifiSignalStrength.getSignalLevel() + "/5\n")
-        );
-
-        TextView noiseView = findViewById(R.id.noiseView);
-        Button buttonNoise = findViewById(R.id.noiseButton);
-        NoiseStrength noiseStrength = new NoiseStrength(this);
-
-        buttonNoise.setOnClickListener(v -> {
-
-            noiseView.setText(
-                            "Noise level: " + (int) noiseStrength.getNoiseLevel() +
-                                    "/100\n");
-        }
-        );
-
-        RoomDatabase.Callback myCallback = new RoomDatabase.Callback() {
-            @Override
-            public void onCreate(@NonNull SupportSQLiteDatabase db) {
-                super.onCreate(db);
+        ActivityMainBinding binding;
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        binding.bottomNavigationView.setOnItemSelectedListener(item -> {
+            switch (item.getItemId()){
+                case R.id.mapButton:
+                    replaceFragment(R.id.fragmentContainer, mainMap);
+                    break;
+                case R.id.gameButton:
+                    replaceFragment(R.id.fragmentContainer, gameMap);
+                    break;
+                case R.id.somethingElseButton:
+                    replaceFragment(R.id.fragmentContainer, somethingElse);
+                    break;
             }
-
-            @Override
-            public void onOpen(@NonNull SupportSQLiteDatabase db) {
-                super.onOpen(db);
-            }
-        };
-
-        // setting the database
-        squaredb = Room.databaseBuilder(this, SquareDatabase.class, "squaredb").addCallback(myCallback).build();
+            return true;
+        });
+        replaceFragment(R.id.fragmentContainer, mainMap);
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+
+
+    private void replaceFragment(int containerId, Fragment newFragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.setReorderingAllowed(true);
+        fragmentTransaction.replace(containerId, newFragment);
+        fragmentTransaction.commit();
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onDestroy() {
-        networkSignalStrength.stopMonitoringSignalStrength();
-        super.onDestroy();
-    }
 }

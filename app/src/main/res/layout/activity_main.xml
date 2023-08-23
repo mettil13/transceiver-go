@@ -6,101 +6,26 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="361dp"
-        android:layout_height="72dp"
-        android:text="The news about Android banning Huawei is sad. But I know Huawei can fix this.  If there’s a will, there’s Huawei. "
-        app:layout_constraintBottom_toBottomOf="parent"
+    <FrameLayout
+        android:id="@+id/fragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.118" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/aaa"
-        android:layout_width="268dp"
-        android:layout_height="63dp"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:layout_constraintVertical_bias="0.061" />
+    </FrameLayout>
 
-    <Button
-        android:id="@+id/buttonLTE"
-        android:layout_width="115dp"
-        android:layout_height="57dp"
-        android:layout_marginTop="28dp"
-        android:text="get LTE/UMTS signal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.077"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/aaa"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <TextView
-        android:id="@+id/SignalView"
-        android:layout_width="113dp"
-        android:layout_height="69dp"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.08"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonLTE"
-        app:layout_constraintVertical_bias="0.066" />
-
-    <Button
-        android:id="@+id/buttonWifi"
-        android:layout_width="105dp"
-        android:layout_height="52dp"
-        android:text="Get Wifi"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.666"
-        app:layout_constraintStart_toEndOf="@+id/buttonLTE"
-        app:layout_constraintTop_toBottomOf="@+id/aaa"
-        app:layout_constraintVertical_bias="0.075" />
-
-    <TextView
-        android:id="@+id/WifiView"
-        android:layout_width="103dp"
-        android:layout_height="63dp"
-        android:text="push the button above!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.672"
-        app:layout_constraintStart_toEndOf="@+id/SignalView"
-        app:layout_constraintTop_toBottomOf="@+id/buttonWifi"
-        app:layout_constraintVertical_bias="0.067" />
-
-    <Button
-        android:id="@+id/noiseButton"
-        android:layout_width="wrap_content"
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="29dp"
-        android:text="Get Noise"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.083"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/SignalView"
-        app:layout_constraintVertical_bias="0.017" />
+        app:menu="@menu/bottom_nav_menu" >
 
-    <TextView
-        android:id="@+id/noiseView"
-        android:layout_width="111dp"
-        android:layout_height="67dp"
-        android:text="Noise will appear here!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.076"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/noiseButton"
-        app:layout_constraintVertical_bias="0.141" />
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
