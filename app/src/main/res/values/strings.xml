@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">transceiver-go</string>
-    <string name="click">click the button!</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="new_measurement">new measurement</string>
+    <string name="new_wifi_measurement">new wifi measurement</string>
+    <string name="new_internet_connection_measurement">new internet connection measurement</string>
+    <string name="new_noise_measurement">new noise measurement</string>
 </resources>

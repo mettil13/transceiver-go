@@ -1,21 +1,22 @@
 package app_mobili.transceiver_go;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.room.RoomSQLiteQuery;
 
 import android.os.Bundle;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Toast;
-
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 
 import app_mobili.transceiver_go.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
+
+    private boolean isAddSelected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
         ActivityMainBinding binding;
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()){
                 case R.id.mapButton:
@@ -44,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
         });
         replaceFragment(R.id.fragmentContainer, mainMap);
 
+        setUpMeasurementButtons(binding);
+
     }
 
 
@@ -54,6 +58,103 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.setReorderingAllowed(true);
         fragmentTransaction.replace(containerId, newFragment);
         fragmentTransaction.commit();
+    }
+
+    private void setUpMeasurementButtons(ActivityMainBinding binding){
+        // animations initialization
+        Animation rotateOpen = AnimationUtils.loadAnimation(this, R.anim.rotate_open_animation);
+        Animation rotateClose = AnimationUtils.loadAnimation(this, R.anim.rotate_close_animation);
+        Animation fromBottomShow = AnimationUtils.loadAnimation(this, R.anim.from_bottom_show_animation);
+        Animation toBottomHide = AnimationUtils.loadAnimation(this, R.anim.to_bottom_hide_animation);
+
+        // on click
+        binding.newMeasurementButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                isAddSelected = !isAddSelected;
+                if(isAddSelected){
+                    // animations
+                    binding.newMeasurementButton.startAnimation(rotateOpen);
+                    binding.newWiFiMeasurementButton.startAnimation(fromBottomShow);
+                    binding.newInternetConnectionMeasurementButton.startAnimation(fromBottomShow);
+                    binding.newNoiseMeasurementButton.startAnimation(fromBottomShow);
+                    // clickable
+                    binding.newWiFiMeasurementButton.setClickable(true);
+                    binding.newInternetConnectionMeasurementButton.setClickable(true);
+                    binding.newNoiseMeasurementButton.setClickable(true);
+                    // long clickable
+                    binding.newWiFiMeasurementButton.setLongClickable(true);
+                    binding.newInternetConnectionMeasurementButton.setLongClickable(true);
+                    binding.newNoiseMeasurementButton.setLongClickable(true);
+                }
+                else {
+                    binding.newMeasurementButton.startAnimation(rotateClose);
+                    binding.newWiFiMeasurementButton.startAnimation(toBottomHide);
+                    binding.newInternetConnectionMeasurementButton.startAnimation(toBottomHide);
+                    binding.newNoiseMeasurementButton.startAnimation(toBottomHide);
+
+                    binding.newWiFiMeasurementButton.setClickable(false);
+                    binding.newInternetConnectionMeasurementButton.setClickable(false);
+                    binding.newNoiseMeasurementButton.setClickable(false);
+
+                    binding.newWiFiMeasurementButton.setLongClickable(false);
+                    binding.newInternetConnectionMeasurementButton.setLongClickable(false);
+                    binding.newNoiseMeasurementButton.setLongClickable(false);
+                }
+            }
+        });
+        binding.newWiFiMeasurementButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+        binding.newInternetConnectionMeasurementButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+        binding.newNoiseMeasurementButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        // on long click
+        binding.newMeasurementButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                Toast toast = Toast.makeText(view.getContext(), R.string.new_measurement, Toast.LENGTH_SHORT);
+                toast.show();
+                return true;
+            }
+        });
+        binding.newWiFiMeasurementButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                Toast toast = Toast.makeText(view.getContext(), R.string.new_wifi_measurement, Toast.LENGTH_SHORT);
+                toast.show();
+                return true;
+            }
+        });
+        binding.newInternetConnectionMeasurementButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                Toast toast = Toast.makeText(view.getContext(), R.string.new_internet_connection_measurement, Toast.LENGTH_SHORT);
+                toast.show();
+                return true;
+            }
+        });
+        binding.newNoiseMeasurementButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                Toast toast = Toast.makeText(view.getContext(), R.string.new_noise_measurement, Toast.LENGTH_SHORT);
+                toast.show();
+                return true;
+            }
+        });
     }
 
 }

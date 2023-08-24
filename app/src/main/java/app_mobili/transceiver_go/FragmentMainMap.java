@@ -53,7 +53,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ((SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.mainMap)).getMapAsync(this);
+        ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.mainMap)).getMapAsync(this);
     }
 
     @Override

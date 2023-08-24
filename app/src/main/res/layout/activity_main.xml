@@ -6,14 +6,68 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/newMeasurementButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:longClickable="true"
+        android:src="@drawable/add_dark"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/newWiFiMeasurementButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:longClickable="true"
+        android:src="@drawable/wifi_dark"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/newMeasurementButton"
+        app:layout_constraintEnd_toEndOf="@+id/newMeasurementButton" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/newInternetConnectionMeasurementButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:longClickable="true"
+        android:src="@drawable/internet_connection_dark"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/newWiFiMeasurementButton"
+        app:layout_constraintEnd_toEndOf="@+id/newWiFiMeasurementButton" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/newNoiseMeasurementButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:longClickable="true"
+        android:src="@drawable/audio_dark"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/newInternetConnectionMeasurementButton"
+        app:layout_constraintEnd_toEndOf="@+id/newInternetConnectionMeasurementButton" />
+
     <FrameLayout
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
 
     </FrameLayout>
 
