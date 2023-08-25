@@ -1,7 +1,5 @@
 package app_mobili.transceiver_go;
 
-import android.util.Pair;
-
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -18,16 +16,15 @@ public class Square {
     @NonNull
     @ColumnInfo(name="SquareID")
     // X,Y,L coordinates
-    String coordinates;
+    String coordinates = "0|0:0"; // initialized, but should always be overwritten
 
     //square centre coordinates can't be non integer numbers so i'll keep 'em this way
     @ColumnInfo(name="X")
-    protected int latitude;
+    protected double latitude;
     @ColumnInfo(name="Y")
-    protected int longitude;
-    @NonNull
+    protected double longitude;
     @ColumnInfo(name="Length")
-    protected int sideLength;
+    protected double sideLength;
     @ColumnInfo(name="Network Signal Strength")
     protected int network;
     @ColumnInfo(name="Wifi Signal Strength")
@@ -43,23 +40,27 @@ public class Square {
 
     }
 
-    // X,Y coordinates 0 = X , 1 = Y
-    // L values are measured in Meters and have to be integers
     public Square(double latitude, double longitude, int sideLength){
         // first we make sure that the provided coordinates are valid
         latitude = toValidLatitude(latitude);
         longitude = toValidLongitude(longitude);
-        // coordinates provided will get rounded to nearest square coordinates
-        Pair<Integer,Integer> block = new Pair<>(Math.round((float)latitude / sideLength),Math.round((float)longitude / sideLength)); // now latitude and longitude can be casted to float because they are real earth coordinates
-        // then to find the X,Y coordinates of square (M,N) we multiply by the requested length l
-        // to mathematically get the center of the square we want
-        this.latitude = block.first * sideLength;
-        this.longitude = block.second * sideLength;
+        // First, calculate the block indices (rounded to nearest) for latitude and longitude
+        int blockLatitude = (int) Math.round(latitude / sideLength);
+        int blockLongitude = (int) Math.round(longitude / sideLength);
+
+        // Then, calculate the center of the square using the block indices and side length
+        //                      v block number  v side length  v offset
+        double centerLatitude = blockLatitude * sideLength + sideLength / (double) 2;
+        double centerLongitude = blockLongitude * sideLength + sideLength / (double) 2; // constructor cries about 2 being an integer
+
+        // Set the calculated center and other attributes
+        this.latitude = centerLatitude;
+        this.longitude = centerLongitude;
         this.sideLength = sideLength;
 
         // i'm sorry this primary key has to be a string with this format, but this is the best
         // solution for readability than a meaningless integer id.
-        coordinates =this.latitude +"."+this.longitude +"/"+this.sideLength;
+        coordinates =this.latitude +"|"+this.longitude +":"+this.sideLength;
 
         network = -1;
         wifi = -1;
@@ -67,10 +68,10 @@ public class Square {
     }
 
     public Polygon drawTile(GoogleMap googleMap, int strokeColor, int fillColor) {
-        LatLng upLeft = new LatLng(toValidLatitude(latitude - (double)sideLength / 2), toValidLongitude(longitude + (double)sideLength / 2));
-        LatLng downLeft = new LatLng(toValidLatitude(latitude + (double)sideLength / 2), toValidLongitude(longitude + (double)sideLength / 2));
-        LatLng downRight = new LatLng(toValidLatitude(latitude + (double)sideLength / 2), toValidLongitude(longitude - (double)sideLength / 2));
-        LatLng upRight = new LatLng(toValidLatitude(latitude - (double)sideLength / 2), toValidLongitude(longitude - (double)sideLength / 2));
+        LatLng upLeft = new LatLng(toValidLatitude(latitude - sideLength / 2), toValidLongitude(longitude + sideLength / 2));
+        LatLng downLeft = new LatLng(toValidLatitude(latitude + sideLength / 2), toValidLongitude(longitude + sideLength / 2));
+        LatLng downRight = new LatLng(toValidLatitude(latitude + sideLength / 2), toValidLongitude(longitude - sideLength / 2));
+        LatLng upRight = new LatLng(toValidLatitude(latitude - sideLength / 2), toValidLongitude(longitude - sideLength / 2));
         Polygon tile = googleMap.addPolygon(new PolygonOptions().add(upLeft, downLeft, downRight, upRight));
         tile.setStrokeColor(strokeColor);
         tile.setFillColor(fillColor);
@@ -99,6 +100,22 @@ public class Square {
         return longitude;
     }
 
+    public void updateNetwork(int network) {
+        // (currentAverage * numberOfElements) + newNumber) / (numberOfElements + 1);
+        //        numberOfElements++;
+        this.network = (this.network*networkAverageCounter + network)/ ++networkAverageCounter;
+    }
+
+    public void updateWifi(int wifi) {
+        this.wifi = (this.wifi*wifiAverageCounter + wifi)/ ++wifiAverageCounter;
+    }
+
+    public void updateNoise(int noise) {
+        this.noise = (this.noise*noiseAverageCounter + noise)/ ++noiseAverageCounter;
+    }
+
+
+    // SETTERS
     // NOTE: Set functions reset the average counters of a square
     // for the interested value, eg. setNetwork resets the networkAverageCounter
     public void setNetwork(int network) {
@@ -116,20 +133,20 @@ public class Square {
         this.noise = noise;
     }
 
-    public void updateNetwork(int network) {
-        // (currentAverage * numberOfElements) + newNumber) / (numberOfElements + 1);
-        //        numberOfElements++;
-        this.network = (this.network*networkAverageCounter + network)/ ++networkAverageCounter;
+    // GETTERS
+    public int getNetwork() {
+        return network;
     }
 
-    public void updateWifi(int wifi) {
-        this.wifi = (this.wifi*wifiAverageCounter + wifi)/ ++wifiAverageCounter;
+    public int getWifi() {
+        return wifi;
     }
 
-    public void updateNoise(int noise) {
-        this.noise = (this.noise*noiseAverageCounter + noise)/ ++noiseAverageCounter;
+    public int getNoise() {
+        return noise;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Square{" +
