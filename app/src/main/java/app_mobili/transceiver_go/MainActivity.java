@@ -1,10 +1,13 @@
 package app_mobili.transceiver_go;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.room.RoomSQLiteQuery;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import android.os.Bundle;
 import android.view.View;
@@ -17,6 +20,9 @@ import app_mobili.transceiver_go.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
 
     private boolean isAddSelected = false;
+
+    SquareDatabase squaredb;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +53,31 @@ public class MainActivity extends AppCompatActivity {
         replaceFragment(R.id.fragmentContainer, mainMap);
 
         setUpMeasurementButtons(binding);
+        RoomDatabase.Callback myCallback = new RoomDatabase.Callback() {
+            @Override
+            public void onCreate(@NonNull SupportSQLiteDatabase db) {
+                super.onCreate(db);
+            }
+
+            @Override
+            public void onOpen(@NonNull SupportSQLiteDatabase db) {
+                super.onOpen(db);
+            }
+        };
+
+        // setting the database
+        squaredb = Room.databaseBuilder(this, SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
+
+        new Thread(() -> {
+            Square s1 = new Square(50,50,5);
+            SquareDatabase.migration.migrate(squaredb.getOpenHelper().getWritableDatabase());
+            squaredb.getSquareDAO().upsertSquare(s1);
+            s1 = squaredb.getSquareDAO().getYourSquare(52,52,5);
+
+            System.out.println(s1.toString());
+
+
+        }).start();
 
     }
 

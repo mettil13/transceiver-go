@@ -18,7 +18,6 @@ public class Square {
     // X,Y,L coordinates
     String coordinates = "0|0:0"; // initialized, but should always be overwritten
 
-    //square centre coordinates can't be non integer numbers so i'll keep 'em this way
     @ColumnInfo(name="X")
     protected double latitude;
     @ColumnInfo(name="Y")
@@ -49,9 +48,9 @@ public class Square {
         int blockLongitude = (int) Math.round(longitude / sideLength);
 
         // Then, calculate the center of the square using the block indices and side length
-        //                      v block number  v side length  v offset
-        double centerLatitude = blockLatitude * sideLength + sideLength / (double) 2;
-        double centerLongitude = blockLongitude * sideLength + sideLength / (double) 2; // constructor cries about 2 being an integer
+        //                      v block number  v side length
+        double centerLatitude = blockLatitude * sideLength;
+        double centerLongitude = blockLongitude * sideLength;
 
         // Set the calculated center and other attributes
         this.latitude = centerLatitude;
