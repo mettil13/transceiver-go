@@ -1,13 +1,10 @@
 package app_mobili.transceiver_go;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.room.Room;
-import androidx.room.RoomDatabase;
-import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import android.os.Bundle;
 import android.view.View;
@@ -53,17 +50,6 @@ public class MainActivity extends AppCompatActivity {
         replaceFragment(R.id.fragmentContainer, mainMap);
 
         setUpMeasurementButtons(binding);
-        RoomDatabase.Callback myCallback = new RoomDatabase.Callback() {
-            @Override
-            public void onCreate(@NonNull SupportSQLiteDatabase db) {
-                super.onCreate(db);
-            }
-
-            @Override
-            public void onOpen(@NonNull SupportSQLiteDatabase db) {
-                super.onOpen(db);
-            }
-        };
 
         // setting the database
         squaredb = Room.databaseBuilder(this, SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();

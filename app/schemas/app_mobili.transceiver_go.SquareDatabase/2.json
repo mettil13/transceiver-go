@@ -1,0 +1,88 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "6bf57e025eada3ad5bd254ed0a67c752",
+    "entities": [
+      {
+        "tableName": "Square",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`SquareID` TEXT NOT NULL, `X` REAL NOT NULL, `Y` REAL NOT NULL, `Length` REAL NOT NULL, `Network Signal Strength` INTEGER NOT NULL, `Wifi Signal Strength` INTEGER NOT NULL, `Noise Strength` INTEGER NOT NULL, `noiseAverageCounter` INTEGER NOT NULL, `wifiAverageCounter` INTEGER NOT NULL, `networkAverageCounter` INTEGER NOT NULL, PRIMARY KEY(`SquareID`))",
+        "fields": [
+          {
+            "fieldPath": "coordinates",
+            "columnName": "SquareID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "X",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "Y",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sideLength",
+            "columnName": "Length",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "network",
+            "columnName": "Network Signal Strength",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wifi",
+            "columnName": "Wifi Signal Strength",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noise",
+            "columnName": "Noise Strength",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noiseAverageCounter",
+            "columnName": "noiseAverageCounter",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wifiAverageCounter",
+            "columnName": "wifiAverageCounter",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "networkAverageCounter",
+            "columnName": "networkAverageCounter",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "SquareID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6bf57e025eada3ad5bd254ed0a67c752')"
+    ]
+  }
+}

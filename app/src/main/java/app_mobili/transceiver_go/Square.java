@@ -3,6 +3,7 @@ package app_mobili.transceiver_go;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -39,6 +40,7 @@ public class Square {
 
     }
 
+    @Ignore
     public Square(double latitude, double longitude, int sideLength){
         // first we make sure that the provided coordinates are valid
         latitude = toValidLatitude(latitude);
