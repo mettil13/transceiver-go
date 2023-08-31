@@ -36,9 +36,9 @@ public interface SquareDAO {
     // BEWARE, if the are is not completely in the positive emisphere
     // function returns nothing
     @Query("select * from Square " +
-            "WHERE `Length`==:l AND `X`>:topLeftX AND `X`<:bottomRightX " +
-            "AND `Y`<:topLeftY AND `Y`>:bottomRightY " +
-            "AND :topLeftX>0 AND :bottomRightX<180")
+            "WHERE `Length`==:l AND `X`>=:topLeftX AND `X`<=:bottomRightX " +
+            "AND `Y`<=:topLeftY AND `Y`>=:bottomRightY " +
+            "AND :topLeftX>=0 AND :bottomRightX<=180")
     List<Square> getAllSquaresInPositiveEmisphereRange(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY, double l);
 
     // returns a list of squares from the negative emisphere of l length,
@@ -47,9 +47,9 @@ public interface SquareDAO {
     // BEWARE, if the are is not completely in the negative emisphere
     // function returns nothing
     @Query("select * from Square " +
-            "WHERE `Length`==:l AND `X`>:topLeftX AND `X`<:bottomRightX " +
-            "AND `Y`<:topLeftY AND `Y`>:bottomRightY " +
-            "AND :topLeftX<0 AND :bottomRightX>-180")
+            "WHERE `Length`==:l AND `X`>=:topLeftX AND `X`<=:bottomRightX " +
+            "AND `Y`<=:topLeftY AND `Y`>=:bottomRightY " +
+            "AND :topLeftX<=0 AND :bottomRightX>=-180")
     List<Square> getAllSquaresInNegativeEmisphereRange(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY, double l);
 
 }

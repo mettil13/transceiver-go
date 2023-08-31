@@ -1,7 +1,11 @@
 package app_mobili.transceiver_go;
 
+import android.graphics.drawable.AnimatedVectorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -10,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.ImageView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -101,5 +106,15 @@ public class FragmentSomethingElse extends Fragment implements NoiseStrength.Rec
         // Inflate the layout for this fragment
         return rootView;
 
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        /*
+        Drawable prova = ((ImageView) getView().findViewById(R.id.imageView)).getDrawable();
+        AnimatedVectorDrawable provaAnimata = (AnimatedVectorDrawable) prova;
+        provaAnimata.start();
+         */
     }
 }

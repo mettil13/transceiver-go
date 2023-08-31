@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
-            switch (item.getItemId()){
+            switch (item.getItemId()) {
                 case R.id.mapButton:
                     replaceFragment(R.id.fragmentContainer, mainMap);
                     break;
@@ -55,10 +55,18 @@ public class MainActivity extends AppCompatActivity {
         squaredb = Room.databaseBuilder(this, SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
 
         new Thread(() -> {
-            Square s1 = new Square(50,50,5);
+            Square s1 = new Square(50, 50, 5);
             SquareDatabase.migration.migrate(squaredb.getOpenHelper().getWritableDatabase());
             squaredb.getSquareDAO().upsertSquare(s1);
-            s1 = squaredb.getSquareDAO().getYourSquare(52,52,5);
+            squaredb.getSquareDAO().upsertSquare(new Square(1, 1, 5));
+            squaredb.getSquareDAO().upsertSquare(new Square(10, 10, 5));
+            squaredb.getSquareDAO().upsertSquare(new Square(10, 5, 5));
+            squaredb.getSquareDAO().upsertSquare(new Square(10, 15, 5));
+            squaredb.getSquareDAO().upsertSquare(new Square(20, 0, 5));
+            squaredb.getSquareDAO().upsertSquare(new Square(1, -10, 5));
+            squaredb.getSquareDAO().upsertSquare(new Square(-15, 5, 5));
+            squaredb.getSquareDAO().upsertSquare(new Square(-5, -5, 5));
+            s1 = squaredb.getSquareDAO().getYourSquare(52, 52, 5);
 
             System.out.println(s1.toString());
 
@@ -66,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
         }).start();
 
     }
-
 
 
     private void replaceFragment(int containerId, Fragment newFragment) {
@@ -77,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
-    private void setUpMeasurementButtons(ActivityMainBinding binding){
+    private void setUpMeasurementButtons(ActivityMainBinding binding) {
         // animations initialization
         Animation rotateOpen = AnimationUtils.loadAnimation(this, R.anim.rotate_open_animation);
         Animation rotateClose = AnimationUtils.loadAnimation(this, R.anim.rotate_close_animation);
@@ -89,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 isAddSelected = !isAddSelected;
-                if(isAddSelected){
+                if (isAddSelected) {
                     // animations
                     binding.newMeasurementButton.startAnimation(rotateOpen);
                     binding.newWiFiMeasurementButton.startAnimation(fromBottomShow);
@@ -103,8 +110,7 @@ public class MainActivity extends AppCompatActivity {
                     binding.newWiFiMeasurementButton.setLongClickable(true);
                     binding.newInternetConnectionMeasurementButton.setLongClickable(true);
                     binding.newNoiseMeasurementButton.setLongClickable(true);
-                }
-                else {
+                } else {
                     binding.newMeasurementButton.startAnimation(rotateClose);
                     binding.newWiFiMeasurementButton.startAnimation(toBottomHide);
                     binding.newInternetConnectionMeasurementButton.startAnimation(toBottomHide);

@@ -41,7 +41,7 @@ public class Square {
     }
 
     @Ignore
-    public Square(double latitude, double longitude, int sideLength){
+    public Square(double latitude, double longitude, double sideLength){
         // first we make sure that the provided coordinates are valid
         latitude = toValidLatitude(latitude);
         longitude = toValidLongitude(longitude);
@@ -159,5 +159,19 @@ public class Square {
                 ", wifi=" + wifi +
                 ", noise=" + noise +
                 '}';
+    }
+
+    public static class LatitudeComparator implements java.util.Comparator<Square>  {
+        @Override
+        public int compare(Square square1, Square square2) {
+            return Double.compare(square1.latitude, square2.latitude);
+        }
+    }
+
+    public static class LongitudeComparator implements java.util.Comparator<Square>  {
+        @Override
+        public int compare(Square square1, Square square2) {
+            return Double.compare(square1.longitude, square2.longitude);
+        }
     }
 }
