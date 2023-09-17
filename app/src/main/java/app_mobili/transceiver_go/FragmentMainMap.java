@@ -22,6 +22,7 @@ import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -86,44 +87,38 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
     public void onCameraMoveStarted(int i) {
         map.clear();
         VisibleRegion viewPort = map.getProjection().getVisibleRegion();
-        retrieveAndDrawSquares(viewPort.farLeft.longitude, viewPort.farLeft.latitude, viewPort.nearRight.longitude, viewPort.nearRight.latitude, 5);
-        /*
-        double viewPortRange;
-        if (viewPort.farLeft.longitude > 90 && viewPort.farRight.longitude < -90) { // in case one border has negative longitude and the other one has positive longitude and they are both near 180
-            viewPortRange = (180 - viewPort.farLeft.longitude) + (180 + viewPort.farRight.longitude);
-        } else {
-            viewPortRange = viewPort.farLeft.longitude - viewPort.farRight.longitude;
-        }
-        viewPortRange = Math.abs(viewPortRange);
-        Square tile = new Square(map.getCameraPosition().target.latitude, map.getCameraPosition().target.longitude, (int) viewPortRange);
-        tile.drawTile(map, 0xff000000, 0x66000000);
-         */
+        retrieveAndDrawSquares(new Longitude(viewPort.farLeft.longitude), new Latitude(viewPort.farLeft.latitude), new Longitude(viewPort.nearRight.longitude), new Latitude(viewPort.nearRight.latitude), 5);
     }
 
-    protected void retrieveAndDrawSquares(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY, double l) {
-        double negativeLeft;
-        double negativeRight;
-        double positiveLeft;
-        double positiveRight;
+    protected void retrieveAndDrawSquares(Longitude topLeftX, Latitude topLeftY, Longitude bottomRightX, Latitude bottomRightY, double l) {
+        topLeftX.subtract(topLeftX.getDistance(bottomRightX) / 2);
+        bottomRightX.add(topLeftX.getDistance(bottomRightX) / 2);
+        topLeftY.add(topLeftY.getDistance(bottomRightY) / 2);
+        bottomRightY.subtract(topLeftY.getDistance(bottomRightY) / 2);
 
-        if (topLeftX < 0 && bottomRightX < 0) {
-            positiveLeft = -1; // invalid value
-            positiveRight = -1;
+        Longitude negativeLeft;
+        Longitude negativeRight;
+        Longitude positiveLeft;
+        Longitude positiveRight;
+
+        if (topLeftX.getValue() < 0 && bottomRightX.getValue() < 0) {
+            positiveLeft = null;
+            positiveRight = null;
             negativeLeft = topLeftX;
             negativeRight = bottomRightX;
-        } else if (topLeftX < 0 && bottomRightX > 0) {
+        } else if (topLeftX.getValue() < 0 && bottomRightX.getValue() > 0) {
             negativeLeft = topLeftX;
-            negativeRight = 0;
-            positiveLeft = 0;
+            negativeRight = new Longitude(0);
+            positiveLeft = new Longitude(0);
             positiveRight = bottomRightX;
-        } else if (topLeftX > 0 && bottomRightX < 0) {
-            negativeLeft = -180;
+        } else if (topLeftX.getValue() > 0 && bottomRightX.getValue() < 0) {
+            negativeLeft = new Longitude(-180);
             negativeRight = bottomRightX;
             positiveLeft = topLeftX;
-            positiveRight = 180;
+            positiveRight = new Longitude(180);
         } else {  // topLeftX > 0 && bottomRightX > 0
-            negativeRight = 1; // invalid value
-            negativeLeft = 1;
+            negativeRight = null;
+            negativeLeft = null;
             positiveLeft = topLeftX;
             positiveRight = bottomRightX;
         }
@@ -131,11 +126,13 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
 
         new Thread(() -> {
             SquareDatabase squaredb = Room.databaseBuilder(getActivity(), SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
-            List<Square> positiveSquares = squaredb.getSquareDAO().getAllSquaresInPositiveEmisphereRange(positiveLeft, topLeftY, positiveRight, bottomRightY, l);
-            List<Square> negativeSquares = squaredb.getSquareDAO().getAllSquaresInNegativeEmisphereRange(negativeLeft, topLeftY, negativeRight, bottomRightY, l);
-
-            List<Square> squaresWithData = positiveSquares;
-            squaresWithData.addAll(negativeSquares);
+            List<Square> squaresWithData = new ArrayList<>();
+            if (positiveLeft != null && positiveRight != null) {
+                squaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInPositiveEmisphereRange(positiveLeft.getValue(), topLeftY.getValue(), positiveRight.getValue(), bottomRightY.getValue(), l));
+            }
+            if (negativeLeft != null && negativeRight != null) {
+                squaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInNegativeEmisphereRange(negativeLeft.getValue(), topLeftY.getValue(), negativeRight.getValue(), bottomRightY.getValue(), l));
+            }
 
             squaresWithData.sort(new Square.LongitudeComparator());
             squaresWithData.sort(new Square.LatitudeComparator());
@@ -143,8 +140,8 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
             Log.println(Log.ASSERT, "", squaresWithData.toString());
             // lat = y, lng = x
 
-            for (double i = topLeftX; i <= bottomRightX; i = i + l) {
-                for (double j = bottomRightY; j <= topLeftY; j = j + l) {
+            for (double i = topLeftX.getValue(); i <= bottomRightX.getValue(); i = i + l) {
+                for (double j = bottomRightY.getValue(); j <= topLeftY.getValue(); j = j + l) {
                     Square square = new Square(j, i, l);
                     getActivity().runOnUiThread(new Runnable() {
                         public void run() {

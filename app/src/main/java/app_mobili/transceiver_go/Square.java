@@ -15,39 +15,40 @@ import com.google.android.gms.maps.model.PolygonOptions;
 public class Square {
     @PrimaryKey()
     @NonNull
-    @ColumnInfo(name="SquareID")
+    @ColumnInfo(name = "SquareID")
     // X,Y,L coordinates
     String coordinates = "0|0:0"; // initialized, but should always be overwritten
 
-    @ColumnInfo(name="X")
-    protected double latitude;
-    @ColumnInfo(name="Y")
-    protected double longitude;
-    @ColumnInfo(name="Length")
+    @ColumnInfo(name = "X")
+    protected Latitude latitude; // a richer object to manage latitude, must always be synced with x
+    @ColumnInfo(name = "Y")
+    protected Longitude longitude; // a richer object to manage longitude, must always be synced with y
+    @ColumnInfo(name = "Length")
     protected double sideLength;
-    @ColumnInfo(name="Network Signal Strength")
+    @ColumnInfo(name = "Network Signal Strength")
     protected int network;
-    @ColumnInfo(name="Wifi Signal Strength")
+    @ColumnInfo(name = "Wifi Signal Strength")
     protected int wifi;
-    @ColumnInfo(name="Noise Strength")
+    @ColumnInfo(name = "Noise Strength")
     protected int noise;
     protected int noiseAverageCounter = 1;
     protected int wifiAverageCounter = 1;
     protected int networkAverageCounter = 1;
 
     // Empty constructor for room
-    public Square(){
 
+    public Square() {
     }
 
+
     @Ignore
-    public Square(double latitude, double longitude, double sideLength){
+    public Square(double x, double y, double sideLength) {
         // first we make sure that the provided coordinates are valid
-        latitude = toValidLatitude(latitude);
-        longitude = toValidLongitude(longitude);
+        latitude = new Latitude(x);
+        longitude = new Longitude(y);
         // First, calculate the block indices (rounded to nearest) for latitude and longitude
-        int blockLatitude = (int) Math.round(latitude / sideLength);
-        int blockLongitude = (int) Math.round(longitude / sideLength);
+        int blockLatitude = (int) Math.round(latitude.getValue() / sideLength);
+        int blockLongitude = (int) Math.round(longitude.getValue() / sideLength);
 
         // Then, calculate the center of the square using the block indices and side length
         //                      v block number  v side length
@@ -55,13 +56,13 @@ public class Square {
         double centerLongitude = blockLongitude * sideLength;
 
         // Set the calculated center and other attributes
-        this.latitude = centerLatitude;
-        this.longitude = centerLongitude;
+        latitude.setValue(centerLatitude);
+        longitude.setValue(centerLongitude);
         this.sideLength = sideLength;
 
         // i'm sorry this primary key has to be a string with this format, but this is the best
         // solution for readability than a meaningless integer id.
-        coordinates =this.latitude +"|"+this.longitude +":"+this.sideLength;
+        coordinates = this.latitude.getValue() + "|" + this.longitude.getValue() + ":" + this.sideLength;
 
         network = -1;
         wifi = -1;
@@ -69,50 +70,34 @@ public class Square {
     }
 
     public Polygon drawTile(GoogleMap googleMap, int strokeColor, int fillColor) {
-        LatLng upLeft = new LatLng(toValidLatitude(latitude - sideLength / 2), toValidLongitude(longitude + sideLength / 2));
-        LatLng downLeft = new LatLng(toValidLatitude(latitude + sideLength / 2), toValidLongitude(longitude + sideLength / 2));
-        LatLng downRight = new LatLng(toValidLatitude(latitude + sideLength / 2), toValidLongitude(longitude - sideLength / 2));
-        LatLng upRight = new LatLng(toValidLatitude(latitude - sideLength / 2), toValidLongitude(longitude - sideLength / 2));
+        // calculate the 4 corners of the tile:
+        // latitude - sideLength / 2 , longitude + sideLength / 2
+        LatLng upLeft = new LatLng(new Latitude(latitude.getValue()).subtract(sideLength / 2).getValue(), new Longitude(longitude.getValue()).add(sideLength / 2).getValue());
+        // latitude + sideLength / 2 , longitude + sideLength / 2
+        LatLng downLeft = new LatLng(new Latitude(latitude.getValue()).add(sideLength / 2).getValue(), new Longitude(longitude.getValue()).add(sideLength / 2).getValue());
+        // latitude + sideLength / 2 , longitude - sideLength / 2
+        LatLng downRight = new LatLng(new Latitude(latitude.getValue()).add(sideLength / 2).getValue(), new Longitude(longitude.getValue()).subtract(sideLength / 2).getValue());
+        // latitude - sideLength / 2 , longitude - sideLength / 2
+        LatLng upRight = new LatLng(new Latitude(latitude.getValue()).subtract(sideLength / 2).getValue(), new Longitude(longitude.getValue()).subtract(sideLength / 2).getValue());
+
         Polygon tile = googleMap.addPolygon(new PolygonOptions().add(upLeft, downLeft, downRight, upRight));
         tile.setStrokeColor(strokeColor);
         tile.setFillColor(fillColor);
         return tile;
     }
 
-    protected double toValidLatitude(double latitude) {
-        if (latitude > 89.99) { // check if latitude is a valid number, 90 degrees glitches the map, so we use 89.99 instead
-            latitude = 89.99;
-        } else if (latitude < -89.99) {
-            latitude = -89.99;
-        }
-
-        return latitude;
-    }
-
-    protected double toValidLongitude(double longitude) {
-        while (longitude > 180) { // check if longitude is a valid number, if it's bigger than 180 it gets converted into negative longitude
-            longitude = -180 + (longitude - 180);
-        }
-
-        while (longitude < -180) {
-            longitude = 180 + (longitude + 180);
-        }
-
-        return longitude;
-    }
-
     public void updateNetwork(int network) {
         // (currentAverage * numberOfElements) + newNumber) / (numberOfElements + 1);
         //        numberOfElements++;
-        this.network = (this.network*networkAverageCounter + network)/ ++networkAverageCounter;
+        this.network = (this.network * networkAverageCounter + network) / ++networkAverageCounter;
     }
 
     public void updateWifi(int wifi) {
-        this.wifi = (this.wifi*wifiAverageCounter + wifi)/ ++wifiAverageCounter;
+        this.wifi = (this.wifi * wifiAverageCounter + wifi) / ++wifiAverageCounter;
     }
 
     public void updateNoise(int noise) {
-        this.noise = (this.noise*noiseAverageCounter + noise)/ ++noiseAverageCounter;
+        this.noise = (this.noise * noiseAverageCounter + noise) / ++noiseAverageCounter;
     }
 
 
@@ -120,7 +105,7 @@ public class Square {
     // NOTE: Set functions reset the average counters of a square
     // for the interested value, eg. setNetwork resets the networkAverageCounter
     public void setNetwork(int network) {
-        networkAverageCounter= 1;
+        networkAverageCounter = 1;
         this.network = network;
     }
 
@@ -161,17 +146,17 @@ public class Square {
                 '}';
     }
 
-    public static class LatitudeComparator implements java.util.Comparator<Square>  {
+    public static class LatitudeComparator implements java.util.Comparator<Square> {
         @Override
         public int compare(Square square1, Square square2) {
-            return Double.compare(square1.latitude, square2.latitude);
+            return Double.compare(square1.latitude.getValue(), square2.latitude.getValue());
         }
     }
 
-    public static class LongitudeComparator implements java.util.Comparator<Square>  {
+    public static class LongitudeComparator implements java.util.Comparator<Square> {
         @Override
         public int compare(Square square1, Square square2) {
-            return Double.compare(square1.longitude, square2.longitude);
+            return Double.compare(square1.longitude.getValue(), square2.longitude.getValue());
         }
     }
 }

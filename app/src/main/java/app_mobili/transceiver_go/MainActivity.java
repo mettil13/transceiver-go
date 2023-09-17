@@ -51,12 +51,12 @@ public class MainActivity extends AppCompatActivity {
 
         setUpMeasurementButtons(binding);
 
+        //this.deleteDatabase("squaredb");
         // setting the database
         squaredb = Room.databaseBuilder(this, SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
 
         new Thread(() -> {
             Square s1 = new Square(50, 50, 5);
-            SquareDatabase.migration.migrate(squaredb.getOpenHelper().getWritableDatabase());
             squaredb.getSquareDAO().upsertSquare(s1);
             squaredb.getSquareDAO().upsertSquare(new Square(1, 1, 5));
             squaredb.getSquareDAO().upsertSquare(new Square(10, 10, 5));
