@@ -71,6 +71,12 @@ public class MainActivity extends AppCompatActivity {
             squaredb.getSquareDAO().upsertSquare(new Square(1, -10, 5));
             squaredb.getSquareDAO().upsertSquare(new Square(-15, 5, 5));
             squaredb.getSquareDAO().upsertSquare(new Square(-5, -5, 5));
+            squaredb.getSquareDAO().upsertSquare(new Square(44.500, 11.4, 0.001));
+            squaredb.getSquareDAO().upsertSquare(new Square(44.501, 11.4, 0.001));
+            squaredb.getSquareDAO().upsertSquare(new Square(44.472, 11.393, 0.001));
+            squaredb.getSquareDAO().upsertSquare(new Square(44.473, 11.393, 0.001));
+            squaredb.getSquareDAO().upsertSquare(new Square(11.393, 44.473, 0.001));
+            squaredb.getSquareDAO().upsertSquare(new Square(44.473466, 11.394963, 0.001));
             s1 = squaredb.getSquareDAO().getYourSquare(52, 52, 5);
 
             System.out.println(s1.toString());
