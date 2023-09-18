@@ -5,18 +5,22 @@
         android:id="@+id/mapButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="map"
-        android:icon="@drawable/map_dark"/>
+        android:icon="@drawable/map_dark"
+        android:title="@string/map" />
     <item
         android:id="@+id/gameButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="game"
-        android:icon="@drawable/game_dark"/>
+        android:icon="@drawable/game_dark"
+        android:title="@string/game" />
     <item
         android:id="@+id/somethingElseButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="something else"
-        android:icon="@drawable/something_else_dark"/>
+        android:icon="@drawable/something_else_dark"
+        android:title="@string/something_else" />
+    <item
+        android:id="@+id/settingsButton"
+        android:icon="@drawable/baseline_settings_24"
+        android:title="@string/settings" />
 </menu>

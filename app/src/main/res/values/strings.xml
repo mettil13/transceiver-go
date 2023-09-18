@@ -4,15 +4,21 @@
     <string name="new_wifi_measurement">new wifi measurement</string>
     <string name="new_internet_connection_measurement">new internet connection measurement</string>
     <string name="new_noise_measurement">new noise measurement</string>
-    <string name="settings">Transciver GO! Preferences</string>
+    <!-- Strings for bottom nav menu -->
+    <string name="map">Map</string>
+    <string name="game">Game map</string>
+    <string name="something_else">Something else</string>
+    <string name="settings">Settings</string>
+
     <!-- Preference Titles -->
     <string name="measurements">Measurement Preferences</string>
+    <string name="personalization">Personalization</string>
     <!-- Strings for the measurements preferences -->
     <string name="automatic_measurements">Automatic Measurements</string>
     <string name="measure_lte_umps">Measure LTE/UMPS</string>
     <string name="measure_wifi">Measure Wifi</string>
     <string name="measure_noise">Measure Noise</string>
     <string name="measure_interval">Measure Every (minutes)</string>
-    <string name="num_kept_measurements">Number of Kept Measurements</string>
-    <string name="personalization">Personalization</string>
+    <string name="num_kept_measurements">Number of Accounted Measurements</string>
+
 </resources>

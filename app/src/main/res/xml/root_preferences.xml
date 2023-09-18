@@ -1,5 +1,7 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
 
     <PreferenceCategory app:title="@string/measurements">
         <!-- SwitchPreferenceCompat for Automatic Measurements -->
@@ -26,14 +28,14 @@
             app:dependency="automatic_measurements" />
 
         <!-- Edit TextPreference for Measure every n minutes -->
-        <EditTextPreference
+        <SeekBarPreference
             app:key="measure_interval"
             app:title="@string/measure_interval"
             app:useSimpleSummaryProvider="true"
             app:dependency="automatic_measurements"
             app:disableDependentsState="false"
             app:defaultValue="5"
-            android:inputType="number"
+            android:max="10"
             />
 
         <!-- Edit TextPreference for Number of Kept Measurements -->
@@ -43,6 +45,7 @@
             app:useSimpleSummaryProvider="true"
             app:defaultValue="10"
             android:inputType="number"
+
             />
 
     </PreferenceCategory>

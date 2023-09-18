@@ -1,17 +1,19 @@
 package app_mobili.transceiver_go;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.room.Room;
-
-import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.PreferenceManager;
+import androidx.room.Room;
 
 import app_mobili.transceiver_go.databinding.ActivityMainBinding;
 
@@ -26,17 +28,21 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this); // Use getContext() in a Fragment or this in an Activity
+
+        //int lastMeasurements = sharedPreferences.getInt("num_kept_measurements",0);
+        //Log.println(Log.ASSERT,"lastmes", lastMeasurements+"");
+
+
         Fragment mainMap = new FragmentMainMap();
         Fragment gameMap = new FragmentGameMap();
         Fragment somethingElse = new FragmentSomethingElse();
+        Fragment settings = new FragmentSettings();
 
         ActivityMainBinding binding;
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        binding.settingsButton.setOnClickListener(listener -> {
-            startActivity(new Intent(MainActivity.this, SettingsActivity.class));
-        });
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
@@ -49,6 +55,12 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.somethingElseButton:
                     replaceFragment(R.id.fragmentContainer, somethingElse);
                     break;
+                case R.id.settingsButton:
+                    //replaceFragment(R.id.fragmentContainer, settings);
+
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragmentContainer, settings)
+                            .commit();
             }
             return true;
         });

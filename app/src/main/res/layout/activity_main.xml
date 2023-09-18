@@ -46,19 +46,6 @@
         app:layout_constraintEnd_toEndOf="@+id/newInternetConnectionMeasurementButton" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/settingsButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.954"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.058"
-        app:srcCompat="@drawable/baseline_settings_24" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/newMeasurementButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -89,8 +76,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/fragmentContainer"
-        android:layout_width="414dp"
-        android:layout_height="720dp"
+        android:layout_width="411dp"
+        android:layout_height="672dp"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.247"
