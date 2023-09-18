@@ -1,5 +1,6 @@
 package app_mobili.transceiver_go;
 
+import android.graphics.Point;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,6 +19,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.TileOverlay;
@@ -39,8 +41,9 @@ import com.google.maps.android.heatmaps.WeightedLatLng;
  * Use the {@link FragmentMainMap#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FragmentMainMap extends Fragment implements OnMapReadyCallback, GoogleMap.OnCameraMoveStartedListener {
+public class FragmentMainMap extends Fragment implements OnMapReadyCallback, GoogleMap.OnCameraMoveStartedListener, GoogleMap.OnCameraMoveListener, GoogleMap.OnCameraIdleListener {
     protected GoogleMap map;
+    protected HeatmapTileProvider heatmapProvider;
 
     public FragmentMainMap() {
         // Required empty public constructor
@@ -85,14 +88,38 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         */
         map = googleMap;
         map.setOnCameraMoveStartedListener(this);
+        map.setOnCameraMoveListener(this);
+        map.setOnCameraIdleListener(this);
     }
 
     @Override
     public void onCameraMoveStarted(int i) {
-        map.clear();
         VisibleRegion viewPort = map.getProjection().getVisibleRegion();
         //retrieveAndDrawSquares(new Longitude(viewPort.farLeft.longitude), new Latitude(viewPort.farLeft.latitude), new Longitude(viewPort.nearRight.longitude), new Latitude(viewPort.nearRight.latitude), 5);
-        retrieveSquaresAndDrawHeatmap(new Longitude(viewPort.farLeft.longitude), new Latitude(viewPort.farLeft.latitude), new Longitude(viewPort.nearRight.longitude), new Latitude(viewPort.nearRight.latitude), 5);
+    }
+
+    @Override
+    public void onCameraMove(){
+
+    }
+
+    @Override
+    public void onCameraIdle() {
+        map.clear();
+        retrieveSquaresAndDrawHeatmap();
+
+        map.addMarker(new MarkerOptions().position((new LatLng(44.500, 11.4))));
+        map.addMarker(new MarkerOptions().position((new LatLng(44.501, 11.4))));
+        Point p1 = map.getProjection().toScreenLocation(new LatLng(44.500, 11.4));
+        Point p2 = map.getProjection().toScreenLocation(new LatLng(44.501, 11.4));
+        //Log.println(Log.ASSERT, "", "" + (p1.y - p2.y));
+        if(heatmapProvider != null){ // doesn't work because of asynchronicity 
+            if(p1.y - p2.y > 10){
+                heatmapProvider.setRadius(p1.y - p2.y);
+            } else {
+                heatmapProvider.setRadius(10);
+            }
+        }
     }
 
     protected void retrieveAndDrawSquares(Longitude topLeftX, Latitude topLeftY, Longitude bottomRightX, Latitude bottomRightY, double l) {
@@ -168,54 +195,13 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
 
     }
 
-    protected void retrieveSquaresAndDrawHeatmap(Longitude topLeftX, Latitude topLeftY, Longitude bottomRightX, Latitude bottomRightY, double l) {
-        // for now it is drawn the heatmap of the entire globe
-        /*
-        topLeftX.subtract(topLeftX.getDistance(bottomRightX) / 2);
-        bottomRightX.add(topLeftX.getDistance(bottomRightX) / 2);
-        topLeftY.add(topLeftY.getDistance(bottomRightY) / 2);
-        bottomRightY.subtract(topLeftY.getDistance(bottomRightY) / 2);
+    protected void retrieveSquaresAndDrawHeatmap() {
 
-        Longitude negativeLeft;
-        Longitude negativeRight;
-        Longitude positiveLeft;
-        Longitude positiveRight;
-
-        if (topLeftX.getValue() < 0 && bottomRightX.getValue() < 0) {
-            positiveLeft = null;
-            positiveRight = null;
-            negativeLeft = topLeftX;
-            negativeRight = bottomRightX;
-        } else if (topLeftX.getValue() < 0 && bottomRightX.getValue() > 0) {
-            negativeLeft = topLeftX;
-            negativeRight = new Longitude(0);
-            positiveLeft = new Longitude(0);
-            positiveRight = bottomRightX;
-        } else if (topLeftX.getValue() > 0 && bottomRightX.getValue() < 0) {
-            negativeLeft = new Longitude(-180);
-            negativeRight = bottomRightX;
-            positiveLeft = topLeftX;
-            positiveRight = new Longitude(180);
-        } else {  // topLeftX > 0 && bottomRightX > 0
-            negativeRight = null;
-            negativeLeft = null;
-            positiveLeft = topLeftX;
-            positiveRight = bottomRightX;
-        }
-        */
-
-        new Thread(() -> {
+            new Thread(() -> {
             SquareDatabase squaredb = Room.databaseBuilder(getActivity(), SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
             List<Square> squaresWithData = new ArrayList<>();
             squaresWithData.addAll(squaredb.getSquareDAO().getAllSquares());
-            /*
-            if (positiveLeft != null && positiveRight != null) {
-                squaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInPositiveEmisphereRange(positiveLeft.getValue(), topLeftY.getValue(), positiveRight.getValue(), bottomRightY.getValue(), l));
-            }
-            if (negativeLeft != null && negativeRight != null) {
-                squaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInNegativeEmisphereRange(negativeLeft.getValue(), topLeftY.getValue(), negativeRight.getValue(), bottomRightY.getValue(), l));
-            }
-             */
+
 
             List<WeightedLatLng> heatmapPoints = new ArrayList<>();
             squaresWithData.forEach( square -> {
@@ -225,30 +211,19 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
             if(!heatmapPoints.isEmpty()){
                 getActivity().runOnUiThread(new Runnable() {
                     public void run() {
-                        HeatmapTileProvider provider = new HeatmapTileProvider.Builder().weightedData(heatmapPoints).build();
-                        // TODO: create a function to calculate at runtime a reasonable radius
-                        provider.setRadius(150); // HeatmapTileProvider.Builder().radius() accepts only values between 0 and 50, provider.setRadius() instead accepts every value
+                        heatmapProvider = new HeatmapTileProvider.Builder().weightedData(heatmapPoints).build();
+                        //heatmapProvider.setRadius(calculateProperHeatmapRadiusBasedOnZoom(map.getCameraPosition().zoom)); // HeatmapTileProvider.Builder().radius() accepts only values between 0 and 50, provider.setRadius() instead accepts every value
                         // TODO: replace this value with the maximum intensity that a measurement can reach
-                        provider.setMaxIntensity(1);
-                        TileOverlay overlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(provider));
+                        heatmapProvider.setMaxIntensity(1);
+                        TileOverlay overlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(heatmapProvider));
                     }
                 });
             }
 
-
-            /*
-            for (double i = topLeftX.getValue(); i <= bottomRightX.getValue(); i = i + l) {
-                for (double j = bottomRightY.getValue(); j <= topLeftY.getValue(); j = j + l) {
-                    Square square = new Square(j, i, l);
-                    getActivity().runOnUiThread(new Runnable() {
-                        public void run() {
-                            square.drawTile(map, 0xff000000, 0x66000000);
-                        }
-                    });
-                }
-            }
-            */
         }).start();
+    }
 
+    private int calculateProperHeatmapRadiusBasedOnZoom(float zoom){
+        return 150;
     }
 }
