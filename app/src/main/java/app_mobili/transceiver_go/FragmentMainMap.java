@@ -230,7 +230,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         } else if (p1.y - p2.y > 500) { // NEVER use the heatmap with this zoom level or higher: an OutOfMemoryError may occur
             return 500;
         } else {
-            return 15;
+            return getContext().getResources().getInteger(R.integer.min_cluster_dimension_in_pixel);
         }
     }
 }
