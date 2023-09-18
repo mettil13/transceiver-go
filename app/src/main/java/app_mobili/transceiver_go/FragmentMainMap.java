@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
@@ -99,26 +100,21 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
     }
 
     @Override
-    public void onCameraMove(){
+    public void onCameraMove() {
 
     }
 
     @Override
     public void onCameraIdle() {
         map.clear();
-        retrieveSquaresAndDrawHeatmap();
-
-        map.addMarker(new MarkerOptions().position((new LatLng(44.500, 11.4))));
-        map.addMarker(new MarkerOptions().position((new LatLng(44.501, 11.4))));
-        Point p1 = map.getProjection().toScreenLocation(new LatLng(44.500, 11.4));
-        Point p2 = map.getProjection().toScreenLocation(new LatLng(44.501, 11.4));
-        //Log.println(Log.ASSERT, "", "" + (p1.y - p2.y));
-        if(heatmapProvider != null){ // doesn't work because of asynchronicity 
-            if(p1.y - p2.y > 10){
-                heatmapProvider.setRadius(p1.y - p2.y);
-            } else {
-                heatmapProvider.setRadius(10);
-            }
+        Log.println(Log.ASSERT, "", "" + map.getCameraPosition().zoom);
+        // The heatmap uses too many resources when the user zooms in, while the grid uses too many resources when the user zooms out.
+        // So the heatmap is used with low zoom levels and the grid with higher ones.
+        if (map.getCameraPosition().zoom < 16) { // I really don't like those hardcoded constants, but it seems to be the only way possible
+            retrieveSquaresAndDrawHeatmap();
+        } else {
+            VisibleRegion viewPort = map.getProjection().getVisibleRegion();
+            retrieveAndDrawSquares(new Longitude(viewPort.farLeft.longitude), new Latitude(viewPort.farLeft.latitude), new Longitude(viewPort.nearRight.longitude), new Latitude(viewPort.nearRight.latitude), ResourcesCompat.getFloat(getActivity().getResources(), R.dimen.square_dimension));
         }
     }
 
@@ -169,7 +165,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
             squaresWithData.sort(new Square.LongitudeComparator());
             squaresWithData.sort(new Square.LatitudeComparator());
 
-            Log.println(Log.ASSERT, "", squaresWithData.toString());
+            //Log.println(Log.ASSERT, "", squaresWithData.toString());
 
 
             for (double i = topLeftX.getValue(); i <= bottomRightX.getValue(); i = i + l) {
@@ -197,25 +193,26 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
 
     protected void retrieveSquaresAndDrawHeatmap() {
 
-            new Thread(() -> {
+        new Thread(() -> {
             SquareDatabase squaredb = Room.databaseBuilder(getActivity(), SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
             List<Square> squaresWithData = new ArrayList<>();
             squaresWithData.addAll(squaredb.getSquareDAO().getAllSquares());
 
 
             List<WeightedLatLng> heatmapPoints = new ArrayList<>();
-            squaresWithData.forEach( square -> {
-                heatmapPoints.add(new WeightedLatLng(new LatLng(square.latitude.getValue(), square.longitude.getValue()) , 1));
+            squaresWithData.forEach(square -> {
+                heatmapPoints.add(new WeightedLatLng(new LatLng(square.latitude.getValue(), square.longitude.getValue()), 1));
             });
 
-            if(!heatmapPoints.isEmpty()){
+            if (!heatmapPoints.isEmpty()) {
                 getActivity().runOnUiThread(new Runnable() {
                     public void run() {
                         heatmapProvider = new HeatmapTileProvider.Builder().weightedData(heatmapPoints).build();
-                        //heatmapProvider.setRadius(calculateProperHeatmapRadiusBasedOnZoom(map.getCameraPosition().zoom)); // HeatmapTileProvider.Builder().radius() accepts only values between 0 and 50, provider.setRadius() instead accepts every value
+                        heatmapProvider.setRadius(calculateProperHeatmapRadiusBasedOnZoom(map.getCameraPosition().zoom)); // HeatmapTileProvider.Builder().radius() accepts only values between 0 and 50, provider.setRadius() instead accepts every value
                         // TODO: replace this value with the maximum intensity that a measurement can reach
                         heatmapProvider.setMaxIntensity(1);
                         TileOverlay overlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(heatmapProvider));
+
                     }
                 });
             }
@@ -223,7 +220,27 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         }).start();
     }
 
-    private int calculateProperHeatmapRadiusBasedOnZoom(float zoom){
-        return 150;
+    private int calculateProperHeatmapRadiusBasedOnZoom(float zoom) {
+        Log.println(Log.ASSERT, "", "" + zoom);
+        Point p1 = map.getProjection().toScreenLocation(map.getCameraPosition().target);
+        Point p2;
+
+        if(zoom < 5) {
+            p2 = map.getProjection().toScreenLocation(new LatLng(map.getCameraPosition().target.latitude + ResourcesCompat.getFloat(getActivity().getResources(), R.dimen.big_cluster_dimension), map.getCameraPosition().target.longitude));
+        } else if (zoom < 10) {
+            p2 = map.getProjection().toScreenLocation(new LatLng(map.getCameraPosition().target.latitude + ResourcesCompat.getFloat(getActivity().getResources(), R.dimen.medium_cluster_dimension), map.getCameraPosition().target.longitude));
+        } else {
+            // on high zoom level the radius is the square dimension in pixel
+            p2 = map.getProjection().toScreenLocation(new LatLng(map.getCameraPosition().target.latitude + ResourcesCompat.getFloat(getActivity().getResources(), R.dimen.square_dimension), map.getCameraPosition().target.longitude));
+        }
+
+        if (p1.y - p2.y > 10 && p1.y - p2.y < 500) {
+            //Log.println(Log.ASSERT, "", "" + (p1.y - p2.y));
+            return p1.y - p2.y;
+        } else if (p1.y - p2.y > 500) { // NEVER use the heatmap with this zoom level or higher: an OutOfMemoryError may occur
+            return 500;
+        } else {
+            return 10;
+        }
     }
 }

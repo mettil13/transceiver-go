@@ -56,11 +56,7 @@ public class MainActivity extends AppCompatActivity {
                     replaceFragment(R.id.fragmentContainer, somethingElse);
                     break;
                 case R.id.settingsButton:
-                    //replaceFragment(R.id.fragmentContainer, settings);
-
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.fragmentContainer, settings)
-                            .commit();
+                    replaceFragment(R.id.fragmentContainer, settings);
             }
             return true;
         });
@@ -76,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
             Square s1 = new Square(50, 50, 5);
             squaredb.getSquareDAO().upsertSquare(s1);
             squaredb.getSquareDAO().upsertSquare(new Square(1, 1, 5));
+            squaredb.getSquareDAO().upsertSquare(new Square(0, 0, 5));
             squaredb.getSquareDAO().upsertSquare(new Square(10, 10, 5));
             squaredb.getSquareDAO().upsertSquare(new Square(10, 5, 5));
             squaredb.getSquareDAO().upsertSquare(new Square(10, 15, 5));

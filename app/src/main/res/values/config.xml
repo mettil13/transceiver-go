@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="square_dimension" format="float" type="dimen">0.001</item>
+    <item name="small_cluster_dimension" format="float" type="dimen">0.01</item>
+    <item name="medium_cluster_dimension" format="float" type="dimen">0.1</item>
+    <item name="big_cluster_dimension" format="float" type="dimen">1.0</item>
+</resources>

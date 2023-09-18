@@ -21,6 +21,8 @@
         android:title="@string/something_else" />
     <item
         android:id="@+id/settingsButton"
-        android:icon="@drawable/baseline_settings_24"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@drawable/settings_dark"
         android:title="@string/settings" />
 </menu>
