@@ -114,7 +114,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
             retrieveSquaresAndDrawHeatmap();
         } else {
             VisibleRegion viewPort = map.getProjection().getVisibleRegion();
-            retrieveAndDrawSquares(new Longitude(viewPort.farLeft.longitude), new Latitude(viewPort.farLeft.latitude), new Longitude(viewPort.nearRight.longitude), new Latitude(viewPort.nearRight.latitude), ResourcesCompat.getFloat(getActivity().getResources(), R.dimen.square_dimension));
+            retrieveAndDrawSquares(new Longitude(viewPort.farLeft.longitude), new Latitude(viewPort.farLeft.latitude), new Longitude(viewPort.nearRight.longitude), new Latitude(viewPort.nearRight.latitude), ResourcesCompat.getFloat(getContext().getResources(), R.dimen.square_dimension));
         }
     }
 
@@ -223,24 +223,14 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
     private int calculateProperHeatmapRadiusBasedOnZoom(float zoom) {
         Log.println(Log.ASSERT, "", "" + zoom);
         Point p1 = map.getProjection().toScreenLocation(map.getCameraPosition().target);
-        Point p2;
+        Point p2 = map.getProjection().toScreenLocation(new LatLng(map.getCameraPosition().target.latitude + ResourcesCompat.getFloat(getContext().getResources(), R.dimen.square_dimension), map.getCameraPosition().target.longitude));
 
-        if(zoom < 5) {
-            p2 = map.getProjection().toScreenLocation(new LatLng(map.getCameraPosition().target.latitude + ResourcesCompat.getFloat(getActivity().getResources(), R.dimen.big_cluster_dimension), map.getCameraPosition().target.longitude));
-        } else if (zoom < 10) {
-            p2 = map.getProjection().toScreenLocation(new LatLng(map.getCameraPosition().target.latitude + ResourcesCompat.getFloat(getActivity().getResources(), R.dimen.medium_cluster_dimension), map.getCameraPosition().target.longitude));
-        } else {
-            // on high zoom level the radius is the square dimension in pixel
-            p2 = map.getProjection().toScreenLocation(new LatLng(map.getCameraPosition().target.latitude + ResourcesCompat.getFloat(getActivity().getResources(), R.dimen.square_dimension), map.getCameraPosition().target.longitude));
-        }
-
-        if (p1.y - p2.y > 10 && p1.y - p2.y < 500) {
-            //Log.println(Log.ASSERT, "", "" + (p1.y - p2.y));
+        if (p1.y - p2.y > getContext().getResources().getInteger(R.integer.min_cluster_dimension_in_pixel) && p1.y - p2.y < 500) {
             return p1.y - p2.y;
         } else if (p1.y - p2.y > 500) { // NEVER use the heatmap with this zoom level or higher: an OutOfMemoryError may occur
             return 500;
         } else {
-            return 10;
+            return 15;
         }
     }
 }
