@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -80,6 +81,7 @@ public class FragmentSomethingElse extends Fragment implements NoiseStrength.Rec
         Button silenceButton = rootView.findViewById(R.id.silenceButton);
         Button clapButton = rootView.findViewById(R.id.clapButton);
         Button treesholdButton = rootView.findViewById(R.id.treesholdButton);
+        Button saveDbButton = rootView.findViewById(R.id.exportDbButton);
 
         NoiseStrength noiseStrength = new NoiseStrength(getContext());
         noiseStrength.setRecordingListener(this);
@@ -100,6 +102,12 @@ public class FragmentSomethingElse extends Fragment implements NoiseStrength.Rec
 
         clapButton.setOnClickListener(v -> {
             noiseStrength.calibrateClap();
+
+        });
+
+        saveDbButton.setOnClickListener(v -> {
+            boolean sussy = DatabaseExporter.saveDatabase(getContext(), "squaredb");
+            Log.println(Log.ASSERT, "click", sussy+"");
 
         });
 
