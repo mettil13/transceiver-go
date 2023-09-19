@@ -1,11 +1,15 @@
 package app_mobili.transceiver_go;
 
+import android.content.Intent;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.provider.ContactsContract;
@@ -33,10 +37,11 @@ public class FragmentSomethingElse extends Fragment implements NoiseStrength.Rec
     private String mParam1;
     private String mParam2;
 
+    private ActivityResultLauncher<Intent> exportLauncher;
+
     public FragmentSomethingElse() {
         // Required empty public constructor
     }
-
 
     /**
      * Use this factory method to create a new instance of
@@ -64,6 +69,15 @@ public class FragmentSomethingElse extends Fragment implements NoiseStrength.Rec
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
+
+        exportLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    int resultCode = result.getResultCode();
+                    Intent data = result.getData();
+                    DatabaseExportUtil.onActivityResult(resultCode, data, requireActivity(), requireActivity().getContentResolver());
+                }
+        );
     }
 
     @Override
@@ -106,9 +120,8 @@ public class FragmentSomethingElse extends Fragment implements NoiseStrength.Rec
         });
 
         saveDbButton.setOnClickListener(v -> {
-            boolean sussy = DatabaseExporter.saveDatabase(getContext(), "squaredb");
-            Log.println(Log.ASSERT, "click", sussy+"");
-
+            DatabaseExportUtil.shareDatabase(getActivity());
+            //exportLauncher.launch(DatabaseExportUtil.exportDatabaseIntent());
         });
 
         // Inflate the layout for this fragment

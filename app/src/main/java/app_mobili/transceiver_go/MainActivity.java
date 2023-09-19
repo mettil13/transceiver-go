@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         new Thread(() -> {
             Square s1 = new Square(50, 50, 5);
             squaredb.getSquareDAO().upsertSquare(s1);
-            squaredb.getSquareDAO().upsertSquare(new Square(1, 1, 5));
+            squaredb.getSquareDAO().upsertSquare(new Square(200, 200, 5));
             squaredb.getSquareDAO().upsertSquare(new Square(0, 0, 5));
             squaredb.getSquareDAO().upsertSquare(new Square(10, 10, 5));
             squaredb.getSquareDAO().upsertSquare(new Square(10, 5, 5));
