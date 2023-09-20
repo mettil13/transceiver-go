@@ -45,6 +45,8 @@ import com.google.maps.android.heatmaps.WeightedLatLng;
 public class FragmentMainMap extends Fragment implements OnMapReadyCallback, GoogleMap.OnCameraMoveStartedListener, GoogleMap.OnCameraMoveListener, GoogleMap.OnCameraIdleListener {
     protected GoogleMap map;
     protected HeatmapTileProvider heatmapProvider;
+    protected static double squareslength = 0.001;
+    protected static int minClusterDimensionInPixel = 15;
 
     public FragmentMainMap() {
         // Required empty public constructor
@@ -107,14 +109,15 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
     @Override
     public void onCameraIdle() {
         map.clear();
-        Log.println(Log.ASSERT, "", "" + map.getCameraPosition().zoom);
+        //Log.println(Log.ASSERT, "", "" + map.getCameraPosition().zoom);
         // The heatmap uses too many resources when the user zooms in, while the grid uses too many resources when the user zooms out.
         // So the heatmap is used with low zoom levels and the grid with higher ones.
         if (map.getCameraPosition().zoom < 16) { // I really don't like those hardcoded constants, but it seems to be the only way possible
             retrieveSquaresAndDrawHeatmap();
         } else {
             VisibleRegion viewPort = map.getProjection().getVisibleRegion();
-            retrieveAndDrawSquares(new Longitude(viewPort.farLeft.longitude), new Latitude(viewPort.farLeft.latitude), new Longitude(viewPort.nearRight.longitude), new Latitude(viewPort.nearRight.latitude), ResourcesCompat.getFloat(getContext().getResources(), R.dimen.square_dimension));
+            map.addMarker(new MarkerOptions().position(new LatLng(viewPort.farLeft.longitude, viewPort.farLeft.latitude)));
+            retrieveAndDrawSquares(new Longitude(viewPort.farLeft.longitude), new Latitude(viewPort.farLeft.latitude), new Longitude(viewPort.nearRight.longitude), new Latitude(viewPort.nearRight.latitude), squareslength);
         }
     }
 
@@ -156,6 +159,11 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
             SquareDatabase squaredb = Room.databaseBuilder(getActivity(), SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
             List<Square> squaresWithData = new ArrayList<>();
             if (positiveLeft != null && positiveRight != null) {
+                getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        Log.println(Log.ASSERT, "", "" + map.getCameraPosition().target);
+                    }
+                });
                 squaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInPositiveEmisphereRange(positiveLeft.getValue(), topLeftY.getValue(), positiveRight.getValue(), bottomRightY.getValue(), l));
             }
             if (negativeLeft != null && negativeRight != null) {
@@ -165,12 +173,12 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
             squaresWithData.sort(new Square.LongitudeComparator());
             squaresWithData.sort(new Square.LatitudeComparator());
 
-            //Log.println(Log.ASSERT, "", squaresWithData.toString());
+            Log.println(Log.ASSERT, "", squaresWithData.toString());
 
 
             for (double i = topLeftX.getValue(); i <= bottomRightX.getValue(); i = i + l) {
                 for (double j = bottomRightY.getValue(); j <= topLeftY.getValue(); j = j + l) {
-                    Square square = new Square(j, i, l);
+                    Square square = new Square(i, j, l);
                     getActivity().runOnUiThread(new Runnable() {
                         public void run() {
                             square.drawTile(map, 0xff000000, 0x66000000);
@@ -221,16 +229,16 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
     }
 
     private int calculateProperHeatmapRadiusBasedOnZoom(float zoom) {
-        Log.println(Log.ASSERT, "", "" + zoom);
+        //Log.println(Log.ASSERT, "", "" + zoom);
         Point p1 = map.getProjection().toScreenLocation(map.getCameraPosition().target);
-        Point p2 = map.getProjection().toScreenLocation(new LatLng(map.getCameraPosition().target.latitude + ResourcesCompat.getFloat(getContext().getResources(), R.dimen.square_dimension), map.getCameraPosition().target.longitude));
+        Point p2 = map.getProjection().toScreenLocation(new LatLng(map.getCameraPosition().target.latitude + squareslength, map.getCameraPosition().target.longitude));
 
-        if (p1.y - p2.y > getContext().getResources().getInteger(R.integer.min_cluster_dimension_in_pixel) && p1.y - p2.y < 500) {
+        if (p1.y - p2.y > minClusterDimensionInPixel && p1.y - p2.y < 500) {
             return p1.y - p2.y;
         } else if (p1.y - p2.y > 500) { // NEVER use the heatmap with this zoom level or higher: an OutOfMemoryError may occur
             return 500;
         } else {
-            return getContext().getResources().getInteger(R.integer.min_cluster_dimension_in_pixel);
+            return minClusterDimensionInPixel;
         }
     }
 }

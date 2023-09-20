@@ -17,12 +17,12 @@ public class Square {
     @NonNull
     @ColumnInfo(name = "SquareID")
     // X,Y,L coordinates
-    String coordinates = "0|0:0"; // initialized, but should always be overwritten
+    String coordinates = "0|0"; // initialized, but should always be overwritten
 
     @ColumnInfo(name = "X")
-    protected Latitude latitude; // a richer object to manage latitude, must always be synced with x
+    protected Longitude longitude;
     @ColumnInfo(name = "Y")
-    protected Longitude longitude; // a richer object to manage longitude, must always be synced with y
+    protected Latitude latitude;
     @ColumnInfo(name = "Length")
     protected double sideLength;
     @ColumnInfo(name = "Network Signal Strength")
@@ -36,19 +36,18 @@ public class Square {
     protected int networkAverageCounter = 1;
 
     // Empty constructor for room
-
     public Square() {
     }
 
 
     @Ignore
-    public Square(double x, double y, double sideLength) {
+    public Square(double longitude, double latitude, double sideLength) {
         // first we make sure that the provided coordinates are valid
-        latitude = new Latitude(x);
-        longitude = new Longitude(y);
+        this.latitude = new Latitude(latitude);
+        this.longitude = new Longitude(longitude);
         // First, calculate the block indices (rounded to nearest) for latitude and longitude
-        int blockLatitude = (int) Math.round(latitude.getValue() / sideLength);
-        int blockLongitude = (int) Math.round(longitude.getValue() / sideLength);
+        int blockLatitude = (int) Math.round(this.latitude.getValue() / sideLength);
+        int blockLongitude = (int) Math.round(this.longitude.getValue() / sideLength);
 
         // Then, calculate the center of the square using the block indices and side length
         //                      v block number  v side length
@@ -56,13 +55,13 @@ public class Square {
         double centerLongitude = blockLongitude * sideLength;
 
         // Set the calculated center and other attributes
-        latitude.setValue(centerLatitude);
-        longitude.setValue(centerLongitude);
+        this.latitude.setValue(centerLatitude);
+        this.longitude.setValue(centerLongitude);
         this.sideLength = sideLength;
 
         // i'm sorry this primary key has to be a string with this format, but this is the best
         // solution for readability than a meaningless integer id.
-        coordinates = this.latitude.getValue() + "|" + this.longitude.getValue() + ":" + this.sideLength;
+        coordinates = this.latitude.getValue() + "|" + this.longitude.getValue();
 
         network = -1;
         wifi = -1;
@@ -137,8 +136,8 @@ public class Square {
     public String toString() {
         return "Square{" +
                 "coordinates='" + coordinates + '\'' +
-                ", latitude=" + latitude +
-                ", longitude=" + longitude +
+                ", latitude=" + latitude.getValue() +
+                ", longitude=" + longitude.getValue() +
                 ", length=" + sideLength +
                 ", network=" + network +
                 ", wifi=" + wifi +

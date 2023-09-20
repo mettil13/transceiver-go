@@ -71,21 +71,20 @@ public class MainActivity extends AppCompatActivity {
         new Thread(() -> {
             Square s1 = new Square(50, 50, 5);
             squaredb.getSquareDAO().upsertSquare(s1);
-            squaredb.getSquareDAO().upsertSquare(new Square(200, 200, 5));
-            squaredb.getSquareDAO().upsertSquare(new Square(0, 0, 5));
-            squaredb.getSquareDAO().upsertSquare(new Square(10, 10, 5));
-            squaredb.getSquareDAO().upsertSquare(new Square(10, 5, 5));
-            squaredb.getSquareDAO().upsertSquare(new Square(10, 15, 5));
-            squaredb.getSquareDAO().upsertSquare(new Square(20, 0, 5));
-            squaredb.getSquareDAO().upsertSquare(new Square(1, -10, 5));
-            squaredb.getSquareDAO().upsertSquare(new Square(-15, 5, 5));
-            squaredb.getSquareDAO().upsertSquare(new Square(-5, -5, 5));
-            squaredb.getSquareDAO().upsertSquare(new Square(44.500, 11.4, 0.001));
-            squaredb.getSquareDAO().upsertSquare(new Square(44.501, 11.4, 0.001));
-            squaredb.getSquareDAO().upsertSquare(new Square(44.472, 11.393, 0.001));
-            squaredb.getSquareDAO().upsertSquare(new Square(44.473, 11.393, 0.001));
+            squaredb.getSquareDAO().upsertSquare(new Square(1, 1, 0.001));
+            squaredb.getSquareDAO().upsertSquare(new Square(0, 0, 0.001));
+            squaredb.getSquareDAO().upsertSquare(new Square(10, 10, 0.001));
+            squaredb.getSquareDAO().upsertSquare(new Square(10, 5, 0.001));
+            squaredb.getSquareDAO().upsertSquare(new Square(10, 15, 0.001));
+            squaredb.getSquareDAO().upsertSquare(new Square(20, 0, 0.001));
+            squaredb.getSquareDAO().upsertSquare(new Square(1, -10, 0.001));
+            squaredb.getSquareDAO().upsertSquare(new Square(-15, 5, 0.001));
+            squaredb.getSquareDAO().upsertSquare(new Square(-5, -5, 0.001));
+            squaredb.getSquareDAO().upsertSquare(new Square(11.4,44.500, 0.001));
+            squaredb.getSquareDAO().upsertSquare(new Square(11.4, 44.501, 0.001));
+            squaredb.getSquareDAO().upsertSquare(new Square(11.393, 44.472, 0.001));
             squaredb.getSquareDAO().upsertSquare(new Square(11.393, 44.473, 0.001));
-            squaredb.getSquareDAO().upsertSquare(new Square(44.473466, 11.394963, 0.001));
+            squaredb.getSquareDAO().upsertSquare(new Square(11.394963, 44.473466, 0.001));
             s1 = squaredb.getSquareDAO().getYourSquare(52, 52, 5);
 
             System.out.println(s1.toString());
