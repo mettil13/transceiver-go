@@ -30,6 +30,8 @@ public class DatabaseExportUtil {
         return intent;
     }
 
+    //todo: check requestCode, or make the fragment check it before calling, it needs to know
+    // which result he's dealing with, import on export
     public static void onActivityResult(int resultCode, @Nullable Intent data, @NonNull Activity activity, @NonNull ContentResolver contentResolver) {
         if (resultCode == Activity.RESULT_OK && data != null) {
             Uri exportUri = data.getData();
