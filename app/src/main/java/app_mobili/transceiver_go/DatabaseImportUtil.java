@@ -7,33 +7,36 @@ import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import androidx.annotation.Nullable;
+
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class DatabaseImportUtil {
-    private static final int REQUEST_CODE_IMPORT_DB = 123;
+    private static final int REQUEST_CODE_IMPORT_DB = 420;
     private static final String TAG = "DatabaseImportUtil";
 
     public static void openDocumentPicker(Activity activity) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("application/x-sqlite3"); // Specify the MIME type for SQLite databases
+        intent.setType("*/*"); // Specify the MIME type for SQLite databases
 
         activity.startActivityForResult(intent, REQUEST_CODE_IMPORT_DB);
     }
-    
-    //todo: check requestCode, or make the fragment check it before calling, it needs to know
-    // which result he's dealing with, import on export
+
     public static void handleDocumentPickerResult(Activity activity, int requestCode, int resultCode, @Nullable Intent data) {
+        Log.println(Log.ASSERT,"Luizo", "in handledocpicker");
         if (requestCode == REQUEST_CODE_IMPORT_DB && resultCode == Activity.RESULT_OK && data != null) {
+            Log.println(Log.ASSERT,"Luizo", "if positive");
             Uri selectedUri = data.getData();
             if (selectedUri != null) {
-                importDatabase(activity, selectedUri);
+                importDatabase(activity, selectedUri, "second");
             }
         }
     }
 
-    public static void importDatabase(Activity activity, Uri selectedUri) {
+    public static void importDatabase(Activity activity, Uri selectedUri, String newDatabaseName) {
         try {
             ContentResolver contentResolver = activity.getContentResolver();
             ParcelFileDescriptor pfd = contentResolver.openFileDescriptor(selectedUri, "r");
@@ -41,11 +44,39 @@ public class DatabaseImportUtil {
             if (pfd != null) {
                 FileInputStream input = new FileInputStream(pfd.getFileDescriptor());
 
-                // Your import logic here
-                // Read from the input stream and insert data into your Room database
+                // Determine the target directory
+                File targetDirectory = activity.getDatabasePath("").getParentFile(); // Use the parent directory of the default Room database directory
+
+                // Ensure the target directory exists
+                if (!targetDirectory.exists()) {
+                    targetDirectory.mkdirs();
+                }
+
+                // Specify the target file path
+                String targetFilePath = targetDirectory.getPath() + File.separator + newDatabaseName;
+
+                Log.println(Log.ASSERT,"Luizo", targetFilePath);
+                // Create a File object for the target file
+                File targetFile = new File(targetFilePath);
+
+                // Create an output stream for the target file
+                FileOutputStream output = new FileOutputStream(targetFile);
+
+                // Copy the data from the input stream to the output stream
+                byte[] buffer = new byte[1024];
+                int length;
+                while ((length = input.read(buffer)) > 0) {
+                    output.write(buffer, 0, length);
+                }
 
                 input.close();
-                pfd.close();
+                output.close();
+
+                if (targetFile.exists()) {
+                    Log.d(TAG, "Database imported and moved successfully.");
+                } else {
+                    Log.e(TAG, "Error moving the imported database.");
+                }
             }
         } catch (IOException e) {
             Log.e(TAG, "Error importing database: " + e.getMessage());

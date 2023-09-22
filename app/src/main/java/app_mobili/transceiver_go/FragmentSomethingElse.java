@@ -1,5 +1,7 @@
 package app_mobili.transceiver_go;
 
+import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
@@ -33,11 +35,15 @@ public class FragmentSomethingElse extends Fragment implements NoiseStrength.Rec
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    private static final int REQUEST_CODE_EXPORT_DB = 69;
+    private static final int REQUEST_CODE_IMPORT_DB = 420;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
     private ActivityResultLauncher<Intent> exportLauncher;
+
+    private ActivityResultLauncher<Intent> importLauncher;
 
     public FragmentSomethingElse() {
         // Required empty public constructor
@@ -76,6 +82,15 @@ public class FragmentSomethingElse extends Fragment implements NoiseStrength.Rec
                     int resultCode = result.getResultCode();
                     Intent data = result.getData();
                     DatabaseExportUtil.onActivityResult(resultCode, data, requireActivity(), requireActivity().getContentResolver());
+                }
+        );
+
+        importLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    int resultCode = result.getResultCode();
+                    Intent data = result.getData();
+                    FileUtil.handleImportFileResult(getActivity(),resultCode,data);
                 }
         );
     }
@@ -120,14 +135,17 @@ public class FragmentSomethingElse extends Fragment implements NoiseStrength.Rec
         });
 
         saveDbButton.setOnClickListener(v -> {
-            DatabaseExportUtil.shareDatabase(getActivity());
+            //DatabaseExportUtil.shareDatabase(getActivity());
             //exportLauncher.launch(DatabaseExportUtil.exportDatabaseIntent());
+            //DatabaseImportUtil.openDocumentPicker(getActivity());
+            importLauncher.launch(FileUtil.importFileToDatabaseDirectory());
         });
 
         // Inflate the layout for this fragment
         return rootView;
 
     }
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {

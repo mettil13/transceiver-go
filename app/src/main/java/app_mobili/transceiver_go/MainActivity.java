@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isAddSelected = false;
 
-    SquareDatabase squaredb;
+    SquareDatabase squaredb, secondb;
 
 
     @Override
@@ -64,13 +64,15 @@ public class MainActivity extends AppCompatActivity {
 
         setUpMeasurementButtons(binding);
 
-        //this.deleteDatabase("squaredb");
+        this.deleteDatabase("second");
         // setting the database
         squaredb = Room.databaseBuilder(this, SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
 
+        //secondb = Room.databaseBuilder(this, SquareDatabase.class, "second").addMigrations(SquareDatabase.migration).build();
+
         new Thread(() -> {
             Square s1 = new Square(50, 50, 5);
-            squaredb.getSquareDAO().upsertSquare(s1);
+            //secondb.getSquareDAO().upsertSquare(s1);
             squaredb.getSquareDAO().upsertSquare(new Square(1, 1, 0.001));
             squaredb.getSquareDAO().upsertSquare(new Square(0, 0, 0.001));
             squaredb.getSquareDAO().upsertSquare(new Square(10, 10, 0.001));

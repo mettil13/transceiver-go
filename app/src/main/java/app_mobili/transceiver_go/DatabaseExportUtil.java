@@ -19,6 +19,8 @@ import java.io.OutputStream;
 public class DatabaseExportUtil {
     private static final String TAG = "DatabaseExportUtil";
 
+    private static final int REQUEST_CODE_EXPORT_DB = 69;
+
     // Replace with your Room database name
     private static final String DATABASE_NAME = "squaredb";
 
@@ -26,12 +28,10 @@ public class DatabaseExportUtil {
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("application/x-sqlite3");
-        intent.putExtra(Intent.EXTRA_TITLE, DATABASE_NAME);
+        intent.putExtra(Intent.EXTRA_TITLE, DATABASE_NAME+".db");
         return intent;
     }
 
-    //todo: check requestCode, or make the fragment check it before calling, it needs to know
-    // which result he's dealing with, import on export
     public static void onActivityResult(int resultCode, @Nullable Intent data, @NonNull Activity activity, @NonNull ContentResolver contentResolver) {
         if (resultCode == Activity.RESULT_OK && data != null) {
             Uri exportUri = data.getData();
@@ -85,6 +85,6 @@ public class DatabaseExportUtil {
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
         // Start the activity to share the file
-        activity.startActivity(Intent.createChooser(shareIntent, "Share Database"));
+        activity.startActivityForResult(Intent.createChooser(shareIntent, "Share Database"), REQUEST_CODE_EXPORT_DB);
     }
 }
