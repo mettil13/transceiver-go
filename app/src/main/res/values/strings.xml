@@ -6,6 +6,7 @@
     <string name="new_noise_measurement">new noise measurement</string>
 
     <string name="exportdb">Share your progress!</string>
+    <string name="importdb">Import your friends\' progress!</string>
     <!-- Strings for bottom nav menu -->
     <string name="map">Map</string>
     <string name="game">Game map</string>
