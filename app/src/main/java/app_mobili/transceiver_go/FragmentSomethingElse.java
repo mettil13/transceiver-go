@@ -1,27 +1,19 @@
 package app_mobili.transceiver_go;
 
-import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Intent;
-import android.graphics.drawable.AnimatedVectorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.ImageView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -75,22 +67,13 @@ public class FragmentSomethingElse extends Fragment implements NoiseStrength.Rec
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-
-        exportLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    int resultCode = result.getResultCode();
-                    Intent data = result.getData();
-                    DatabaseExportUtil.onActivityResult(resultCode, data, requireActivity(), requireActivity().getContentResolver());
-                }
-        );
-
+        // needed for the importing process
         importLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     int resultCode = result.getResultCode();
                     Intent data = result.getData();
-                    FileUtil.handleImportFileResult(getActivity(),resultCode,data);
+                    DatabaseImportExportUtil.handleImportFileResult(getActivity(),resultCode,data);
                 }
         );
     }
@@ -110,7 +93,8 @@ public class FragmentSomethingElse extends Fragment implements NoiseStrength.Rec
         Button silenceButton = rootView.findViewById(R.id.silenceButton);
         Button clapButton = rootView.findViewById(R.id.clapButton);
         Button treesholdButton = rootView.findViewById(R.id.treesholdButton);
-        Button saveDbButton = rootView.findViewById(R.id.exportDbButton);
+        Button shareDbButton = rootView.findViewById(R.id.exportDbButton);
+        Button importDbButton = rootView.findViewById(R.id.importDbButton);
 
         NoiseStrength noiseStrength = new NoiseStrength(getContext());
         noiseStrength.setRecordingListener(this);
@@ -134,11 +118,15 @@ public class FragmentSomethingElse extends Fragment implements NoiseStrength.Rec
 
         });
 
-        saveDbButton.setOnClickListener(v -> {
-            //DatabaseExportUtil.shareDatabase(getActivity());
+        shareDbButton.setOnClickListener(v -> {
+            DatabaseImportExportUtil.shareDatabase(getActivity(), "database-di-luizo");
             //exportLauncher.launch(DatabaseExportUtil.exportDatabaseIntent());
             //DatabaseImportUtil.openDocumentPicker(getActivity());
-            importLauncher.launch(FileUtil.importFileToDatabaseDirectory());
+            //importLauncher.launch(DatabaseImportExportUtil.importFileToDatabaseDirectory());
+        });
+
+        importDbButton.setOnClickListener(v -> {
+            importLauncher.launch(DatabaseImportExportUtil.importFileToDatabaseDirectory());
         });
 
         // Inflate the layout for this fragment

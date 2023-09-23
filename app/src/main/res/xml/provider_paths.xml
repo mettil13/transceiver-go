@@ -8,4 +8,7 @@
     <files-path
         name="app_files"
         path=".." />
+    <files-path
+        name="db_files"
+        path="databases/" />
 </paths>
