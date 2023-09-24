@@ -5,7 +5,6 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
@@ -13,27 +12,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polygon;
-import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
 import com.google.maps.android.heatmaps.WeightedLatLng;
 
@@ -81,14 +71,6 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-        /*
-        for (int i=0; i<180; i=i+2){
-            for(int j=0; j<90; j=j+2){
-                MapTile tile = new MapTile(j, i, 2);
-                tile.drawTile(googleMap, 0xff000000,0x66000000);
-            }
-        }
-        */
         map = googleMap;
         map.setOnCameraMoveStartedListener(this);
         map.setOnCameraMoveListener(this);
@@ -97,8 +79,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
 
     @Override
     public void onCameraMoveStarted(int i) {
-        VisibleRegion viewPort = map.getProjection().getVisibleRegion();
-        //retrieveAndDrawSquares(new Longitude(viewPort.farLeft.longitude), new Latitude(viewPort.farLeft.latitude), new Longitude(viewPort.nearRight.longitude), new Latitude(viewPort.nearRight.latitude), 5);
+
     }
 
     @Override
@@ -109,24 +90,45 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
     @Override
     public void onCameraIdle() {
         map.clear();
-        //Log.println(Log.ASSERT, "", "" + map.getCameraPosition().zoom);
+
+        VisibleRegion viewPort = map.getProjection().getVisibleRegion();
+        Longitude topLeftX = new Longitude(Math.min(viewPort.farLeft.longitude, Math.min(viewPort.farRight.longitude, Math.min(viewPort.nearLeft.longitude, viewPort.nearRight.longitude))));
+        Latitude topLeftY = new Latitude(Math.max(viewPort.farLeft.latitude, Math.max(viewPort.farRight.latitude, Math.max(viewPort.nearLeft.latitude, viewPort.nearRight.latitude))));
+        Longitude bottomRightX = new Longitude(Math.max(viewPort.farLeft.longitude, Math.max(viewPort.farRight.longitude, Math.max(viewPort.nearLeft.longitude, viewPort.nearRight.longitude))));
+        Latitude bottomRightY = new Latitude(Math.min(viewPort.farLeft.latitude, Math.min(viewPort.farRight.latitude, Math.min(viewPort.nearLeft.latitude, viewPort.nearRight.latitude))));
+
+        Longitude cameraX = new Longitude(map.getCameraPosition().target.longitude);
+        Latitude cameraY = new Latitude(map.getCameraPosition().target.latitude);
+
+        // expands the viewport area adding a bit of margin to let the camera move around a little bit without having to wait for the new areas being drawn
+        int maxNumberOfSquares = 15; // limits the number of drawn squares (from the target of the camera to the side of the drawn area) to use less resources
+        topLeftX.subtract(topLeftX.getCounterClockwiseDistance(cameraX));
+        if (topLeftX.getCounterClockwiseDistance(cameraX) > squareslength * maxNumberOfSquares) {
+            topLeftX.setValue(cameraX.getValue() - squareslength * maxNumberOfSquares);
+        }
+        bottomRightX.add(cameraX.getCounterClockwiseDistance(bottomRightX));
+        if (cameraX.getCounterClockwiseDistance(bottomRightX) > squareslength * maxNumberOfSquares) {
+            bottomRightX.setValue(cameraX.getValue() + squareslength * maxNumberOfSquares);
+        }
+        topLeftY.add(topLeftY.getDistance(cameraY));
+        if (topLeftY.getDistance(cameraY) > squareslength * maxNumberOfSquares) {
+            topLeftY.setValue(cameraY.getValue() + squareslength * maxNumberOfSquares);
+        }
+        bottomRightY.subtract(bottomRightY.getDistance(cameraY));
+        if (bottomRightY.getDistance(cameraY) > squareslength * maxNumberOfSquares) {
+            bottomRightY.setValue(cameraY.getValue() - squareslength * maxNumberOfSquares);
+        }
+
         // The heatmap uses too many resources when the user zooms in, while the grid uses too many resources when the user zooms out.
         // So the heatmap is used with low zoom levels and the grid with higher ones.
         if (map.getCameraPosition().zoom < 16) { // I really don't like those hardcoded constants, but it seems to be the only way possible
             retrieveSquaresAndDrawHeatmap();
         } else {
-            VisibleRegion viewPort = map.getProjection().getVisibleRegion();
-            map.addMarker(new MarkerOptions().position(new LatLng(viewPort.farLeft.longitude, viewPort.farLeft.latitude)));
-            retrieveAndDrawSquares(new Longitude(viewPort.farLeft.longitude), new Latitude(viewPort.farLeft.latitude), new Longitude(viewPort.nearRight.longitude), new Latitude(viewPort.nearRight.latitude), squareslength);
+            retrieveAndDrawSquares(topLeftX, topLeftY, bottomRightX, bottomRightY, squareslength);
         }
     }
 
     protected void retrieveAndDrawSquares(Longitude topLeftX, Latitude topLeftY, Longitude bottomRightX, Latitude bottomRightY, double l) {
-        topLeftX.subtract(topLeftX.getDistance(bottomRightX) / 2);
-        bottomRightX.add(topLeftX.getDistance(bottomRightX) / 2);
-        topLeftY.add(topLeftY.getDistance(bottomRightY) / 2);
-        bottomRightY.subtract(topLeftY.getDistance(bottomRightY) / 2);
-
         Longitude negativeLeft;
         Longitude negativeRight;
         Longitude positiveLeft;
@@ -159,11 +161,6 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
             SquareDatabase squaredb = Room.databaseBuilder(getActivity(), SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
             List<Square> squaresWithData = new ArrayList<>();
             if (positiveLeft != null && positiveRight != null) {
-                getActivity().runOnUiThread(new Runnable() {
-                    public void run() {
-                        Log.println(Log.ASSERT, "", "" + map.getCameraPosition().target);
-                    }
-                });
                 squaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInPositiveEmisphereRange(positiveLeft.getValue(), topLeftY.getValue(), positiveRight.getValue(), bottomRightY.getValue(), l));
             }
             if (negativeLeft != null && negativeRight != null) {

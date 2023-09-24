@@ -28,7 +28,7 @@ public class Longitude {
     }
 
     // returns distance between this longitude and otherLongitude in the counter-clockwise direction
-    public double getDistance(Longitude otherLongitude){
+    public double getCounterClockwiseDistance(Longitude otherLongitude){
         if(lng < otherLongitude.getValue()){
             return Math.abs(otherLongitude.getValue() - lng);
         }
