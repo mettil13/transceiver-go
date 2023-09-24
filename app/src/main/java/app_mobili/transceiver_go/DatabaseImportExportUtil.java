@@ -4,9 +4,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
+import androidx.documentfile.provider.DocumentFile;
+import androidx.room.Room;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -73,7 +76,8 @@ public class DatabaseImportExportUtil {
         if (resultCode == Activity.RESULT_OK && data != null) {
             Uri selectedUri = data.getData();
             if (selectedUri != null) {
-                importSelectedFile(activity, selectedUri, "temp");
+                String fileName = DocumentFile.fromSingleUri(activity, selectedUri).getName();
+                importSelectedFile(activity, selectedUri, fileName);
             }
         }
     }
@@ -83,11 +87,11 @@ public class DatabaseImportExportUtil {
         try {
             // Get the path of the Room database directory
 
-            Log.println(Log.ASSERT,"Luizo",databaseDirectoryPath);
+            //Log.println(Log.ASSERT,"Luizo",databaseDirectoryPath);
 
             File destinationFile = new File(databaseDirectoryPath, dbname);
 
-            Log.println(Log.ASSERT,"Luizo",destinationFile.getPath());
+            //Log.println(Log.ASSERT,"Luizo",destinationFile.getPath());
 
             FileInputStream input = new FileInputStream(activity.getContentResolver().openFileDescriptor(selectedUri, "r").getFileDescriptor());
             FileOutputStream output = new FileOutputStream(destinationFile);
@@ -101,6 +105,10 @@ public class DatabaseImportExportUtil {
             input.close();
             output.close();
 
+            //SquareDatabase imported = Room.databaseBuilder(activity, SquareDatabase.class, dbname).build();
+
+            Toast toast = Toast.makeText(activity,R.string.imported, Toast.LENGTH_SHORT);
+            toast.show();
             Log.d(TAG, "File imported successfully to the database directory.");
         } catch (IOException e) {
             Log.e(TAG, "Error importing file: " + e.getMessage());

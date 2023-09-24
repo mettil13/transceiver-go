@@ -7,6 +7,7 @@
 
     <string name="exportdb">Share your progress!</string>
     <string name="importdb">Import your friends\' progress!</string>
+    <string name="imported"> imported successfully to the database directory, yay!</string>
     <!-- Strings for bottom nav menu -->
     <string name="map">Map</string>
     <string name="game">Game map</string>
