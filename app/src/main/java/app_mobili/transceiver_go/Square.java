@@ -63,9 +63,9 @@ public class Square {
         // solution for readability than a meaningless integer id.
         coordinates = this.latitude.getValue() + "|" + this.longitude.getValue();
 
-        network = -1;
-        wifi = -1;
-        noise = -1;
+        network = 1;
+        wifi = 1;
+        noise = 1;
     }
 
     public Polygon drawTile(GoogleMap googleMap, int strokeColor, int fillColor) {
@@ -129,6 +129,12 @@ public class Square {
 
     public int getNoise() {
         return noise;
+    }
+
+    // returns Id of the square
+    @NonNull
+    public String getCoordinates() {
+        return coordinates;
     }
 
     @NonNull

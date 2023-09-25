@@ -1,39 +1,74 @@
 package app_mobili.transceiver_go;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
 import androidx.room.Room;
 
+import com.google.android.gms.location.LocationListener;
+
 import app_mobili.transceiver_go.databinding.ActivityMainBinding;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NoiseStrength.RecordingListener {
 
     private boolean isAddSelected = false;
+    SquareDatabase squaredb;
 
-    SquareDatabase squaredb, secondb;
+    // stuff for coordinates
+    CoordinateListener coordinateListener;
+    LocationManager lm;
+    double longitude;
+    double latitude;
 
+    //stuff for measurement
+    NoiseStrength noiseStrength;
+    NoiseListener noiseListener;
+    NetworkSignalStrength networkSignalStrength;
+    WifiSignalStrength wifiSignalStrength;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // retrieving preferences
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this); // Use getContext() in a Fragment or this in an Activity
 
         //int lastMeasurements = sharedPreferences.getInt("num_kept_measurements",0);
         //Log.println(Log.ASSERT,"lastmes", lastMeasurements+"");
 
+        // coordinate setup
+        coordinateListener = new CoordinateListener();
+        lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        startListenForCoordinates();
 
+        // measurements setup
+        noiseStrength = new NoiseStrength(this);
+        noiseListener = new NoiseListener(this);
+        noiseStrength.setRecordingListener(noiseListener);
+
+        networkSignalStrength = new NetworkSignalStrength(this);
+        wifiSignalStrength = new WifiSignalStrength(this);
+
+
+        // fragment setup
         Fragment mainMap = new FragmentMainMap();
         Fragment gameMap = new FragmentGameMap();
         Fragment somethingElse = new FragmentSomethingElse();
@@ -64,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
         setUpMeasurementButtons(binding);
 
-        this.deleteDatabase("second");
+        //this.deleteDatabase("second");
         // setting the database
         squaredb = Room.databaseBuilder(this, SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
 
@@ -82,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
             squaredb.getSquareDAO().upsertSquare(new Square(1, -10, 0.001));
             squaredb.getSquareDAO().upsertSquare(new Square(-15, 5, 0.001));
             squaredb.getSquareDAO().upsertSquare(new Square(-5, -5, 0.001));
-            squaredb.getSquareDAO().upsertSquare(new Square(11.4,44.500, 0.001));
+            squaredb.getSquareDAO().upsertSquare(new Square(11.4, 44.500, 0.001));
             squaredb.getSquareDAO().upsertSquare(new Square(11.4, 44.501, 0.001));
             squaredb.getSquareDAO().upsertSquare(new Square(11.393, 44.472, 0.001));
             squaredb.getSquareDAO().upsertSquare(new Square(11.393, 44.473, 0.001));
@@ -159,46 +194,49 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        binding.newNoiseMeasurementButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
+        binding.newNoiseMeasurementButton.setOnClickListener(view -> {
+            longitude = coordinateListener.getLongitude();
+            latitude = coordinateListener.getLatitude();
+            noiseListener.updateCoordinates(longitude,latitude);
+            noiseStrength.startRecording();
+            // when recording is finished, onRecordingFinished over "NoiseListener" gets called
+            // operations of db updates are done there
         });
 
         // on long click
-        binding.newMeasurementButton.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                Toast toast = Toast.makeText(view.getContext(), R.string.new_measurement, Toast.LENGTH_SHORT);
-                toast.show();
-                return true;
-            }
+        binding.newMeasurementButton.setOnLongClickListener(view -> {
+            Toast toast = Toast.makeText(view.getContext(), R.string.new_measurement, Toast.LENGTH_SHORT);
+            toast.show();
+            return true;
         });
-        binding.newWiFiMeasurementButton.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                Toast toast = Toast.makeText(view.getContext(), R.string.new_wifi_measurement, Toast.LENGTH_SHORT);
-                toast.show();
-                return true;
-            }
+        binding.newWiFiMeasurementButton.setOnLongClickListener(view -> {
+            Toast toast = Toast.makeText(view.getContext(), R.string.new_wifi_measurement, Toast.LENGTH_SHORT);
+            toast.show();
+            return true;
         });
-        binding.newInternetConnectionMeasurementButton.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                Toast toast = Toast.makeText(view.getContext(), R.string.new_internet_connection_measurement, Toast.LENGTH_SHORT);
-                toast.show();
-                return true;
-            }
+        binding.newInternetConnectionMeasurementButton.setOnLongClickListener(view -> {
+            Toast toast = Toast.makeText(view.getContext(), R.string.new_internet_connection_measurement, Toast.LENGTH_SHORT);
+            toast.show();
+            return true;
         });
-        binding.newNoiseMeasurementButton.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                Toast toast = Toast.makeText(view.getContext(), R.string.new_noise_measurement, Toast.LENGTH_SHORT);
-                toast.show();
-                return true;
-            }
+        binding.newNoiseMeasurementButton.setOnLongClickListener(view -> {
+            Toast toast = Toast.makeText(view.getContext(), R.string.new_noise_measurement, Toast.LENGTH_SHORT);
+            toast.show();
+            return true;
         });
     }
 
+
+    public void startListenForCoordinates() {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    808);
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    809);
+            return;
+        }
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000L, 10F, coordinateListener);
+    }
 }

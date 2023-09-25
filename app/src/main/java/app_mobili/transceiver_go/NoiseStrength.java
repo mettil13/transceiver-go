@@ -69,7 +69,7 @@ public class NoiseStrength extends Sensor {
         handler.postDelayed(this::stopRecording, millis); // Record for x seconds
     }
 
-    public void stopRecording() {
+    private void stopRecording() {
         if (!isRecording) {
             return;
         }

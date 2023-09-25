@@ -23,8 +23,15 @@ public interface SquareDAO {
     List<Square> getAllSquares();
 
     // only returns the square if it exists, otherwise returns a null object reference, BEWARE!
+    // check trough single coordinates
     @Query("select * from Square where `X`==:x AND `Y`==:y AND `Length`==:l LIMIT 1")
     Square getSquare(int x, int y, int l);
+
+    // only returns the square if it exists, otherwise returns a null object reference, BEWARE!
+    // check trough IDs
+    @Query("select * from Square where `SquareID`==:id LIMIT 1")
+    Square getSquare(String id);
+
 
     // only returns the square if it exists, otherwise returns a null object reference, BEWARE!
     @Query("SELECT * FROM Square WHERE (`Length` == :l) AND (ABS(`X` - :x) <= (:l/2)) AND (ABS(`Y` - :y) <= (:l/2)) ORDER BY ABS(`X` - :x) + ABS(`Y` - :y) LIMIT 1")
