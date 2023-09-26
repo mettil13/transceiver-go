@@ -204,6 +204,7 @@ public class NoiseStrength extends Sensor {
         return clapAmplitude;
     }
 
+    // getter in case we need it
     public int getNoiseScale() {
         return SensorValue;
     }

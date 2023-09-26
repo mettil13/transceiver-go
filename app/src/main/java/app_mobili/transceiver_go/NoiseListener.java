@@ -1,6 +1,7 @@
 package app_mobili.transceiver_go;
 
 import android.content.Context;
+import android.widget.Toast;
 
 import androidx.room.Room;
 
@@ -46,5 +47,7 @@ public class NoiseListener implements NoiseStrength.RecordingListener {
             // TODO: Update map view to reflect new measurement
         }).start();
 
+        Toast toast = Toast.makeText(context, R.string.new_noise_measurement, Toast.LENGTH_SHORT);
+        toast.show();
     }
 }

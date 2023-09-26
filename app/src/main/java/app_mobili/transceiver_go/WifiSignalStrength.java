@@ -8,7 +8,7 @@ public class WifiSignalStrength extends Sensor{
     private final WifiManager wifiManager;
     private WifiInfo wifiInfo;
     private int signalStrength = 1; // Default value (dBm)
-    private int signalLevel = -1; // Default value
+    private int signalLevel = 0; // Default value
 
     // initialize and request information, ez! :>
     WifiSignalStrength(Context context) {
@@ -24,7 +24,7 @@ public class WifiSignalStrength extends Sensor{
             return signalStrength;
         }
         // Wifi is disabled, return invalid value
-        else return 1;
+        else return 0;
     }
 
     public int getSignalLevel() {
@@ -36,7 +36,8 @@ public class WifiSignalStrength extends Sensor{
             signalLevel = WifiManager.calculateSignalLevel(signalStrength, 5);
         }
         // Wifi is disabled, return invalid value
-        else signalLevel = -1;
+        else return -1;
+
         return signalLevel;
     }
 }

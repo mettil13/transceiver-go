@@ -1,20 +1,16 @@
 package app_mobili.transceiver_go;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -22,8 +18,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
 import androidx.room.Room;
-
-import com.google.android.gms.location.LocationListener;
 
 import app_mobili.transceiver_go.databinding.ActivityMainBinding;
 
@@ -51,8 +45,8 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         // retrieving preferences
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this); // Use getContext() in a Fragment or this in an Activity
 
-        //int lastMeasurements = sharedPreferences.getInt("num_kept_measurements",0);
-        //Log.println(Log.ASSERT,"lastmes", lastMeasurements+"");
+        int lastMeasurements = sharedPreferences.getInt("num_kept_measurements",0);
+        Log.println(Log.ASSERT,"luizo", lastMeasurements+"");
 
         // coordinate setup
         coordinateListener = new CoordinateListener();
@@ -99,14 +93,14 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
 
         setUpMeasurementButtons(binding);
 
-        //this.deleteDatabase("second");
+        this.deleteDatabase("squaredb");
         // setting the database
         squaredb = Room.databaseBuilder(this, SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
 
         //secondb = Room.databaseBuilder(this, SquareDatabase.class, "second").addMigrations(SquareDatabase.migration).build();
 
         new Thread(() -> {
-            Square s1 = new Square(50, 50, 5);
+            //Square s1;
             //secondb.getSquareDAO().upsertSquare(s1);
             squaredb.getSquareDAO().upsertSquare(new Square(1, 1, 0.001));
             squaredb.getSquareDAO().upsertSquare(new Square(0, 0, 0.001));
@@ -122,9 +116,9 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
             squaredb.getSquareDAO().upsertSquare(new Square(11.393, 44.472, 0.001));
             squaredb.getSquareDAO().upsertSquare(new Square(11.393, 44.473, 0.001));
             squaredb.getSquareDAO().upsertSquare(new Square(11.394963, 44.473466, 0.001));
-            s1 = squaredb.getSquareDAO().getYourSquare(52, 52, 5);
+            //s1 = squaredb.getSquareDAO().getYourSquare(52, 52, 5);
 
-            System.out.println(s1.toString());
+            //System.out.println(s1.toString());
 
 
         }).start();
@@ -148,51 +142,119 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         Animation toBottomHide = AnimationUtils.loadAnimation(this, R.anim.to_bottom_hide_animation);
 
         // on click
-        binding.newMeasurementButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                isAddSelected = !isAddSelected;
-                if (isAddSelected) {
-                    // animations
-                    binding.newMeasurementButton.startAnimation(rotateOpen);
-                    binding.newWiFiMeasurementButton.startAnimation(fromBottomShow);
-                    binding.newInternetConnectionMeasurementButton.startAnimation(fromBottomShow);
-                    binding.newNoiseMeasurementButton.startAnimation(fromBottomShow);
-                    // clickable
-                    binding.newWiFiMeasurementButton.setClickable(true);
-                    binding.newInternetConnectionMeasurementButton.setClickable(true);
-                    binding.newNoiseMeasurementButton.setClickable(true);
-                    // long clickable
-                    binding.newWiFiMeasurementButton.setLongClickable(true);
-                    binding.newInternetConnectionMeasurementButton.setLongClickable(true);
-                    binding.newNoiseMeasurementButton.setLongClickable(true);
-                } else {
-                    binding.newMeasurementButton.startAnimation(rotateClose);
-                    binding.newWiFiMeasurementButton.startAnimation(toBottomHide);
-                    binding.newInternetConnectionMeasurementButton.startAnimation(toBottomHide);
-                    binding.newNoiseMeasurementButton.startAnimation(toBottomHide);
+        binding.newMeasurementButton.setOnClickListener(view -> {
+            isAddSelected = !isAddSelected;
+            if (isAddSelected) {
+                // animations
+                binding.newMeasurementButton.startAnimation(rotateOpen);
+                binding.newWiFiMeasurementButton.startAnimation(fromBottomShow);
+                binding.newInternetConnectionMeasurementButton.startAnimation(fromBottomShow);
+                binding.newNoiseMeasurementButton.startAnimation(fromBottomShow);
+                // clickable
+                binding.newWiFiMeasurementButton.setClickable(true);
+                binding.newInternetConnectionMeasurementButton.setClickable(true);
+                binding.newNoiseMeasurementButton.setClickable(true);
+                // long clickable
+                binding.newWiFiMeasurementButton.setLongClickable(true);
+                binding.newInternetConnectionMeasurementButton.setLongClickable(true);
+                binding.newNoiseMeasurementButton.setLongClickable(true);
+            } else {
+                binding.newMeasurementButton.startAnimation(rotateClose);
+                binding.newWiFiMeasurementButton.startAnimation(toBottomHide);
+                binding.newInternetConnectionMeasurementButton.startAnimation(toBottomHide);
+                binding.newNoiseMeasurementButton.startAnimation(toBottomHide);
 
-                    binding.newWiFiMeasurementButton.setClickable(false);
-                    binding.newInternetConnectionMeasurementButton.setClickable(false);
-                    binding.newNoiseMeasurementButton.setClickable(false);
+                binding.newWiFiMeasurementButton.setClickable(false);
+                binding.newInternetConnectionMeasurementButton.setClickable(false);
+                binding.newNoiseMeasurementButton.setClickable(false);
 
-                    binding.newWiFiMeasurementButton.setLongClickable(false);
-                    binding.newInternetConnectionMeasurementButton.setLongClickable(false);
-                    binding.newNoiseMeasurementButton.setLongClickable(false);
-                }
+                binding.newWiFiMeasurementButton.setLongClickable(false);
+                binding.newInternetConnectionMeasurementButton.setLongClickable(false);
+                binding.newNoiseMeasurementButton.setLongClickable(false);
             }
         });
-        binding.newWiFiMeasurementButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        binding.newWiFiMeasurementButton.setOnClickListener(view -> {
+            longitude = coordinateListener.getLongitude();
+            latitude = coordinateListener.getLatitude();
 
-            }
+            int wifi = wifiSignalStrength.getSignalLevel();
+
+            new Thread(() -> {
+                Square square = new Square(longitude,latitude, 0.001);
+                // returns the square we're in, if it exists
+                Square squareInDb = squaredb.getSquareDAO().getSquare(square.getCoordinates());
+
+                // if such database exists, copy everything in the square used to update
+                // information, if not update the new one
+                if(squareInDb != null) square = squareInDb;
+
+                // actual update
+                square.updateWifi(wifi);
+
+                // update the database with updated square
+                squaredb.getSquareDAO().upsertSquare(square);
+
+
+
+                // TODO: Update map view to reflect new measurement
+            }).start();
+            Toast toast = Toast.makeText(view.getContext(), R.string.new_wifi_measurement, Toast.LENGTH_SHORT);
+            toast.show();
         });
-        binding.newInternetConnectionMeasurementButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        binding.newInternetConnectionMeasurementButton.setOnClickListener(view -> {
+            networkSignalStrength.startMonitoringSignalStrength();
+
+            longitude = coordinateListener.getLongitude();
+            latitude = coordinateListener.getLatitude();
+            int umts = networkSignalStrength.getUmtsSignalStrength();
+            int lte = networkSignalStrength.getLteSignalStrength();
+
+            networkSignalStrength.stopMonitoringSignalStrength();
+            // if umts has unused value
+            if (umts == 99 || umts == android.telephony.CellInfo.UNAVAILABLE) {
+                // save LTE measurement
+                new Thread(() -> {
+                    Square square = new Square(longitude,latitude, 0.001);
+                    // returns the square we're in, if it exists
+                    Square squareInDb = squaredb.getSquareDAO().getSquare(square.getCoordinates());
+
+                    // if such database exists, copy everything in the square used to update
+                    // information, if not update the new one
+                    if(squareInDb != null) square = squareInDb;
+
+                    // actual update
+                    square.updateNetwork(lte);
+
+                    // update the database with updated square
+                    squaredb.getSquareDAO().upsertSquare(square);
+
+                    // TODO: Update map view to reflect new measurement
+                }).start();
+            }
+            else {
+                // save UMTS measurement
+                new Thread(() -> {
+                    Square square = new Square(longitude,latitude, 0.001);
+                    // returns the square we're in, if it exists
+                    Square squareInDb = squaredb.getSquareDAO().getSquare(square.getCoordinates());
+
+                    // if such database exists, copy everything in the square used to update
+                    // information, if not update the new one
+                    if(squareInDb != null) square = squareInDb;
+
+                    // actual update
+                    square.updateNetwork(umts);
+
+                    // update the database with updated square
+                    squaredb.getSquareDAO().upsertSquare(square);
+
+                    // TODO: Update map view to reflect new measurement
+                }).start();
 
             }
+            Toast toast = Toast.makeText(view.getContext(), R.string.new_internet_connection_measurement, Toast.LENGTH_SHORT);
+            toast.show();
+
         });
         binding.newNoiseMeasurementButton.setOnClickListener(view -> {
             longitude = coordinateListener.getLongitude();

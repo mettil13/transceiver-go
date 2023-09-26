@@ -161,10 +161,10 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
             SquareDatabase squaredb = Room.databaseBuilder(getActivity(), SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
             List<Square> squaresWithData = new ArrayList<>();
             if (positiveLeft != null && positiveRight != null) {
-                squaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInPositiveEmisphereRange(positiveLeft.getValue(), topLeftY.getValue(), positiveRight.getValue(), bottomRightY.getValue(), l));
+                squaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInPositiveHemisphereRange(positiveLeft.getValue(), topLeftY.getValue(), positiveRight.getValue(), bottomRightY.getValue(), l));
             }
             if (negativeLeft != null && negativeRight != null) {
-                squaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInNegativeEmisphereRange(negativeLeft.getValue(), topLeftY.getValue(), negativeRight.getValue(), bottomRightY.getValue(), l));
+                squaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInNegativeHemisphereRange(negativeLeft.getValue(), topLeftY.getValue(), negativeRight.getValue(), bottomRightY.getValue(), l));
             }
 
             squaresWithData.sort(new Square.LongitudeComparator());

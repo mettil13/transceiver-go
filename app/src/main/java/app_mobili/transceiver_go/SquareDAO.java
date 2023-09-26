@@ -37,26 +37,26 @@ public interface SquareDAO {
     @Query("SELECT * FROM Square WHERE (`Length` == :l) AND (ABS(`X` - :x) <= (:l/2)) AND (ABS(`Y` - :y) <= (:l/2)) ORDER BY ABS(`X` - :x) + ABS(`Y` - :y) LIMIT 1")
     Square getYourSquare(int x, int y, int l);
 
-    // returns a list of squares from the positive emisphere of l length,
+    // returns a list of squares from the positive hemisphere of l length,
     // in a rectangular area defined by the center of the top left square
     // and the center of the bottom right square.
-    // BEWARE, if the are is not completely in the positive emisphere
+    // BEWARE, if the are is not completely in the positive hemisphere
     // function returns nothing
     @Query("select * from Square " +
             "WHERE `Length`==:l AND `X`>=:topLeftX AND `X`<=:bottomRightX " +
             "AND `Y`<=:topLeftY AND `Y`>=:bottomRightY " +
             "AND :topLeftX>=0 AND :bottomRightX<=180")
-    List<Square> getAllSquaresInPositiveEmisphereRange(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY, double l);
+    List<Square> getAllSquaresInPositiveHemisphereRange(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY, double l);
 
-    // returns a list of squares from the negative emisphere of l length,
+    // returns a list of squares from the negative hemisphere of l length,
     // in a rectangular area defined by the center of the top left square
     // and the center of the bottom right square.
-    // BEWARE, if the are is not completely in the negative emisphere
+    // BEWARE, if the are is not completely in the negative hemisphere
     // function returns nothing
     @Query("select * from Square " +
             "WHERE `Length`==:l AND `X`>=:topLeftX AND `X`<=:bottomRightX " +
             "AND `Y`<=:topLeftY AND `Y`>=:bottomRightY " +
             "AND :topLeftX<=0 AND :bottomRightX>=-180")
-    List<Square> getAllSquaresInNegativeEmisphereRange(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY, double l);
+    List<Square> getAllSquaresInNegativeHemisphereRange(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY, double l);
 
 }
