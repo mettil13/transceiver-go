@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "7344a83ae0356bc6a32eda35980af2e3",
+    "identityHash": "9aeb12306573efde0e04c19f4c62e69e",
     "entities": [
       {
         "tableName": "Square",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`SquareID` TEXT NOT NULL, `X` REAL, `Y` REAL, `Length` REAL NOT NULL, `Network Signal Strength` INTEGER NOT NULL, `Wifi Signal Strength` INTEGER NOT NULL, `Noise Strength` INTEGER NOT NULL, `noiseAverageCounter` INTEGER NOT NULL, `wifiAverageCounter` INTEGER NOT NULL, `networkAverageCounter` INTEGER NOT NULL, PRIMARY KEY(`SquareID`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`SquareID` TEXT NOT NULL, `X` REAL, `Y` REAL, `Network Signal Strength` INTEGER NOT NULL, `Wifi Signal Strength` INTEGER NOT NULL, `Noise Strength` INTEGER NOT NULL, `noiseAverageCounter` INTEGER NOT NULL, `wifiAverageCounter` INTEGER NOT NULL, `networkAverageCounter` INTEGER NOT NULL, PRIMARY KEY(`SquareID`))",
         "fields": [
           {
             "fieldPath": "coordinates",
@@ -15,22 +15,16 @@
             "notNull": true
           },
           {
-            "fieldPath": "latitude",
+            "fieldPath": "longitude",
             "columnName": "X",
             "affinity": "REAL",
             "notNull": false
           },
           {
-            "fieldPath": "longitude",
+            "fieldPath": "latitude",
             "columnName": "Y",
             "affinity": "REAL",
             "notNull": false
-          },
-          {
-            "fieldPath": "sideLength",
-            "columnName": "Length",
-            "affinity": "REAL",
-            "notNull": true
           },
           {
             "fieldPath": "network",
@@ -82,7 +76,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7344a83ae0356bc6a32eda35980af2e3')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9aeb12306573efde0e04c19f4c62e69e')"
     ]
   }
 }

@@ -30,7 +30,7 @@ public class NoiseListener implements NoiseStrength.RecordingListener {
     @Override
     public void onRecordingFinished(int noise) {
         new Thread(() -> {
-            Square square = new Square(longitude,latitude, SIDE_LENGTH);
+            Square square = new Square(longitude,latitude);
             // returns the square we're in, if it exists
             Square squareInDb = squaredb.getSquareDAO().getSquare(square.getCoordinates());
 

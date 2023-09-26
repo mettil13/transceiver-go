@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <item name="square_dimension" format="float" type="dimen">0.001</item>
-    <integer name="min_cluster_dimension_in_pixel">15</integer>
-</resources>

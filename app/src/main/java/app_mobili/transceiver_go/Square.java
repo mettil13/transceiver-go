@@ -13,6 +13,9 @@ import com.google.android.gms.maps.model.PolygonOptions;
 
 @Entity(tableName = "Square")
 public class Square {
+    @Ignore
+    public final static double SIDE_LENGTH = 0.001;
+
     @PrimaryKey()
     @NonNull
     @ColumnInfo(name = "SquareID")
@@ -23,8 +26,6 @@ public class Square {
     protected Longitude longitude;
     @ColumnInfo(name = "Y")
     protected Latitude latitude;
-    @ColumnInfo(name = "Length")
-    protected double sideLength;
     @ColumnInfo(name = "Network Signal Strength")
     protected int network;
     @ColumnInfo(name = "Wifi Signal Strength")
@@ -41,23 +42,22 @@ public class Square {
 
 
     @Ignore
-    public Square(double longitude, double latitude, double sideLength) {
+    public Square(double longitude, double latitude) {
         // first we make sure that the provided coordinates are valid
         this.latitude = new Latitude(latitude);
         this.longitude = new Longitude(longitude);
         // First, calculate the block indices (rounded to nearest) for latitude and longitude
-        int blockLatitude = (int) Math.round(this.latitude.getValue() / sideLength);
-        int blockLongitude = (int) Math.round(this.longitude.getValue() / sideLength);
+        int blockLatitude = (int) Math.round(this.latitude.getValue() / SIDE_LENGTH);
+        int blockLongitude = (int) Math.round(this.longitude.getValue() / SIDE_LENGTH);
 
         // Then, calculate the center of the square using the block indices and side length
         //                      v block number  v side length
-        double centerLatitude = blockLatitude * sideLength;
-        double centerLongitude = blockLongitude * sideLength;
+        double centerLatitude = blockLatitude * SIDE_LENGTH;
+        double centerLongitude = blockLongitude * SIDE_LENGTH;
 
         // Set the calculated center and other attributes
         this.latitude.setValue(centerLatitude);
         this.longitude.setValue(centerLongitude);
-        this.sideLength = sideLength;
 
         // i'm sorry this primary key has to be a string with this format, but this is the best
         // solution for readability than a meaningless integer id.
@@ -68,21 +68,57 @@ public class Square {
         noise = 1;
     }
 
-    public Polygon drawTile(GoogleMap googleMap, int strokeColor, int fillColor) {
+    protected Polygon drawTile(GoogleMap googleMap, int strokeColor, int fillColor) {
         // calculate the 4 corners of the tile:
-        // latitude - sideLength / 2 , longitude + sideLength / 2
-        LatLng upLeft = new LatLng(new Latitude(latitude.getValue()).subtract(sideLength / 2).getValue(), new Longitude(longitude.getValue()).add(sideLength / 2).getValue());
-        // latitude + sideLength / 2 , longitude + sideLength / 2
-        LatLng downLeft = new LatLng(new Latitude(latitude.getValue()).add(sideLength / 2).getValue(), new Longitude(longitude.getValue()).add(sideLength / 2).getValue());
-        // latitude + sideLength / 2 , longitude - sideLength / 2
-        LatLng downRight = new LatLng(new Latitude(latitude.getValue()).add(sideLength / 2).getValue(), new Longitude(longitude.getValue()).subtract(sideLength / 2).getValue());
-        // latitude - sideLength / 2 , longitude - sideLength / 2
-        LatLng upRight = new LatLng(new Latitude(latitude.getValue()).subtract(sideLength / 2).getValue(), new Longitude(longitude.getValue()).subtract(sideLength / 2).getValue());
+        // latitude - SIDE_LENGTH / 2 , longitude + SIDE_LENGTH / 2
+        LatLng upLeft = new LatLng(new Latitude(latitude.getValue()).subtract(SIDE_LENGTH / 2).getValue(), new Longitude(longitude.getValue()).add(SIDE_LENGTH / 2).getValue());
+        // latitude + SIDE_LENGTH / 2 , longitude + SIDE_LENGTH / 2
+        LatLng downLeft = new LatLng(new Latitude(latitude.getValue()).add(SIDE_LENGTH / 2).getValue(), new Longitude(longitude.getValue()).add(SIDE_LENGTH / 2).getValue());
+        // latitude + SIDE_LENGTH / 2 , longitude - SIDE_LENGTH / 2
+        LatLng downRight = new LatLng(new Latitude(latitude.getValue()).add(SIDE_LENGTH / 2).getValue(), new Longitude(longitude.getValue()).subtract(SIDE_LENGTH / 2).getValue());
+        // latitude - SIDE_LENGTH / 2 , longitude - SIDE_LENGTH / 2
+        LatLng upRight = new LatLng(new Latitude(latitude.getValue()).subtract(SIDE_LENGTH / 2).getValue(), new Longitude(longitude.getValue()).subtract(SIDE_LENGTH / 2).getValue());
 
         Polygon tile = googleMap.addPolygon(new PolygonOptions().add(upLeft, downLeft, downRight, upRight));
         tile.setStrokeColor(strokeColor);
         tile.setFillColor(fillColor);
         return tile;
+    }
+
+    public Polygon drawNoiseTile(GoogleMap googleMap){
+        if(noise < 0){
+            return drawTile(googleMap, R.color.no_data_intensity_border, R.color.no_data_intensity_filler);
+        } else if(noise <= R.integer.noise_low_upper_bound){
+            return drawTile(googleMap, R.color.low_intensity_border, R.color.low_intensity_filler);
+        } else if(noise <= R.integer.noise_medium_upper_bound){
+            return drawTile(googleMap, R.color.medium_intensity_border, R.color.medium_intensity_filler);
+        } else  {
+            return drawTile(googleMap, R.color.high_intensity_border, R.color.high_intensity_filler);
+        }
+    }
+
+    public Polygon drawWifiTile(GoogleMap googleMap){
+        if(wifi < 0){
+            return drawTile(googleMap, R.color.no_data_intensity_border, R.color.no_data_intensity_filler);
+        } else if(wifi <= R.integer.wifi_low_upper_bound){
+            return drawTile(googleMap, R.color.low_intensity_border, R.color.low_intensity_filler);
+        } else if(wifi <= R.integer.wifi_medium_upper_bound){
+            return drawTile(googleMap, R.color.medium_intensity_border, R.color.medium_intensity_filler);
+        } else  {
+            return drawTile(googleMap, R.color.high_intensity_border, R.color.high_intensity_filler);
+        }
+    }
+
+    public Polygon drawNetworkTile(GoogleMap googleMap){
+        if(network < 0){
+            return drawTile(googleMap, R.color.no_data_intensity_border, R.color.no_data_intensity_filler);
+        } else if(network <= R.integer.network_low_upper_bound){
+            return drawTile(googleMap, R.color.low_intensity_border, R.color.low_intensity_filler);
+        } else if(network <= R.integer.network_medium_upper_bound){
+            return drawTile(googleMap, R.color.medium_intensity_border, R.color.medium_intensity_filler);
+        } else  {
+            return drawTile(googleMap, R.color.high_intensity_border, R.color.high_intensity_filler);
+        }
     }
 
     public void updateNetwork(int network) {
@@ -144,7 +180,6 @@ public class Square {
                 "coordinates='" + coordinates + '\'' +
                 ", latitude=" + latitude.getValue() +
                 ", longitude=" + longitude.getValue() +
-                ", length=" + sideLength +
                 ", network=" + network +
                 ", wifi=" + wifi +
                 ", noise=" + noise +

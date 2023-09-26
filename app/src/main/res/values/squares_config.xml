@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The dimension of the side of the squares is stored in the class Square -->
+
+    <color name="no_data_intensity_border">#4C4C4C</color>
+    <color name="no_data_intensity_filler">#00000000</color>
+    <color name="low_intensity_border">#4CAF50</color>
+    <color name="low_intensity_filler">#804CAF50</color>
+    <color name="medium_intensity_border">#FFEB3B</color>
+    <color name="medium_intensity_filler">#80FFEB3B</color>
+    <color name="high_intensity_border">#FF5722</color>
+    <color name="high_intensity_filler">#80FF5722</color>
+
+    <integer name="noise_low_upper_bound">35</integer>
+    <integer name="noise_medium_upper_bound">70</integer>
+
+    <integer name="wifi_low_upper_bound">1</integer>
+    <integer name="wifi_medium_upper_bound">3</integer>
+
+    <integer name="network_low_upper_bound">1</integer>
+    <integer name="network_medium_upper_bound">2</integer>
+
+    <!-- Grid config-->
+
+    <!-- Heatmap config-->
+    <integer name="min_cluster_dimension_in_pixel">15</integer>
+</resources>

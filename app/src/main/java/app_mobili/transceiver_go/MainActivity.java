@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         int lastMeasurements = sharedPreferences.getInt("num_kept_measurements",0);
         Log.println(Log.ASSERT,"luizo", lastMeasurements+"");
 
+
         // coordinate setup
         coordinateListener = new CoordinateListener();
         lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -60,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
 
         networkSignalStrength = new NetworkSignalStrength(this);
         wifiSignalStrength = new WifiSignalStrength(this);
-
 
         // fragment setup
         Fragment mainMap = new FragmentMainMap();
@@ -91,7 +91,9 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         });
         replaceFragment(R.id.fragmentContainer, mainMap);
 
+
         setUpMeasurementButtons(binding);
+
 
         this.deleteDatabase("squaredb");
         // setting the database
@@ -102,20 +104,20 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         new Thread(() -> {
             //Square s1;
             //secondb.getSquareDAO().upsertSquare(s1);
-            squaredb.getSquareDAO().upsertSquare(new Square(1, 1, 0.001));
-            squaredb.getSquareDAO().upsertSquare(new Square(0, 0, 0.001));
-            squaredb.getSquareDAO().upsertSquare(new Square(10, 10, 0.001));
-            squaredb.getSquareDAO().upsertSquare(new Square(10, 5, 0.001));
-            squaredb.getSquareDAO().upsertSquare(new Square(10, 15, 0.001));
-            squaredb.getSquareDAO().upsertSquare(new Square(20, 0, 0.001));
-            squaredb.getSquareDAO().upsertSquare(new Square(1, -10, 0.001));
-            squaredb.getSquareDAO().upsertSquare(new Square(-15, 5, 0.001));
-            squaredb.getSquareDAO().upsertSquare(new Square(-5, -5, 0.001));
-            squaredb.getSquareDAO().upsertSquare(new Square(11.4, 44.500, 0.001));
-            squaredb.getSquareDAO().upsertSquare(new Square(11.4, 44.501, 0.001));
-            squaredb.getSquareDAO().upsertSquare(new Square(11.393, 44.472, 0.001));
-            squaredb.getSquareDAO().upsertSquare(new Square(11.393, 44.473, 0.001));
-            squaredb.getSquareDAO().upsertSquare(new Square(11.394963, 44.473466, 0.001));
+            squaredb.getSquareDAO().upsertSquare(new Square(1, 1));
+            squaredb.getSquareDAO().upsertSquare(new Square(0, 0));
+            squaredb.getSquareDAO().upsertSquare(new Square(10, 10));
+            squaredb.getSquareDAO().upsertSquare(new Square(10, 5));
+            squaredb.getSquareDAO().upsertSquare(new Square(10, 15));
+            squaredb.getSquareDAO().upsertSquare(new Square(20, 0));
+            squaredb.getSquareDAO().upsertSquare(new Square(1, -10));
+            squaredb.getSquareDAO().upsertSquare(new Square(-15, 5));
+            squaredb.getSquareDAO().upsertSquare(new Square(-5, -5));
+            squaredb.getSquareDAO().upsertSquare(new Square(11.4, 44.500));
+            squaredb.getSquareDAO().upsertSquare(new Square(11.4, 44.501));
+            squaredb.getSquareDAO().upsertSquare(new Square(11.393, 44.472));
+            squaredb.getSquareDAO().upsertSquare(new Square(11.393, 44.473));
+            squaredb.getSquareDAO().upsertSquare(new Square(11.394963, 44.473466));
             //s1 = squaredb.getSquareDAO().getYourSquare(52, 52, 5);
 
             //System.out.println(s1.toString());
@@ -180,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
             int wifi = wifiSignalStrength.getSignalLevel();
 
             new Thread(() -> {
-                Square square = new Square(longitude,latitude, 0.001);
+                Square square = new Square(longitude,latitude);
                 // returns the square we're in, if it exists
                 Square squareInDb = squaredb.getSquareDAO().getSquare(square.getCoordinates());
 
@@ -214,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
             if (umts == 99 || umts == android.telephony.CellInfo.UNAVAILABLE) {
                 // save LTE measurement
                 new Thread(() -> {
-                    Square square = new Square(longitude,latitude, 0.001);
+                    Square square = new Square(longitude,latitude);
                     // returns the square we're in, if it exists
                     Square squareInDb = squaredb.getSquareDAO().getSquare(square.getCoordinates());
 
@@ -234,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
             else {
                 // save UMTS measurement
                 new Thread(() -> {
-                    Square square = new Square(longitude,latitude, 0.001);
+                    Square square = new Square(longitude,latitude);
                     // returns the square we're in, if it exists
                     Square squareInDb = squaredb.getSquareDAO().getSquare(square.getCoordinates());
 
