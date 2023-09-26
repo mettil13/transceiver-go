@@ -36,7 +36,7 @@ public class WifiSignalStrength extends Sensor{
             signalLevel = WifiManager.calculateSignalLevel(signalStrength, 5);
         }
         // Wifi is disabled, return invalid value
-        else return -1;
+        else return 0;
 
         return signalLevel;
     }
