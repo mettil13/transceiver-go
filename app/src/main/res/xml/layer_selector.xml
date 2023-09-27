@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <ListPreference
+        android:defaultValue="0"
+        android:entries="@array/type_of_data_entries"
+        android:entryValues="@array/type_of_data_values"
+        android:key="my_database"
+        android:title="My database"
+        app:defaultValue="@string/none"
+        app:useSimpleSummaryProvider="true"/>
+</PreferenceScreen>
