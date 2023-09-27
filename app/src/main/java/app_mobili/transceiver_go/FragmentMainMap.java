@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -26,9 +25,6 @@ import com.google.android.gms.maps.model.VisibleRegion;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
@@ -68,11 +64,9 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         View view = inflater.inflate(R.layout.fragment_main_map, container, false);
         FloatingActionButton button = (FloatingActionButton) view.findViewById(R.id.layerButton);
         Fragment layerSelector = new FragmentLayerSelector();
-        button.setOnClickListener(new View.OnClickListener()
-        {
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 FragmentManager fragmentManager = getParentFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.setReorderingAllowed(true);
@@ -162,10 +156,10 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
             List<Square> easternSquaresWithData = new ArrayList<>();
             List<Square> westernSquaresWithData = new ArrayList<>();
             if (positiveLeft != null && positiveRight != null) {
-                easternSquaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInPositiveEmisphereRange(positiveLeft.getValue(), topLeftY.getValue(), positiveRight.getValue(), bottomRightY.getValue()));
+                easternSquaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInPositiveHemisphereRange(positiveLeft.getValue(), topLeftY.getValue(), positiveRight.getValue(), bottomRightY.getValue()));
             }
             if (negativeLeft != null && negativeRight != null) {
-                westernSquaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInNegativeEmisphereRange(negativeLeft.getValue(), topLeftY.getValue(), negativeRight.getValue(), bottomRightY.getValue()));
+                westernSquaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInNegativeHemisphereRange(negativeLeft.getValue(), topLeftY.getValue(), negativeRight.getValue(), bottomRightY.getValue()));
             }
 
 
@@ -238,10 +232,10 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
             SquareDatabase squaredb = Room.databaseBuilder(getActivity(), SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
             List<Square> squaresWithData = new ArrayList<>();
             if (positiveLeft != null && positiveRight != null) {
-                squaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInPositiveEmisphereRange(positiveLeft.getValue(), topLeftY.getValue(), positiveRight.getValue(), bottomRightY.getValue()));
+                squaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInPositiveHemisphereRange(positiveLeft.getValue(), topLeftY.getValue(), positiveRight.getValue(), bottomRightY.getValue()));
             }
             if (negativeLeft != null && negativeRight != null) {
-                squaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInNegativeEmisphereRange(negativeLeft.getValue(), topLeftY.getValue(), negativeRight.getValue(), bottomRightY.getValue()));
+                squaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInNegativeHemisphereRange(negativeLeft.getValue(), topLeftY.getValue(), negativeRight.getValue(), bottomRightY.getValue()));
             }
 
             List<WeightedLatLng> heatmapPoints = new ArrayList<>();

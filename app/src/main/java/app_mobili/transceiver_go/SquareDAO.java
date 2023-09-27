@@ -46,7 +46,7 @@ public interface SquareDAO {
             "WHERE `X`>=:topLeftX AND `X`<=:bottomRightX " +
             "AND `Y`<=:topLeftY AND `Y`>=:bottomRightY " +
             "AND :topLeftX>=0 AND :bottomRightX<=180")
-    List<Square> getAllSquaresInPositiveEmisphereRange(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY);
+    List<Square> getAllSquaresInPositiveHemisphereRange(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY);
 
     // returns a list of squares from the negative hemisphere of l length,
     // in a rectangular area defined by the center of the top left square
@@ -57,6 +57,6 @@ public interface SquareDAO {
             "WHERE `X`>=:topLeftX AND `X`<=:bottomRightX " +
             "AND `Y`<=:topLeftY AND `Y`>=:bottomRightY " +
             "AND :topLeftX<=0 AND :bottomRightX>=-180")
-    List<Square> getAllSquaresInNegativeEmisphereRange(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY);
+    List<Square> getAllSquaresInNegativeHemisphereRange(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY);
 
 }
