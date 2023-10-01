@@ -1,6 +1,10 @@
 package app_mobili.transceiver_go;
 
+import android.content.Context;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -63,9 +67,9 @@ public class Square {
         // solution for readability than a meaningless integer id.
         coordinates = this.latitude.getValue() + "|" + this.longitude.getValue();
 
-        network = 1;
-        wifi = 1;
-        noise = 1;
+        network = -1;
+        wifi = -1;
+        noise = -1;
     }
 
     protected Polygon drawTile(GoogleMap googleMap, int strokeColor, int fillColor) {
@@ -85,40 +89,48 @@ public class Square {
         return tile;
     }
 
-    public Polygon drawNoiseTile(GoogleMap googleMap){
+    public String getSquareId(){
+        return coordinates;
+    }
+
+    public Polygon drawNoiseTile(GoogleMap googleMap, Context context){
         if(noise < 0){
-            return drawTile(googleMap, R.color.no_data_intensity_border, R.color.no_data_intensity_filler);
-        } else if(noise <= R.integer.noise_low_upper_bound){
-            return drawTile(googleMap, R.color.low_intensity_border, R.color.low_intensity_filler);
-        } else if(noise <= R.integer.noise_medium_upper_bound){
-            return drawTile(googleMap, R.color.medium_intensity_border, R.color.medium_intensity_filler);
+            return drawTile(googleMap, ContextCompat.getColor(context, R.color.no_data_intensity_border), ContextCompat.getColor(context, R.color.no_data_intensity_filler));
+        } else if(noise <= context.getResources().getInteger(R.integer.noise_low_upper_bound)){
+            return drawTile(googleMap, ContextCompat.getColor(context, R.color.low_intensity_border), ContextCompat.getColor(context, R.color.low_intensity_filler));
+        } else if(noise <= context.getResources().getInteger(R.integer.noise_medium_upper_bound)){
+            return drawTile(googleMap, ContextCompat.getColor(context, R.color.medium_intensity_border), ContextCompat.getColor(context, R.color.medium_intensity_filler));
         } else  {
-            return drawTile(googleMap, R.color.high_intensity_border, R.color.high_intensity_filler);
+            return drawTile(googleMap, ContextCompat.getColor(context, R.color.high_intensity_border), ContextCompat.getColor(context, R.color.high_intensity_filler));
         }
     }
 
-    public Polygon drawWifiTile(GoogleMap googleMap){
+    public Polygon drawWifiTile(GoogleMap googleMap, Context context){
         if(wifi < 0){
-            return drawTile(googleMap, R.color.no_data_intensity_border, R.color.no_data_intensity_filler);
-        } else if(wifi <= R.integer.wifi_low_upper_bound){
-            return drawTile(googleMap, R.color.low_intensity_border, R.color.low_intensity_filler);
-        } else if(wifi <= R.integer.wifi_medium_upper_bound){
-            return drawTile(googleMap, R.color.medium_intensity_border, R.color.medium_intensity_filler);
+            return drawTile(googleMap, ContextCompat.getColor(context, R.color.no_data_intensity_border), ContextCompat.getColor(context, R.color.no_data_intensity_filler));
+        } else if(wifi <= context.getResources().getInteger(R.integer.wifi_low_upper_bound)){
+            return drawTile(googleMap, ContextCompat.getColor(context, R.color.low_intensity_border), ContextCompat.getColor(context, R.color.low_intensity_filler));
+        } else if(wifi <= context.getResources().getInteger(R.integer.wifi_medium_upper_bound)){
+            return drawTile(googleMap, ContextCompat.getColor(context, R.color.medium_intensity_border), ContextCompat.getColor(context, R.color.medium_intensity_filler));
         } else  {
-            return drawTile(googleMap, R.color.high_intensity_border, R.color.high_intensity_filler);
+            return drawTile(googleMap, ContextCompat.getColor(context, R.color.high_intensity_border), ContextCompat.getColor(context, R.color.high_intensity_filler));
         }
     }
 
-    public Polygon drawNetworkTile(GoogleMap googleMap){
+    public Polygon drawNetworkTile(GoogleMap googleMap, Context context){
         if(network < 0){
-            return drawTile(googleMap, R.color.no_data_intensity_border, R.color.no_data_intensity_filler);
-        } else if(network <= R.integer.network_low_upper_bound){
-            return drawTile(googleMap, R.color.low_intensity_border, R.color.low_intensity_filler);
-        } else if(network <= R.integer.network_medium_upper_bound){
-            return drawTile(googleMap, R.color.medium_intensity_border, R.color.medium_intensity_filler);
+            return drawTile(googleMap, ContextCompat.getColor(context, R.color.no_data_intensity_border), ContextCompat.getColor(context, R.color.no_data_intensity_filler));
+        } else if(network <= context.getResources().getInteger(R.integer.network_low_upper_bound)){
+            return drawTile(googleMap, ContextCompat.getColor(context, R.color.low_intensity_border), ContextCompat.getColor(context, R.color.low_intensity_filler));
+        } else if(network <= context.getResources().getInteger(R.integer.network_medium_upper_bound)){
+            return drawTile(googleMap, ContextCompat.getColor(context, R.color.medium_intensity_border), ContextCompat.getColor(context, R.color.medium_intensity_filler));
         } else  {
-            return drawTile(googleMap, R.color.high_intensity_border, R.color.high_intensity_filler);
+            return drawTile(googleMap, ContextCompat.getColor(context, R.color.high_intensity_border), ContextCompat.getColor(context, R.color.high_intensity_filler));
         }
+    }
+
+    public Polygon drawEmptyTile(GoogleMap googleMap, Context context){
+        return drawTile(googleMap, ContextCompat.getColor(context, R.color.no_data_intensity_border), ContextCompat.getColor(context, R.color.no_data_intensity_filler));
     }
 
     public void updateNetwork(int network) {

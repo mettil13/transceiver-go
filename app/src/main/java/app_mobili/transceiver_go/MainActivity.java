@@ -104,24 +104,81 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         new Thread(() -> {
             //Square s1;
             //secondb.getSquareDAO().upsertSquare(s1);
-            squaredb.getSquareDAO().upsertSquare(new Square(1, 1));
-            squaredb.getSquareDAO().upsertSquare(new Square(0, 0));
-            squaredb.getSquareDAO().upsertSquare(new Square(10, 10));
-            squaredb.getSquareDAO().upsertSquare(new Square(10, 5));
-            squaredb.getSquareDAO().upsertSquare(new Square(10, 15));
-            squaredb.getSquareDAO().upsertSquare(new Square(20, 0));
-            squaredb.getSquareDAO().upsertSquare(new Square(1, -10));
-            squaredb.getSquareDAO().upsertSquare(new Square(-15, 5));
-            squaredb.getSquareDAO().upsertSquare(new Square(-5, -5));
-            squaredb.getSquareDAO().upsertSquare(new Square(11.4, 44.500));
-            squaredb.getSquareDAO().upsertSquare(new Square(11.4, 44.501));
-            squaredb.getSquareDAO().upsertSquare(new Square(11.393, 44.472));
-            squaredb.getSquareDAO().upsertSquare(new Square(11.393, 44.473));
-            squaredb.getSquareDAO().upsertSquare(new Square(11.394963, 44.473466));
-            //s1 = squaredb.getSquareDAO().getYourSquare(52, 52, 5);
-
-            //System.out.println(s1.toString());
-
+            {
+                Square square = new Square(1, 1);
+                square.setNoise(100);
+                squaredb.getSquareDAO().upsertSquare(square);
+            }
+            {
+                Square square = new Square(0, 0);
+                square.setNoise(5);
+                squaredb.getSquareDAO().upsertSquare(square);
+            }
+            {
+                Square square = new Square(10, 10);
+                square.setNoise(100);
+                squaredb.getSquareDAO().upsertSquare(square);
+            }
+            {
+                Square square = new Square(10, 5);
+                square.setNoise(100);
+                squaredb.getSquareDAO().upsertSquare(square);
+            }
+            {
+                Square square = new Square(10, 15);
+                square.setNoise(10);
+                squaredb.getSquareDAO().upsertSquare(square);
+            }
+            {
+                Square square = new Square(20, 0);
+                square.setNoise(10);
+                squaredb.getSquareDAO().upsertSquare(square);
+            }
+            {
+                Square square = new Square(1, -10);
+                square.setNoise(10);
+                squaredb.getSquareDAO().upsertSquare(square);
+            }
+            {
+                Square square = new Square(-15, 5);
+                square.setNoise(100);
+                squaredb.getSquareDAO().upsertSquare(square);
+            }
+            {
+                Square square = new Square(-5, -5);
+                square.setNoise(100);
+                squaredb.getSquareDAO().upsertSquare(square);
+            }
+            {
+                Square square = new Square(-5, 10);
+                square.setNoise(100);
+                squaredb.getSquareDAO().upsertSquare(square);
+            }
+            {
+                Square square = new Square(11.4, 44.500);
+                square.setNoise(100);
+                squaredb.getSquareDAO().upsertSquare(square);
+            }
+            {
+                Square square = new Square(11.4, 44.501);
+                square.setNoise(50);
+                squaredb.getSquareDAO().upsertSquare(square);
+            }
+            {
+                Square square = new Square(11.393, 44.472);
+                square.setNoise(50);
+                squaredb.getSquareDAO().upsertSquare(square);
+            }
+            {
+                Square square = new Square(11.393, 44.473);
+                square.setNoise(10);
+                squaredb.getSquareDAO().upsertSquare(square);
+            }
+            {
+                Square square = new Square(11.394963, 44.473466);
+                square.setNoise(100);
+                squaredb.getSquareDAO().upsertSquare(square);
+            }
 
         }).start();
 

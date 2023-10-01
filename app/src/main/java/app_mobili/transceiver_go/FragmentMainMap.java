@@ -1,14 +1,18 @@
 package app_mobili.transceiver_go;
 
+import android.database.Cursor;
 import android.graphics.Point;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.PreferenceManager;
 import androidx.room.Room;
+import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,14 +23,22 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.maps.android.heatmaps.Gradient;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
 import com.google.maps.android.heatmaps.WeightedLatLng;
 
@@ -38,7 +50,7 @@ import com.google.maps.android.heatmaps.WeightedLatLng;
 public class FragmentMainMap extends Fragment implements OnMapReadyCallback, GoogleMap.OnCameraMoveStartedListener, GoogleMap.OnCameraMoveListener, GoogleMap.OnCameraIdleListener {
     protected GoogleMap map;
     protected HeatmapTileProvider heatmapProvider;
-
+    protected FragmentLayerSelector layerSelector; // contains the names of the data to display
     protected static int minClusterDimensionInPixel = 15;
 
     public FragmentMainMap() {
@@ -63,7 +75,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_main_map, container, false);
         FloatingActionButton button = (FloatingActionButton) view.findViewById(R.id.layerButton);
-        Fragment layerSelector = new FragmentLayerSelector();
+        layerSelector = new FragmentLayerSelector();
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -146,77 +158,21 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
 
     protected void retrieveAndDrawSquares(Longitude topLeftX, Latitude topLeftY, Longitude bottomRightX, Latitude bottomRightY) {
         Longitude negativeLeft = truncateLongitudeToWesternHemisphere(topLeftX, bottomRightX) != null ? truncateLongitudeToWesternHemisphere(topLeftX, bottomRightX)[0] : null;
-        Longitude negativeRight = truncateLongitudeToWesternHemisphere(topLeftX, bottomRightX) != null ? truncateLongitudeToWesternHemisphere(topLeftX, bottomRightX)[0] : null;
+        Longitude negativeRight = truncateLongitudeToWesternHemisphere(topLeftX, bottomRightX) != null ? truncateLongitudeToWesternHemisphere(topLeftX, bottomRightX)[1] : null;
         Longitude positiveLeft = truncateLongitudeToEasternHemisphere(topLeftX, bottomRightX) != null ? truncateLongitudeToEasternHemisphere(topLeftX, bottomRightX)[0] : null;
         Longitude positiveRight = truncateLongitudeToEasternHemisphere(topLeftX, bottomRightX) != null ? truncateLongitudeToEasternHemisphere(topLeftX, bottomRightX)[1] : null;
 
+        String typeOfData = PreferenceManager.getDefaultSharedPreferences(getContext()).getString("type_of_data", "None");
 
         new Thread(() -> {
-            SquareDatabase squaredb = Room.databaseBuilder(getActivity(), SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
-            List<Square> easternSquaresWithData = new ArrayList<>();
-            List<Square> westernSquaresWithData = new ArrayList<>();
             if (positiveLeft != null && positiveRight != null) {
-                easternSquaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInPositiveHemisphereRange(positiveLeft.getValue(), topLeftY.getValue(), positiveRight.getValue(), bottomRightY.getValue()));
+                Map<String, Square> easternSquaresWithData = retrieveEasternSquares(getActiveMapNames(), positiveLeft, topLeftY, positiveRight, bottomRightY);
+                drawGridOnOneHemisphere(easternSquaresWithData, positiveLeft, topLeftY, positiveRight, bottomRightY, typeOfData);
             }
             if (negativeLeft != null && negativeRight != null) {
-                westernSquaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInNegativeHemisphereRange(negativeLeft.getValue(), topLeftY.getValue(), negativeRight.getValue(), bottomRightY.getValue()));
+                Map<String, Square> westernSquaresWithData = retrieveWesternSquares(getActiveMapNames(), negativeLeft, topLeftY, negativeRight, bottomRightY);
+                drawGridOnOneHemisphere(westernSquaresWithData, negativeLeft, topLeftY, negativeRight, bottomRightY, typeOfData);
             }
-
-
-            Log.println(Log.ASSERT, "", easternSquaresWithData.toString() + westernSquaresWithData.toString());
-
-            /*
-            if(positiveLeft != null && positiveRight != null){
-                for (double lng = positiveLeft.getValue(); lng <= positiveRight.getValue(); lng = lng + Square.SIDE_LENGTH) {
-                    for (double lat = bottomRightY.getValue(); lat <= topLeftY.getValue(); lat = lat + Square.SIDE_LENGTH) {
-                        Square square;
-                        List<Square> match = easternSquaresWithData.stream().filter(a -> Objects.equals(a.longitude.getValue(), lng) && Objects.equals(a.latitude.getValue(), lat)).collect(Collectors.toList()); // match contains all the squares (hopefully one or zero) with matching latitude and longitude
-                        if(!match.isEmpty())  {
-                            square = easternSquaresWithData.get(0);
-                        } else{
-                            square = new Square(lng, lat);
-                        }
-                        getActivity().runOnUiThread(new Runnable() {
-                            public void run() {
-                            //TODO: make squares of different colors
-                                square.drawTile(map, 0xff000000, 0x66000000);
-                            }
-                        });
-                    }
-                }
-            }
-            //TODO: the same thing with the other hemisphere
-
-             */
-
-
-            for (double i = topLeftX.getValue(); i <= bottomRightX.getValue(); i = i + Square.SIDE_LENGTH) {
-                for (double j = bottomRightY.getValue(); j <= topLeftY.getValue(); j = j + Square.SIDE_LENGTH) {
-                    Square square = new Square(i, j);
-                    getActivity().runOnUiThread(new Runnable() {
-                        public void run() {
-                            square.drawTile(map, 0xff000000, 0x66000000);
-                        }
-                    });
-                }
-            }
-
-            easternSquaresWithData.forEach((item) -> {
-                getActivity().runOnUiThread(new Runnable() {
-                    public void run() {
-                        item.drawTile(map, 0xff00ff00, 0x66ffff33);
-                    }
-                });
-            });
-
-            westernSquaresWithData.forEach((item) -> {
-                getActivity().runOnUiThread(new Runnable() {
-                    public void run() {
-                        item.drawTile(map, 0xff00ff00, 0x66ffff33);
-                    }
-                });
-            });
-
 
         }).start();
 
@@ -224,11 +180,14 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
 
     protected void retrieveSquaresAndDrawHeatmap(Longitude topLeftX, Latitude topLeftY, Longitude bottomRightX, Latitude bottomRightY) {
         Longitude negativeLeft = truncateLongitudeToWesternHemisphere(topLeftX, bottomRightX) != null ? truncateLongitudeToWesternHemisphere(topLeftX, bottomRightX)[0] : null;
-        Longitude negativeRight = truncateLongitudeToWesternHemisphere(topLeftX, bottomRightX) != null ? truncateLongitudeToWesternHemisphere(topLeftX, bottomRightX)[0] : null;
+        Longitude negativeRight = truncateLongitudeToWesternHemisphere(topLeftX, bottomRightX) != null ? truncateLongitudeToWesternHemisphere(topLeftX, bottomRightX)[1] : null;
         Longitude positiveLeft = truncateLongitudeToEasternHemisphere(topLeftX, bottomRightX) != null ? truncateLongitudeToEasternHemisphere(topLeftX, bottomRightX)[0] : null;
         Longitude positiveRight = truncateLongitudeToEasternHemisphere(topLeftX, bottomRightX) != null ? truncateLongitudeToEasternHemisphere(topLeftX, bottomRightX)[1] : null;
 
+        String typeOfData = PreferenceManager.getDefaultSharedPreferences(getContext()).getString("type_of_data", "None");
+
         new Thread(() -> {
+            getActiveMapNames();
             SquareDatabase squaredb = Room.databaseBuilder(getActivity(), SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
             List<Square> squaresWithData = new ArrayList<>();
             if (positiveLeft != null && positiveRight != null) {
@@ -238,25 +197,98 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
                 squaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInNegativeHemisphereRange(negativeLeft.getValue(), topLeftY.getValue(), negativeRight.getValue(), bottomRightY.getValue()));
             }
 
-            List<WeightedLatLng> heatmapPoints = new ArrayList<>();
+            List<LatLng> heatmapPointsLow = new ArrayList<>();
+            List<LatLng> heatmapPointsMedium = new ArrayList<>();
+            List<LatLng> heatmapPointsHigh = new ArrayList<>();
             squaresWithData.forEach(square -> {
-                heatmapPoints.add(new WeightedLatLng(new LatLng(square.latitude.getValue(), square.longitude.getValue()), 1));
+                switch (typeOfData) {
+                    case "Noise":
+                        if (square.getNoise() >= 0) {
+                            if (square.getNoise() <= getContext().getResources().getInteger(R.integer.noise_low_upper_bound)) {
+                                heatmapPointsLow.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
+                            } else if (square.getNoise() <= getContext().getResources().getInteger(R.integer.noise_medium_upper_bound)) {
+                                heatmapPointsLow.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
+                                heatmapPointsMedium.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
+                            } else {
+                                heatmapPointsLow.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
+                                heatmapPointsMedium.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
+                                heatmapPointsHigh.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
+                            }
+                        }
+                        break;
+                    case "Network":
+                        if (square.getNetwork() >= 0) {
+                            if (square.getNetwork() <= getContext().getResources().getInteger(R.integer.network_low_upper_bound)) {
+                                heatmapPointsLow.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
+                            } else if (square.getNetwork() <= getContext().getResources().getInteger(R.integer.network_medium_upper_bound)) {
+                                heatmapPointsLow.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
+                                heatmapPointsMedium.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
+                            } else {
+                                heatmapPointsLow.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
+                                heatmapPointsMedium.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
+                                heatmapPointsHigh.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
+                            }
+                        }
+                        break;
+                    case "Wi-fi":
+                        if (square.getWifi() >= 0) {
+                            if (square.getWifi() <= getContext().getResources().getInteger(R.integer.wifi_low_upper_bound)) {
+                                heatmapPointsLow.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
+                            } else if (square.getWifi() <= getContext().getResources().getInteger(R.integer.wifi_medium_upper_bound)) {
+                                heatmapPointsLow.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
+                                heatmapPointsMedium.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
+                            } else {
+                                heatmapPointsLow.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
+                                heatmapPointsMedium.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
+                                heatmapPointsHigh.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
+                            }
+                        }
+                        break;
+                }
             });
 
-            if (!heatmapPoints.isEmpty()) {
-                getActivity().runOnUiThread(new Runnable() {
-                    public void run() {
-                        heatmapProvider = new HeatmapTileProvider.Builder().weightedData(heatmapPoints).build();
+            Gradient gradientLow = new Gradient(new int[]{ContextCompat.getColor(getContext(), R.color.low_intensity_border)}, new float[]{0.50f}, 3);
+            Gradient gradientMedium = new Gradient(new int[]{ContextCompat.getColor(getContext(), R.color.medium_intensity_border)}, new float[]{0.50f}, 3);
+            Gradient gradientHigh = new Gradient(new int[]{ContextCompat.getColor(getContext(), R.color.high_intensity_border)}, new float[]{0.50f}, 3);
+
+
+            getActivity().runOnUiThread(new Runnable() {
+                public void run() {
+                    if (!heatmapPointsLow.isEmpty()) {
+                        heatmapProvider = new HeatmapTileProvider.Builder().data(heatmapPointsLow).build();
+                        heatmapProvider.setRadius(calculateProperHeatmapRadiusBasedOnZoom(map.getCameraPosition().zoom)); // HeatmapTileProvider.Builder().radius() accepts only values between 0 and 50, provider.setRadius() instead accepts every value
+                        heatmapProvider.setMaxIntensity(1);
+                        heatmapProvider.setGradient(gradientLow);
+                        TileOverlay overlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(heatmapProvider));
+                    }
+
+                    if (!heatmapPointsMedium.isEmpty()) {
+                        heatmapProvider = new HeatmapTileProvider.Builder().data(heatmapPointsMedium).build();
                         heatmapProvider.setRadius(calculateProperHeatmapRadiusBasedOnZoom(map.getCameraPosition().zoom)); // HeatmapTileProvider.Builder().radius() accepts only values between 0 and 50, provider.setRadius() instead accepts every value
                         // TODO: replace this value with the maximum intensity that a measurement can reach
                         heatmapProvider.setMaxIntensity(1);
+                        heatmapProvider.setGradient(gradientMedium);
                         TileOverlay overlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(heatmapProvider));
 
                     }
-                });
-            }
+
+                    if (!heatmapPointsHigh.isEmpty()) {
+                        heatmapProvider = new HeatmapTileProvider.Builder().data(heatmapPointsHigh).build();
+                        heatmapProvider.setRadius(calculateProperHeatmapRadiusBasedOnZoom(map.getCameraPosition().zoom)); // HeatmapTileProvider.Builder().radius() accepts only values between 0 and 50, provider.setRadius() instead accepts every value
+                        // TODO: replace this value with the maximum intensity that a measurement can reach
+                        heatmapProvider.setMaxIntensity(1);
+                        heatmapProvider.setGradient(gradientHigh);
+                        TileOverlay overlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(heatmapProvider));
+
+                    }
+
+                }
+            });
+
 
         }).start();
+
+
     }
 
     // returns an array containing the boundaries of the area between leftLng and rightLng but truncated to the eastern hemisphere.
@@ -307,17 +339,159 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         }
     }
 
-    private int calculateProperHeatmapRadiusBasedOnZoom(float zoom) {
-        //Log.println(Log.ASSERT, "", "" + zoom);
-        Point p1 = map.getProjection().toScreenLocation(map.getCameraPosition().target);
-        Point p2 = map.getProjection().toScreenLocation(new LatLng(map.getCameraPosition().target.latitude + Square.SIDE_LENGTH, map.getCameraPosition().target.longitude));
+    private void drawSquareOfType(String typeOfData, Square squareToDraw) {
+        switch (typeOfData) {
+            case "Noise":
+                squareToDraw.drawNoiseTile(map, getContext());
+                break;
+            case "Network":
+                squareToDraw.drawNetworkTile(map, getContext());
+                break;
+            case "Wi-fi":
+                squareToDraw.drawWifiTile(map, getContext());
+                break;
+            default:
+                squareToDraw.drawEmptyTile(map, getContext());
+        }
+    }
 
-        if (p1.y - p2.y > minClusterDimensionInPixel && p1.y - p2.y < 500) {
-            return p1.y - p2.y;
-        } else if (p1.y - p2.y > 500) { // NEVER use the heatmap with this zoom level or higher: an OutOfMemoryError may occur
+    private void drawGridOnOneHemisphere(Map<String, Square> squaresWithData, Longitude topLeftX, Latitude topLeftY, Longitude bottomRightX, Latitude bottomRightY, String typeOfData) { // BEWARE: it doesn't behave correctly if the drawing area extends over two hemispheres
+        // creates a bidimensional array to store all the square that are going to be drawn
+        //    y  x
+        Square[][] squaresToDraw = new Square[(int) ((topLeftY.getValue() - bottomRightY.getValue()) / Square.SIDE_LENGTH) + 1][(int) ((bottomRightX.getValue() - topLeftX.getValue()) / Square.SIDE_LENGTH) + 1];
+        for (int i = 0; i < squaresToDraw.length; i++) { // y
+            for (int j = 0; j < squaresToDraw[i].length; j++) { // x
+                // creates a square with no measurements
+                squaresToDraw[i][j] = new Square(topLeftX.getValue() + Square.SIDE_LENGTH * j, bottomRightY.getValue() + Square.SIDE_LENGTH * i);
+                // if a square with some measurement exists, it replaces the empty square
+                if (squaresWithData.containsKey(squaresToDraw[i][j].getSquareId())) {
+                    squaresToDraw[i][j] = squaresWithData.get(squaresToDraw[i][j].getSquareId());
+                }
+
+                Square tileToDraw = squaresToDraw[i][j];
+                getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        drawSquareOfType(typeOfData, tileToDraw);
+                    }
+                });
+
+            }
+        }
+    }
+
+    private int calculateProperHeatmapRadiusBasedOnZoom(float zoom) { //TODO: fix
+        Point p1 = map.getProjection().toScreenLocation(map.getCameraPosition().target);
+        Point p2 = map.getProjection().toScreenLocation(new LatLng( new Latitude(map.getCameraPosition().target.latitude).add(Square.SIDE_LENGTH).getValue(), new Longitude(map.getCameraPosition().target.longitude).add(Square.SIDE_LENGTH).getValue()));
+        int distanceInPixel = (int) (Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2)) / 2);
+        if (distanceInPixel > minClusterDimensionInPixel && distanceInPixel <= 500) {
+            Log.println(Log.ASSERT, "", "" + distanceInPixel);
+            return distanceInPixel;
+        } else if (distanceInPixel > 500) { // NEVER use the heatmap with this zoom level or higher: an OutOfMemoryError may occur
             return 500;
         } else {
             return minClusterDimensionInPixel;
         }
+    }
+
+    private List<String> getActiveMapNames() {
+        List<String> ret = new ArrayList<>();
+        String[] dbList = getContext().databaseList();
+        for (String s : dbList) {
+            if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(s, false)) {
+                ret.add(s);
+            }
+        }
+
+        return ret;
+    }
+
+    private Map<String, Square> retrieveEasternSquares(List<String> mapNames, Longitude topLeftX, Latitude topLeftY, Longitude bottomRightX, Latitude bottomRightY) {
+        Map<String, Square> easternSquaresWithData = new HashMap<>();
+        Map<String, Integer> numberOfNoise = new HashMap<>();
+        Map<String, Integer> numberOfNetwork = new HashMap<>();
+        Map<String, Integer> numberOfWifi = new HashMap<>();
+        // gets the squares from all the active databases
+        for (String name : mapNames) {
+            SquareDatabase squaredb = Room.databaseBuilder(getActivity(), SquareDatabase.class, name).addMigrations(SquareDatabase.migration).build();
+            List<Square> list = squaredb.getSquareDAO().getAllSquaresInPositiveHemisphereRange(topLeftX.getValue(), topLeftY.getValue(), bottomRightX.getValue(), bottomRightY.getValue());
+            list.forEach(square -> {
+                if (easternSquaresWithData.containsKey(square.getSquareId())) {
+
+                    Square oldSquare = easternSquaresWithData.get(square.getSquareId());
+                    if (oldSquare.getNoise() >= 0 && square.getNoise() >= 0) {
+                        oldSquare.setNoise(oldSquare.getNoise() + square.getNoise());
+                        numberOfNoise.put(square.getSquareId(), numberOfNoise.get(square.getSquareId()) + 1);
+                    }
+                    if (oldSquare.getNetwork() >= 0 && square.getNetwork() >= 0) {
+                        oldSquare.setNetwork(oldSquare.getNetwork() + square.getNetwork());
+                        numberOfNetwork.put(square.getSquareId(), numberOfNetwork.get(square.getSquareId()) + 1);
+                    }
+                    if (oldSquare.getWifi() >= 0 && square.getWifi() >= 0) {
+                        oldSquare.setWifi(oldSquare.getWifi() + square.getWifi());
+                        numberOfWifi.put(square.getSquareId(), numberOfWifi.get(square.getSquareId()) + 1);
+                    }
+
+                } else {
+                    easternSquaresWithData.put(square.getSquareId(), square);
+                    numberOfNoise.put(square.getSquareId(), 1);
+                    numberOfNetwork.put(square.getSquareId(), 1);
+                    numberOfWifi.put(square.getSquareId(), 1);
+                }
+            });
+        }
+
+        // divides the values to make average values
+        easternSquaresWithData.forEach((id, square) -> {
+            square.setNoise(square.getNoise() / numberOfNoise.get(id));
+            square.setNetwork(square.getNetwork() / numberOfNetwork.get(id));
+            square.setWifi(square.getWifi() / numberOfWifi.get(id));
+        });
+
+        return easternSquaresWithData;
+    }
+
+    private Map<String, Square> retrieveWesternSquares(List<String> mapNames, Longitude topLeftX, Latitude topLeftY, Longitude bottomRightX, Latitude bottomRightY) {
+        Map<String, Square> westernSquaresWithData = new HashMap<>();
+        Map<String, Integer> numberOfNoise = new HashMap<>();
+        Map<String, Integer> numberOfNetwork = new HashMap<>();
+        Map<String, Integer> numberOfWifi = new HashMap<>();
+        // gets the squares from all the active databases
+        for (String name : mapNames) {
+            SquareDatabase squaredb = Room.databaseBuilder(getActivity(), SquareDatabase.class, name).addMigrations(SquareDatabase.migration).build();
+            List<Square> list = squaredb.getSquareDAO().getAllSquaresInNegativeHemisphereRange(topLeftX.getValue(), topLeftY.getValue(), bottomRightX.getValue(), bottomRightY.getValue());
+            list.forEach(square -> {
+                if (westernSquaresWithData.containsKey(square.getSquareId())) {
+
+                    Square oldSquare = westernSquaresWithData.get(square.getSquareId());
+                    if (oldSquare.getNoise() >= 0 && square.getNoise() >= 0) {
+                        oldSquare.setNoise(oldSquare.getNoise() + square.getNoise());
+                        numberOfNoise.put(square.getSquareId(), numberOfNoise.get(square.getSquareId()) + 1);
+                    }
+                    if (oldSquare.getNetwork() >= 0 && square.getNetwork() >= 0) {
+                        oldSquare.setNetwork(oldSquare.getNetwork() + square.getNetwork());
+                        numberOfNetwork.put(square.getSquareId(), numberOfNetwork.get(square.getSquareId()) + 1);
+                    }
+                    if (oldSquare.getWifi() >= 0 && square.getWifi() >= 0) {
+                        oldSquare.setWifi(oldSquare.getWifi() + square.getWifi());
+                        numberOfWifi.put(square.getSquareId(), numberOfWifi.get(square.getSquareId()) + 1);
+                    }
+
+                } else {
+                    westernSquaresWithData.put(square.getSquareId(), square);
+                    numberOfNoise.put(square.getSquareId(), 1);
+                    numberOfNetwork.put(square.getSquareId(), 1);
+                    numberOfWifi.put(square.getSquareId(), 1);
+                }
+            });
+        }
+
+        // divides the values to make average values
+        westernSquaresWithData.forEach((id, square) -> {
+            square.setNoise(square.getNoise() / numberOfNoise.get(id));
+            square.setNetwork(square.getNetwork() / numberOfNetwork.get(id));
+            square.setWifi(square.getWifi() / numberOfWifi.get(id));
+        });
+
+        return westernSquaresWithData;
     }
 }

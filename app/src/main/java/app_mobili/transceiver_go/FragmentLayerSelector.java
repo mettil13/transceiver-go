@@ -42,20 +42,13 @@ public class FragmentLayerSelector extends PreferenceFragmentCompat {
         if(count != 0){
 
             new Thread(() -> {
-                Log.println(Log.ASSERT, "", "ciao");
-                SquareDatabase squaredb = Room.databaseBuilder(getActivity(), SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
-                Cursor c = squaredb.query(new SimpleSQLiteQuery("SELECT name FROM sqlite_master WHERE type='table'"));
-
-                if (c.moveToFirst()) {
-                    while ( !c.isAfterLast() ) {
-                        if(!Objects.equals(c.getString(0), "android_metadata") && !Objects.equals(c.getString(0), "room_master_table")){
-                            Log.println(Log.ASSERT, "", "" + c.getString(0));
-                            Preference pref = new CheckBoxPreference(getContext(), attr);
-                            pref.setKey(c.getString(0));
-                            pref.setTitle(c.getString(0));
-                            category.addPreference(pref);
-                        }
-                        c.moveToNext();
+                String[] dbList = getContext().databaseList();
+                for (String s : dbList) {
+                    if (!Objects.equals(s, "squaredb-wal") && !Objects.equals(s, "squaredb-shm")) { //TODO: make this check based on the username
+                        Preference pref = new CheckBoxPreference(getContext(), attr);
+                        pref.setKey(s);
+                        pref.setTitle(s);
+                        category.addPreference(pref);
                     }
                 }
             }).start();
