@@ -103,7 +103,6 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
 
         new Thread(() -> {
             //Square s1;
-            //secondb.getSquareDAO().upsertSquare(s1);
             {
                 Square square = new Square(1, 1);
                 square.setNoise(100);
@@ -179,6 +178,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
                 square.setNoise(100);
                 squaredb.getSquareDAO().upsertSquare(square);
             }
+            //squaredb.close();
 
         }).start();
 

@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,9 +33,6 @@ public class FragmentSomethingElse extends Fragment implements NoiseStrength.Rec
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
-    private ActivityResultLauncher<Intent> exportLauncher;
-
     private ActivityResultLauncher<Intent> importLauncher;
 
     public FragmentSomethingElse() {
@@ -119,9 +117,8 @@ public class FragmentSomethingElse extends Fragment implements NoiseStrength.Rec
         });
 
         shareDbButton.setOnClickListener(v -> {
-            DatabaseImportExportUtil.shareDatabase(getActivity(), "database-di-luizo");
-            //exportLauncher.launch(DatabaseExportUtil.exportDatabaseIntent());
-            //DatabaseImportUtil.openDocumentPicker(getActivity());
+            DatabaseImportExportUtil.shareDatabase(getContext(),getActivity(),"db_di_luizo");
+            //exportLauncher.launch(DatabaseImportExportUtil.exportDatabaseIntent());
             //importLauncher.launch(DatabaseImportExportUtil.importFileToDatabaseDirectory());
         });
 

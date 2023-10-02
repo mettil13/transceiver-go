@@ -1,8 +1,12 @@
 package app_mobili.transceiver_go;
 
 import android.app.Activity;
+
+import android.content.Context;
 import android.content.Intent;
+
 import android.net.Uri;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -10,26 +14,29 @@ import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.room.Room;
+import androidx.room.RoomDatabase;
 
 import java.io.File;
-import java.io.FileInputStream;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 
 
 public class DatabaseImportExportUtil {
     private static final String TAG = "DatabaseImportExportUtil";
-    private static final int REQUEST_CODE_IMPORT_DB = 420;
     private static final int REQUEST_CODE_EXPORT_DB = 69;
-    private static final String databaseDirectoryPath = "/data/user/0/app_mobili.transceiver_go/databases/";
     private static final String DATABASE_NAME = "squaredb";
+
 
     /* -------------------------------------------------------------------------- */
     /*                                Share Utils                                 */
     /* -------------------------------------------------------------------------- */
     // Export the database sharing it to some application chosen by the user
-    public static void shareDatabase(Activity activity, String fileName) {
+    public static void shareDatabase(Context context, Activity activity, String fileName) {
+
         String currentDBPath = activity.getDatabasePath(DATABASE_NAME).getPath();
 
         // Create a content URI using FileProvider
@@ -41,7 +48,7 @@ public class DatabaseImportExportUtil {
 
         // Create an intent to share the file
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType("application/x-sqlite3");
+        shareIntent.setType("application/octet-stream");
         shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
 
         shareIntent.putExtra(Intent.EXTRA_TITLE, fileName);
@@ -64,8 +71,8 @@ public class DatabaseImportExportUtil {
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         // room databases aren't straight up sqlite databases, you can't import them by
-        // specifying the file type
-        intent.setType("*/*"); // Specify the MIME type of files you want to allow for import
+        // specifying the file type sqlite-3, they need the BIN type
+        intent.setType("application/octet-stream"); // Specifying the MIME type
 
         // Start the document picker activity
         return intent;
@@ -81,38 +88,72 @@ public class DatabaseImportExportUtil {
             }
         }
     }
-
-    // Import the selected file to the app's internal storage, specifically to the database directory
     private static void importSelectedFile(Activity activity, Uri selectedUri, String dbname) {
         try {
+            final String databaseDirectoryPath = activity.getDatabasePath(dbname).getParent();
+
             // Get the path of the Room database directory
-
-            //Log.println(Log.ASSERT,"Luizo",databaseDirectoryPath);
-
             File destinationFile = new File(databaseDirectoryPath, dbname);
 
-            //Log.println(Log.ASSERT,"Luizo",destinationFile.getPath());
-
-            FileInputStream input = new FileInputStream(activity.getContentResolver().openFileDescriptor(selectedUri, "r").getFileDescriptor());
-            FileOutputStream output = new FileOutputStream(destinationFile);
-
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = input.read(buffer)) > 0) {
-                output.write(buffer, 0, length);
+            Log.d(TAG, destinationFile.toString());
+            // Check if a file with the same name already exists
+            if (destinationFile.exists()) {
+                // Delete the existing file
+                boolean isDeleted = destinationFile.delete();
+                if (isDeleted) Log.d(TAG, "Deleted the existing file with the same name.");
+            } else {
+                Log.d(TAG, "couldn't delete the file, the file is already present and i should update it");
             }
 
-            input.close();
-            output.close();
+            // Copy the contents of the selected file to the destination file
+            InputStream inputStream = activity.getContentResolver().openInputStream(selectedUri);
+            OutputStream outputStream = new FileOutputStream(destinationFile);
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
+            }
+            outputStream.flush();
+            outputStream.close();
+            inputStream.close();
 
-            //SquareDatabase imported = Room.databaseBuilder(activity, SquareDatabase.class, dbname).build();
-
-            Toast toast = Toast.makeText(activity,R.string.imported, Toast.LENGTH_SHORT);
-            toast.show();
-            Log.d(TAG, "File imported successfully to the database directory.");
         } catch (IOException e) {
             Log.e(TAG, "Error importing file: " + e.getMessage());
         }
-    }
 
+        // trying to load the database and test
+        new Thread(() -> {
+            try {
+                Looper.prepare();
+                final String databaseDirectoryPath = activity.getDatabasePath(dbname).getParent();
+                File destinationFile = new File(databaseDirectoryPath, dbname);
+
+                // try to build the database to see if it's compatible
+                SquareDatabase imported = Room.databaseBuilder(activity, SquareDatabase.class, dbname).build();
+                Square e = new Square(69, 420);
+                imported.getSquareDAO().upsertSquare(e);
+
+                // if an exception was not thrown, we're good
+                Log.d(TAG, "File imported successfully to the database directory.");
+                Toast toast = Toast.makeText(activity, R.string.imported, Toast.LENGTH_SHORT);
+                toast.show();
+
+            } catch (IllegalStateException e) {
+                Log.e(TAG, "Error checking db: " + e.getMessage());
+
+                final String databaseDirectoryPath = activity.getDataDir().getPath();
+                File destinationFile = new File(databaseDirectoryPath, dbname);
+
+
+                boolean isDeleted = destinationFile.delete();
+                if (isDeleted) {
+                    Toast toast = Toast.makeText(activity, R.string.not_a_db, Toast.LENGTH_SHORT);
+                    toast.show();
+                } else {
+                    Log.d(TAG, "couldn't delete the file, the file was probably not a db");
+
+                }
+            }
+        }).start();
+    }
 }

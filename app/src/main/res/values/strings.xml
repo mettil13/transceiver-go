@@ -5,9 +5,12 @@
     <string name="new_internet_connection_measurement">new internet connection measurement</string>
     <string name="new_noise_measurement">new noise measurement</string>
 
+    <!-- Strings for import / export -->
     <string name="exportdb">Share your progress!</string>
     <string name="importdb">Import your friends\' progress!</string>
-    <string name="imported"> imported successfully to the database directory, yay!</string>
+    <string name="imported">Imported successfully to the database directory :D</string>
+    <string name="wrong_db_version">Failed Import: Wrong database version :/</string>
+    <string name="not_a_db">Failed Import: Not compatible :(</string>
     <!-- Strings for bottom nav menu -->
     <string name="map">Map</string>
     <string name="game">Game map</string>
