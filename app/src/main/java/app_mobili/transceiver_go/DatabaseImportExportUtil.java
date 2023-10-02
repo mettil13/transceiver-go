@@ -35,6 +35,7 @@ public class DatabaseImportExportUtil {
     /*                                Share Utils                                 */
     /* -------------------------------------------------------------------------- */
     // Export the database sharing it to some application chosen by the user
+    //TODO DATABASE MUST BE CLOSE WHEN EXPORTING, OTHERWISE IT WILL BE EMPTY
     public static void shareDatabase(Context context, Activity activity, String fileName) {
 
         String currentDBPath = activity.getDatabasePath(DATABASE_NAME).getPath();
