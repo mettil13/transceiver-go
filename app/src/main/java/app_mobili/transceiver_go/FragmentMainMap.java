@@ -1,5 +1,6 @@
 package app_mobili.transceiver_go;
 
+import android.animation.ObjectAnimator;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +51,7 @@ import com.google.maps.android.heatmaps.WeightedLatLng;
  */
 public class FragmentMainMap extends Fragment implements OnMapReadyCallback, GoogleMap.OnCameraMoveStartedListener, GoogleMap.OnCameraMoveListener, GoogleMap.OnCameraIdleListener {
     protected GoogleMap map;
+    protected FloatingActionButton orientationButton;
     protected HeatmapTileProvider heatmapProvider;
     protected FragmentLayerSelector layerSelector; // contains the names of the data to display
     protected static int minClusterDimensionInPixel = 15;
@@ -74,9 +77,10 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_main_map, container, false);
-        FloatingActionButton button = (FloatingActionButton) view.findViewById(R.id.layerButton);
+
+        FloatingActionButton layerButton = (FloatingActionButton) view.findViewById(R.id.layerButton);
         layerSelector = new FragmentLayerSelector();
-        button.setOnClickListener(new View.OnClickListener() {
+        layerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FragmentManager fragmentManager = getParentFragmentManager();
@@ -86,6 +90,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
                 fragmentTransaction.commit();
             }
         });
+
         return view;
     }
 
@@ -102,6 +107,28 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         map.setOnCameraMoveStartedListener(this);
         map.setOnCameraMoveListener(this);
         map.setOnCameraIdleListener(this);
+
+        // disables the camera tilting
+        map.getUiSettings().setTiltGesturesEnabled(false);
+
+        // hides default compass button and creates another one with the same use (just an aesthetic thing)
+        View locationButton = getView().findViewById((int) 5); // "5" is the id of google maps compass button
+        // Change the visibility of compass button
+        if(locationButton != null){
+            locationButton.setVisibility(View.GONE);
+        }
+
+        orientationButton = (FloatingActionButton) getView().findViewById(R.id.orientationButton);
+        orientationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(locationButton != null){
+                    locationButton.callOnClick();
+                }
+            }
+        });
+        float bearing = map.getCameraPosition().bearing;
+        ObjectAnimator.ofFloat(orientationButton, "rotation", bearing - 45).setDuration(0).start(); // the icon has a 45° initial rotation
     }
 
     @Override
@@ -111,7 +138,8 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
 
     @Override
     public void onCameraMove() {
-
+        float bearing = map.getCameraPosition().bearing;
+        ObjectAnimator.ofFloat(orientationButton, "rotation", bearing - 45).setDuration(0).start(); // the icon has a 45° initial rotation
     }
 
     @Override
@@ -187,20 +215,18 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         String typeOfData = PreferenceManager.getDefaultSharedPreferences(getContext()).getString("type_of_data", "None");
 
         new Thread(() -> {
-            getActiveMapNames();
-            SquareDatabase squaredb = Room.databaseBuilder(getActivity(), SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
-            List<Square> squaresWithData = new ArrayList<>();
+            Map<String, Square> squaresWithData = new HashMap<>();
             if (positiveLeft != null && positiveRight != null) {
-                squaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInPositiveHemisphereRange(positiveLeft.getValue(), topLeftY.getValue(), positiveRight.getValue(), bottomRightY.getValue()));
+                squaresWithData.putAll(retrieveEasternSquares(getActiveMapNames(), positiveLeft, topLeftY, positiveRight, bottomRightY));
             }
             if (negativeLeft != null && negativeRight != null) {
-                squaresWithData.addAll(squaredb.getSquareDAO().getAllSquaresInNegativeHemisphereRange(negativeLeft.getValue(), topLeftY.getValue(), negativeRight.getValue(), bottomRightY.getValue()));
+                squaresWithData.putAll(retrieveWesternSquares(getActiveMapNames(), negativeLeft, topLeftY, negativeRight, bottomRightY));
             }
 
             List<LatLng> heatmapPointsLow = new ArrayList<>();
             List<LatLng> heatmapPointsMedium = new ArrayList<>();
             List<LatLng> heatmapPointsHigh = new ArrayList<>();
-            squaresWithData.forEach(square -> {
+            squaresWithData.forEach((index, square) -> {
                 switch (typeOfData) {
                     case "Noise":
                         if (square.getNoise() >= 0) {
@@ -265,7 +291,6 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
                     if (!heatmapPointsMedium.isEmpty()) {
                         heatmapProvider = new HeatmapTileProvider.Builder().data(heatmapPointsMedium).build();
                         heatmapProvider.setRadius(calculateProperHeatmapRadiusBasedOnZoom(map.getCameraPosition().zoom)); // HeatmapTileProvider.Builder().radius() accepts only values between 0 and 50, provider.setRadius() instead accepts every value
-                        // TODO: replace this value with the maximum intensity that a measurement can reach
                         heatmapProvider.setMaxIntensity(1);
                         heatmapProvider.setGradient(gradientMedium);
                         TileOverlay overlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(heatmapProvider));
@@ -275,7 +300,6 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
                     if (!heatmapPointsHigh.isEmpty()) {
                         heatmapProvider = new HeatmapTileProvider.Builder().data(heatmapPointsHigh).build();
                         heatmapProvider.setRadius(calculateProperHeatmapRadiusBasedOnZoom(map.getCameraPosition().zoom)); // HeatmapTileProvider.Builder().radius() accepts only values between 0 and 50, provider.setRadius() instead accepts every value
-                        // TODO: replace this value with the maximum intensity that a measurement can reach
                         heatmapProvider.setMaxIntensity(1);
                         heatmapProvider.setGradient(gradientHigh);
                         TileOverlay overlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(heatmapProvider));
@@ -381,7 +405,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
 
     private int calculateProperHeatmapRadiusBasedOnZoom(float zoom) { //TODO: fix
         Point p1 = map.getProjection().toScreenLocation(map.getCameraPosition().target);
-        Point p2 = map.getProjection().toScreenLocation(new LatLng( new Latitude(map.getCameraPosition().target.latitude).add(Square.SIDE_LENGTH).getValue(), new Longitude(map.getCameraPosition().target.longitude).add(Square.SIDE_LENGTH).getValue()));
+        Point p2 = map.getProjection().toScreenLocation(new LatLng(new Latitude(map.getCameraPosition().target.latitude).add(Square.SIDE_LENGTH).getValue(), new Longitude(map.getCameraPosition().target.longitude).add(Square.SIDE_LENGTH).getValue()));
         int distanceInPixel = (int) (Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2)) / 2);
         if (distanceInPixel > minClusterDimensionInPixel && distanceInPixel <= 500) {
             Log.println(Log.ASSERT, "", "" + distanceInPixel);
