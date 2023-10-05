@@ -1,7 +1,6 @@
-<PreferenceScreen xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
+    xmlns:tools="http://schemas.android.com/tools">
 
     <PreferenceCategory app:title="@string/measurements">
         <!-- SwitchPreferenceCompat for Automatic Measurements -->
@@ -11,47 +10,75 @@
 
         <!-- CheckBoxPreference for measure LTE/UMPS -->
         <CheckBoxPreference
+            app:dependency="automatic_measurements"
             app:key="measure_lte_umps"
-            app:title="@string/measure_lte_umps"
-            app:dependency="automatic_measurements" />
+            app:title="@string/measure_lte_umps" />
 
         <!-- CheckBoxPreference for measure Wifi -->
         <CheckBoxPreference
+            app:dependency="automatic_measurements"
             app:key="measure_wifi"
-            app:title="@string/measure_wifi"
-            app:dependency="automatic_measurements" />
+            app:title="@string/measure_wifi" />
 
         <!-- CheckBoxPreference for measure Noise -->
         <CheckBoxPreference
+            app:dependency="automatic_measurements"
             app:key="measure_noise"
-            app:title="@string/measure_noise"
-            app:dependency="automatic_measurements" />
+            app:title="@string/measure_noise" />
 
         <!-- Edit TextPreference for Measure every n minutes -->
         <SeekBarPreference
-            app:key="measure_interval"
-            app:title="@string/measure_interval"
-            app:useSimpleSummaryProvider="true"
+            android:max="10"
+            app:defaultValue="5"
             app:dependency="automatic_measurements"
             app:disableDependentsState="false"
+            app:key="measure_interval"
             app:showSeekBarValue="true"
-            app:defaultValue="5"
-            android:max="10"
-            />
+            app:title="@string/measure_interval"
+            app:useSimpleSummaryProvider="true" />
 
         <!-- Edit TextPreference for Number of Kept Measurements -->
         <SeekBarPreference
-            app:key="num_kept_measurements"
-            app:title="@string/num_kept_measurements"
-            app:useSimpleSummaryProvider="true"
-            app:showSeekBarValue="true"
-            app:defaultValue="5"
             android:max="10"
-            />
+            app:defaultValue="5"
+            app:key="num_kept_measurements"
+            app:showSeekBarValue="true"
+            app:title="@string/num_kept_measurements"
+            app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/personalization">
+
+    </PreferenceCategory>
+    <PreferenceCategory app:title="@string/messages_header">
+
+        <EditTextPreference
+            app:key="signature"
+            app:title="@string/signature_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="reply"
+            app:entries="@array/reply_entries"
+            app:entryValues="@array/reply_values"
+            app:key="reply"
+            app:title="@string/reply_title"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+    <PreferenceCategory app:title="@string/sync_header">
+
+        <SwitchPreferenceCompat
+            app:key="sync"
+            app:title="@string/sync_title" />
+
+        <SwitchPreferenceCompat
+            app:dependency="sync"
+            app:key="attachment"
+            app:summaryOff="@string/attachment_summary_off"
+            app:summaryOn="@string/attachment_summary_on"
+            app:title="@string/attachment_title" />
 
     </PreferenceCategory>
 

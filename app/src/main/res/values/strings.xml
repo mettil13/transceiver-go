@@ -16,6 +16,7 @@
     <string name="game">Game map</string>
     <string name="something_else">Something else</string>
     <string name="settings">Settings</string>
+    <string name="account">Account</string>
 
     <!-- Preference Titles -->
     <string name="measurements">Measurement Preferences</string>
@@ -47,4 +48,8 @@
     <string name="noise">Noise</string>
     <string name="network">Network</string>
     <string name="wifi">Wi-fi</string>
+
+    <!-- Account Preferences -->
+    <string name="account_name">Username</string>
+
 </resources>

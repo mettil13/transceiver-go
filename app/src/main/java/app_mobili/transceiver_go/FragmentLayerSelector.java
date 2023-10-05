@@ -44,7 +44,7 @@ public class FragmentLayerSelector extends PreferenceFragmentCompat {
             new Thread(() -> {
                 String[] dbList = getContext().databaseList();
                 for (String s : dbList) {
-                    if (!Objects.equals(s, "squaredb-wal") && !Objects.equals(s, "squaredb-shm")) { //TODO: make this check based on the username
+                    if (!s.endsWith("-wal") && !s.endsWith("-shm")) {
                         Preference pref = new CheckBoxPreference(getContext(), attr);
                         pref.setKey(s);
                         pref.setTitle(s);
