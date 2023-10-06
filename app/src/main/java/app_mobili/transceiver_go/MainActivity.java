@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
 
     //stuff for measurement
     NoiseStrength noiseStrength;
-    MeasurementListener noiseListener;
+    MeasurementListener measurementListener;
     NetworkSignalStrength networkSignalStrength;
     WifiSignalStrength wifiSignalStrength;
 
@@ -56,8 +56,8 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
 
         // measurements setup
         noiseStrength = new NoiseStrength(this);
-        noiseListener = new MeasurementListener(this);
-        noiseStrength.setRecordingListener(noiseListener);
+        measurementListener = new MeasurementListener(this);
+        noiseStrength.setRecordingListener(measurementListener);
 
         networkSignalStrength = new NetworkSignalStrength(this);
         wifiSignalStrength = new WifiSignalStrength(this);
@@ -104,8 +104,6 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
             this.deleteDatabase("squaredb");
             // setting the database
             SquareDatabase squaredb = Room.databaseBuilder(this, SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
-
-            //secondb = Room.databaseBuilder(this, SquareDatabase.class, "second").addMigrations(SquareDatabase.migration).build();
 
             //Square s1;
             {
@@ -238,32 +236,17 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
             }
         });
         binding.newWiFiMeasurementButton.setOnClickListener(view -> {
+            // update current coordinates
             longitude = coordinateListener.getLongitude();
             latitude = coordinateListener.getLatitude();
+            measurementListener.updateCoordinates(longitude, latitude);
 
+            // get wifi signal
             int wifi = wifiSignalStrength.getSignalLevel();
+            measurementListener.updateWifiMeasurement(wifi);
 
-            new Thread(() -> {
-                SquareDatabase squaredb = Room.databaseBuilder(this, SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
-
-                Square square = new Square(longitude, latitude);
-                // returns the square we're in, if it exists
-                Square squareInDb = squaredb.getSquareDAO().getSquare(square.getCoordinates());
-
-                // if such database exists, copy everything in the square used to update
-                // information, if not update the new one
-                if (squareInDb != null) square = squareInDb;
-
-                // actual update
-                square.updateWifi(wifi);
-
-                // update the database with updated square
-                squaredb.getSquareDAO().upsertSquare(square);
-
-                squaredb.close();
-                // TODO: Update map view to reflect new measurement
-            }).start();
-            Toast toast = Toast.makeText(view.getContext(), R.string.new_wifi_measurement, Toast.LENGTH_SHORT);
+            // notify the user
+            Toast toast = Toast.makeText(view.getContext(), R.string.taken_wifi_measurement, Toast.LENGTH_SHORT);
             toast.show();
         });
         binding.newInternetConnectionMeasurementButton.setOnClickListener(view -> {
@@ -271,67 +254,25 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
 
             longitude = coordinateListener.getLongitude();
             latitude = coordinateListener.getLatitude();
+            measurementListener.updateCoordinates(longitude, latitude);
+
             int umts = networkSignalStrength.getUmtsSignalStrength();
             int lte = networkSignalStrength.getLteSignalStrength();
 
             networkSignalStrength.stopMonitoringSignalStrength();
-            // if umts has unused value
-            if (umts == 99 || umts == android.telephony.CellInfo.UNAVAILABLE) {
-                // save LTE measurement
-                new Thread(() -> {
-                    SquareDatabase squaredb = Room.databaseBuilder(this, SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
 
-                    Square square = new Square(longitude, latitude);
-                    // returns the square we're in, if it exists
-                    Square squareInDb = squaredb.getSquareDAO().getSquare(square.getCoordinates());
+            measurementListener.updateNetworkMeasurement(umts,lte);
 
-                    // if such database exists, copy everything in the square used to update
-                    // information, if not update the new one
-                    if (squareInDb != null) square = squareInDb;
-
-                    // actual update
-                    square.updateNetwork(lte);
-
-                    // update the database with updated square
-                    squaredb.getSquareDAO().upsertSquare(square);
-
-                    squaredb.close();
-                    // TODO: Update map view to reflect new measurement
-                }).start();
-            } else {
-                // save UMTS measurement
-                new Thread(() -> {
-                    SquareDatabase squaredb = Room.databaseBuilder(this, SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
-
-                    Square square = new Square(longitude, latitude);
-                    // returns the square we're in, if it exists
-                    Square squareInDb = squaredb.getSquareDAO().getSquare(square.getCoordinates());
-
-                    // if such database exists, copy everything in the square used to update
-                    // information, if not update the new one
-                    if (squareInDb != null) square = squareInDb;
-
-                    // actual update
-                    square.updateNetwork(umts);
-
-                    // update the database with updated square
-                    squaredb.getSquareDAO().upsertSquare(square);
-
-                    squaredb.close();
-                    // TODO: Update map view to reflect new measurement
-                }).start();
-
-            }
-            Toast toast = Toast.makeText(view.getContext(), R.string.new_internet_connection_measurement, Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(view.getContext(), R.string.taken_internet_connection_measurement, Toast.LENGTH_SHORT);
             toast.show();
 
         });
         binding.newNoiseMeasurementButton.setOnClickListener(view -> {
             longitude = coordinateListener.getLongitude();
             latitude = coordinateListener.getLatitude();
-            noiseListener.updateCoordinates(longitude, latitude);
+            measurementListener.updateCoordinates(longitude, latitude);
             noiseStrength.startRecording();
-            // when recording is finished, onRecordingFinished over "NoiseListener" gets called
+            // when recording is finished, onRecordingFinished over "MeasurementListener" gets called
             // operations of db updates are done there
         });
 

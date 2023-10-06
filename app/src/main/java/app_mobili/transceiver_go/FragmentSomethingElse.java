@@ -117,7 +117,7 @@ public class FragmentSomethingElse extends Fragment implements NoiseStrength.Rec
         });
 
         shareDbButton.setOnClickListener(v -> {
-            DatabaseImportExportUtil.shareDatabase(getContext(),getActivity(),"db_di_luizo");
+            DatabaseImportExportUtil.shareDatabase(getContext(),getActivity());
             //exportLauncher.launch(DatabaseImportExportUtil.exportDatabaseIntent());
             //importLauncher.launch(DatabaseImportExportUtil.importFileToDatabaseDirectory());
         });

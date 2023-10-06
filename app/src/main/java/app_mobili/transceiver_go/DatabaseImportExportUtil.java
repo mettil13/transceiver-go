@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Looper;
 import android.util.Log;
@@ -13,8 +14,8 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.documentfile.provider.DocumentFile;
+import androidx.preference.PreferenceManager;
 import androidx.room.Room;
-import androidx.room.RoomDatabase;
 
 import java.io.File;
 
@@ -22,13 +23,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
+import java.nio.file.Files;
 
 
 public class DatabaseImportExportUtil {
     private static final String TAG = "DatabaseImportExportUtil";
     private static final int REQUEST_CODE_EXPORT_DB = 69;
-    private static final String DATABASE_NAME = "squaredb";
+
+    private static final int sleepTime = 1000; // ms
 
 
     /* -------------------------------------------------------------------------- */
@@ -36,29 +38,73 @@ public class DatabaseImportExportUtil {
     /* -------------------------------------------------------------------------- */
     // Export the database sharing it to some application chosen by the user
     //TODO DATABASE MUST BE CLOSE WHEN EXPORTING, OTHERWISE IT WILL BE EMPTY
-    public static void shareDatabase(Context context, Activity activity, String fileName) {
+    public static void shareDatabase(Context context, Activity activity) {
+        new Thread(() -> {
 
-        String currentDBPath = activity.getDatabasePath(DATABASE_NAME).getPath();
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            String dbname = sharedPreferences.getString("account_name", "squaredb");
 
-        // Create a content URI using FileProvider
-        Uri contentUri = FileProvider.getUriForFile(
-                activity,
-                "app_mobili.transceiver_go.fileprovider", // Use your FileProvider authority
-                new File(currentDBPath)
-        );
+            String currentDBPath = activity.getDatabasePath(dbname).getPath();
 
-        // Create an intent to share the file
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType("application/octet-stream");
-        shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+            // Create a content URI using FileProvider
+            Uri contentUri = FileProvider.getUriForFile(
+                    activity,
+                    "app_mobili.transceiver_go.fileprovider", // Use your FileProvider authority
+                    new File(currentDBPath)
+            );
 
-        shareIntent.putExtra(Intent.EXTRA_TITLE, fileName);
+            // Create an intent to share the file
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("application/octet-stream");
+            shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
 
-        // Grant read permission to the receiving app
-        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            shareIntent.putExtra(Intent.EXTRA_TITLE, dbname);
 
-        // Start the activity to share the file
-        activity.startActivityForResult(Intent.createChooser(shareIntent, "Share Database"), REQUEST_CODE_EXPORT_DB);
+            // Grant read permission to the receiving app
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+
+            SquareDatabase squaredb = Room.databaseBuilder(context, SquareDatabase.class, dbname).build();
+
+            // yes, busy waiting
+            while(squaredb.isOpen()) {
+                squaredb.close();
+                try {
+                    Thread.sleep(sleepTime);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            // Start the activity to share the file
+            activity.startActivityForResult(Intent.createChooser(shareIntent, "Share Database"), REQUEST_CODE_EXPORT_DB);
+        });
+
+    }
+
+    public static boolean changeDatabaseName(Context context, String oldName, String newName) {
+        try {
+            // Close the old database
+            SquareDatabase oldDatabase = Room.databaseBuilder(context, SquareDatabase.class, oldName).build();
+            oldDatabase.close();
+
+            // Get the path to the old and new database files
+            File oldDbFile = context.getDatabasePath(oldName);
+            File newDbFile = context.getDatabasePath(newName);
+
+            // Rename the old database file to the new name
+            if (oldDbFile.renameTo(newDbFile)) {
+                // Reopen the database with the new name
+                SquareDatabase newDatabase = Room.databaseBuilder(context, SquareDatabase.class, newName).build();
+                newDatabase.close();
+                return true; // Database name changed successfully
+            } else {
+                return false; // Renaming failed
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false; // An error occurred
+        }
     }
 
     /* -------------------------------------------------------------------------- */
@@ -84,6 +130,7 @@ public class DatabaseImportExportUtil {
         if (resultCode == Activity.RESULT_OK && data != null) {
             Uri selectedUri = data.getData();
             if (selectedUri != null) {
+                assert DocumentFile.fromSingleUri(activity, selectedUri) != null;
                 String fileName = DocumentFile.fromSingleUri(activity, selectedUri).getName();
                 importSelectedFile(activity, selectedUri, fileName);
             }
@@ -108,7 +155,10 @@ public class DatabaseImportExportUtil {
 
             // Copy the contents of the selected file to the destination file
             InputStream inputStream = activity.getContentResolver().openInputStream(selectedUri);
-            OutputStream outputStream = new FileOutputStream(destinationFile);
+            OutputStream outputStream;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                outputStream = Files.newOutputStream(destinationFile.toPath());
+            } else outputStream = new FileOutputStream(destinationFile);
             byte[] buffer = new byte[1024];
             int length;
             while ((length = inputStream.read(buffer)) > 0) {
