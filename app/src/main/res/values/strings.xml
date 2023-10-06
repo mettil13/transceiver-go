@@ -1,34 +1,42 @@
 <resources>
     <string name="app_name">transceiver-go</string>
+
+    <!-- Measurement buttons -->
     <string name="new_measurement">new measurement</string>
     <string name="new_wifi_measurement">new wifi measurement</string>
     <string name="new_internet_connection_measurement">new internet connection measurement</string>
     <string name="new_noise_measurement">new noise measurement</string>
+    <string name="taken_wifi_measurement">Wifi measurement taken!</string>
+    <string name="taken_internet_connection_measurement">Internet connection measurement taken!</string>
+    <string name="taken_noise_measurement">Noise measurement taken!</string>
 
-    <!-- Strings for import / export -->
+    <!-- Import / Export -->
     <string name="exportdb">Share your progress!</string>
     <string name="importdb">Import your friends\' progress!</string>
     <string name="imported">Imported successfully to the database directory :D</string>
     <string name="wrong_db_version">Failed Import: Wrong database version :/</string>
-    <string name="not_a_db">Failed Import: Not compatible :(</string>
-    <!-- Strings for bottom nav menu -->
+    <string name="not_a_db">Failed Import: Selected file not compatible :(</string>
+
+    <!-- Bottom nav menu -->
     <string name="map">Map</string>
     <string name="game">Game map</string>
     <string name="something_else">Something else</string>
     <string name="settings">Settings</string>
     <string name="account">Account</string>
 
-    <!-- Preference Titles -->
+    <!-- Measurement preferences Titles -->
     <string name="measurements">Measurement Preferences</string>
     <string name="personalization">Personalization</string>
-    <!-- Strings for the measurements preferences -->
+
+    <!-- Measurements preferences -->
     <string name="automatic_measurements">Automatic Measurements</string>
     <string name="measure_lte_umps">Measure LTE/UMPS</string>
     <string name="measure_wifi">Measure Wifi</string>
     <string name="measure_noise">Measure Noise</string>
     <string name="measure_interval">Measure Every (minutes)</string>
     <string name="num_kept_measurements">Number of Accounted Measurements</string>
-    <!-- Preference Titles -->
+
+    <!-- Message Preferences Titles -->
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>
 

@@ -5,7 +5,7 @@ import android.widget.Toast;
 
 import androidx.room.Room;
 
-public class NoiseListener implements NoiseStrength.RecordingListener {
+public class MeasurementListener implements NoiseStrength.RecordingListener {
 
     SquareDatabase squaredb;
     Context context;
@@ -15,7 +15,7 @@ public class NoiseListener implements NoiseStrength.RecordingListener {
     double longitude;
     double latitude;
 
-    NoiseListener(Context context){
+    MeasurementListener(Context context){
         this.context = context;
         longitude = 0;
         latitude = 0;
