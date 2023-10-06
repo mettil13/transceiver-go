@@ -17,7 +17,6 @@ public class NoiseListener implements NoiseStrength.RecordingListener {
 
     NoiseListener(Context context){
         this.context = context;
-        squaredb = Room.databaseBuilder(context, SquareDatabase.class, "squaredb").build();
         longitude = 0;
         latitude = 0;
     }
@@ -30,6 +29,7 @@ public class NoiseListener implements NoiseStrength.RecordingListener {
     @Override
     public void onRecordingFinished(int noise) {
         new Thread(() -> {
+            squaredb = Room.databaseBuilder(context, SquareDatabase.class, "squaredb").build();
             Square square = new Square(longitude,latitude);
             // returns the square we're in, if it exists
             Square squareInDb = squaredb.getSquareDAO().getSquare(square.getCoordinates());
@@ -43,7 +43,7 @@ public class NoiseListener implements NoiseStrength.RecordingListener {
 
             // update the database with updated square
             squaredb.getSquareDAO().upsertSquare(square);
-
+            squaredb.close();
             // TODO: Update map view to reflect new measurement
         }).start();
 

@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -24,7 +25,7 @@ import app_mobili.transceiver_go.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity implements NoiseStrength.RecordingListener {
 
     private boolean isAddSelected = false;
-    SquareDatabase squaredb;
+    //SquareDatabase squaredb;
 
     // stuff for coordinates
     CoordinateListener coordinateListener;
@@ -45,8 +46,8 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         // retrieving preferences
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this); // Use getContext() in a Fragment or this in an Activity
 
-        int lastMeasurements = sharedPreferences.getInt("num_kept_measurements",0);
-        Log.println(Log.ASSERT,"luizo", lastMeasurements+"");
+        int lastMeasurements = sharedPreferences.getInt("num_kept_measurements", 0);
+        Log.println(Log.ASSERT, "luizo", lastMeasurements + "");
 
 
         // coordinate setup
@@ -100,13 +101,13 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         setUpMeasurementButtons(binding);
 
 
-        this.deleteDatabase("squaredb");
-        // setting the database
-        squaredb = Room.databaseBuilder(this, SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
-
-        //secondb = Room.databaseBuilder(this, SquareDatabase.class, "second").addMigrations(SquareDatabase.migration).build();
-
         new Thread(() -> {
+            this.deleteDatabase("squaredb");
+            // setting the database
+            SquareDatabase squaredb = Room.databaseBuilder(this, SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
+
+            //secondb = Room.databaseBuilder(this, SquareDatabase.class, "second").addMigrations(SquareDatabase.migration).build();
+
             //Square s1;
             {
                 Square square = new Square(1, 1);
@@ -183,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
                 square.setNoise(100);
                 squaredb.getSquareDAO().upsertSquare(square);
             }
-            //squaredb.close();
+            squaredb.close();
 
         }).start();
 
@@ -244,13 +245,15 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
             int wifi = wifiSignalStrength.getSignalLevel();
 
             new Thread(() -> {
-                Square square = new Square(longitude,latitude);
+                SquareDatabase squaredb = Room.databaseBuilder(this, SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
+
+                Square square = new Square(longitude, latitude);
                 // returns the square we're in, if it exists
                 Square squareInDb = squaredb.getSquareDAO().getSquare(square.getCoordinates());
 
                 // if such database exists, copy everything in the square used to update
                 // information, if not update the new one
-                if(squareInDb != null) square = squareInDb;
+                if (squareInDb != null) square = squareInDb;
 
                 // actual update
                 square.updateWifi(wifi);
@@ -258,8 +261,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
                 // update the database with updated square
                 squaredb.getSquareDAO().upsertSquare(square);
 
-
-
+                squaredb.close();
                 // TODO: Update map view to reflect new measurement
             }).start();
             Toast toast = Toast.makeText(view.getContext(), R.string.new_wifi_measurement, Toast.LENGTH_SHORT);
@@ -278,13 +280,15 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
             if (umts == 99 || umts == android.telephony.CellInfo.UNAVAILABLE) {
                 // save LTE measurement
                 new Thread(() -> {
-                    Square square = new Square(longitude,latitude);
+                    SquareDatabase squaredb = Room.databaseBuilder(this, SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
+
+                    Square square = new Square(longitude, latitude);
                     // returns the square we're in, if it exists
                     Square squareInDb = squaredb.getSquareDAO().getSquare(square.getCoordinates());
 
                     // if such database exists, copy everything in the square used to update
                     // information, if not update the new one
-                    if(squareInDb != null) square = squareInDb;
+                    if (squareInDb != null) square = squareInDb;
 
                     // actual update
                     square.updateNetwork(lte);
@@ -292,19 +296,21 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
                     // update the database with updated square
                     squaredb.getSquareDAO().upsertSquare(square);
 
+                    squaredb.close();
                     // TODO: Update map view to reflect new measurement
                 }).start();
-            }
-            else {
+            } else {
                 // save UMTS measurement
                 new Thread(() -> {
-                    Square square = new Square(longitude,latitude);
+                    SquareDatabase squaredb = Room.databaseBuilder(this, SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
+
+                    Square square = new Square(longitude, latitude);
                     // returns the square we're in, if it exists
                     Square squareInDb = squaredb.getSquareDAO().getSquare(square.getCoordinates());
 
                     // if such database exists, copy everything in the square used to update
                     // information, if not update the new one
-                    if(squareInDb != null) square = squareInDb;
+                    if (squareInDb != null) square = squareInDb;
 
                     // actual update
                     square.updateNetwork(umts);
@@ -312,6 +318,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
                     // update the database with updated square
                     squaredb.getSquareDAO().upsertSquare(square);
 
+                    squaredb.close();
                     // TODO: Update map view to reflect new measurement
                 }).start();
 
@@ -323,7 +330,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         binding.newNoiseMeasurementButton.setOnClickListener(view -> {
             longitude = coordinateListener.getLongitude();
             latitude = coordinateListener.getLatitude();
-            noiseListener.updateCoordinates(longitude,latitude);
+            noiseListener.updateCoordinates(longitude, latitude);
             noiseStrength.startRecording();
             // when recording is finished, onRecordingFinished over "NoiseListener" gets called
             // operations of db updates are done there

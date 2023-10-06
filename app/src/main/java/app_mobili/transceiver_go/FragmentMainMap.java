@@ -462,6 +462,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
                     numberOfWifi.put(square.getSquareId(), 1);
                 }
             });
+            squaredb.close();
         }
 
         // divides the values to make average values
@@ -507,6 +508,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
                     numberOfWifi.put(square.getSquareId(), 1);
                 }
             });
+            squaredb.close();
         }
 
         // divides the values to make average values

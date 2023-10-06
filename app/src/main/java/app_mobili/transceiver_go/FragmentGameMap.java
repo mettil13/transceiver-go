@@ -1,14 +1,18 @@
 package app_mobili.transceiver_go;
 
+import static android.content.Context.LOCATION_SERVICE;
+
 import android.animation.ObjectAnimator;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +21,10 @@ import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.Date;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -61,6 +69,9 @@ public class FragmentGameMap extends FragmentMainMap implements GoogleMap.OnMyLo
         map.setOnMyLocationClickListener(this);
         map.setMyLocationEnabled(true);
         //map.getMyLocation();
+        LocationManager lm = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
+        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER); // todo controlla che non sia null
+        map.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())));
 
     }
 
@@ -72,6 +83,7 @@ public class FragmentGameMap extends FragmentMainMap implements GoogleMap.OnMyLo
 
     @Override
     public void onCameraIdle() {
+        super.onCameraIdle();
         CameraPosition pos = map.getCameraPosition();
         map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().target(pos.target).tilt(90).bearing(pos.bearing).zoom(pos.zoom).build()));
     }
