@@ -1,7 +1,11 @@
 package app_mobili.transceiver_go;
 
 import android.Manifest;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
@@ -13,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -24,7 +29,6 @@ import app_mobili.transceiver_go.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity implements NoiseStrength.RecordingListener {
 
     private boolean isAddSelected = false;
-    //SquareDatabase squaredb;
 
     // stuff for coordinates
     CoordinateListener coordinateListener;
@@ -46,7 +50,16 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this); // Use getContext() in a Fragment or this in an Activity
 
         int lastMeasurements = sharedPreferences.getInt("num_kept_measurements", 0);
-        Log.println(Log.ASSERT, "luizo", lastMeasurements + "");
+
+        boolean automatic_measurements = sharedPreferences.getBoolean("automatic_measurements", false);
+
+        int measure_interval = sharedPreferences.getInt("measure_interval", 10);
+
+        boolean get_auto_wifi = sharedPreferences.getBoolean("measure_wifi", false);
+        boolean get_auto_network = sharedPreferences.getBoolean("measure_lte_umps", false);
+        boolean get_auto_noise = sharedPreferences.getBoolean("measure_noise", false);
+        
+        Log.d("Luizo", "automatic_measurements: " + automatic_measurements + "\n measure_interval: " + measure_interval + "\n get_auto_wifi: " + get_auto_wifi + "\n get_auto_network: " + get_auto_network + "\n get_auto_noise: " + get_auto_noise);
 
 
         // coordinate setup
@@ -73,6 +86,24 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+
+        //TODO move these checks in order to happen when activating automatic measurements
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            // Request the FOREGROUND_SERVICE permission at runtime
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.FOREGROUND_SERVICE}, 444);
+            }
+        }
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this ,
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                    333);
+            return;
+        }
+
+        // service setup
+        Intent serviceIntent = new Intent(this, MeasurementService.class);
+        startService(serviceIntent);
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
@@ -187,6 +218,12 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopService(new Intent(this, MeasurementService.class));
+    }
+
 
     private void replaceFragment(int containerId, Fragment newFragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -298,8 +335,6 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
             return true;
         });
     }
-
-
     public void startListenForCoordinates() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
