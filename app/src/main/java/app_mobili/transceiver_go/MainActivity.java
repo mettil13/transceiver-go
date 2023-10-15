@@ -98,7 +98,6 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
             ActivityCompat.requestPermissions(this ,
                     new String[]{Manifest.permission.POST_NOTIFICATIONS},
                     333);
-            return;
         }
 
         // service setup
