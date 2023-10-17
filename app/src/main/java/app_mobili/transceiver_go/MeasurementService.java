@@ -107,6 +107,7 @@ public class MeasurementService extends Service {
                 .setContentIntent(pendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setOngoing(true) // Makes the notification non-dismissable
+                .setSilent(true)
                 .build();
 
         return notification;

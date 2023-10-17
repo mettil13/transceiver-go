@@ -112,18 +112,18 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         map.getUiSettings().setTiltGesturesEnabled(false);
 
         // hides default compass button and creates another one with the same use (just an aesthetic thing)
-        View locationButton = getView().findViewById((int) 5); // "5" is the id of google maps compass button
+        View defalutOrientationButton = getView().findViewById((int) 5); // "5" is the id of google maps compass button
         // Change the visibility of compass button
-        if(locationButton != null){
-            locationButton.setVisibility(View.GONE);
+        if (defalutOrientationButton != null) {
+            defalutOrientationButton.setVisibility(View.GONE);
         }
 
         orientationButton = (FloatingActionButton) getView().findViewById(R.id.orientationButton);
         orientationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(locationButton != null){
-                    locationButton.callOnClick();
+                if (defalutOrientationButton != null) {
+                    defalutOrientationButton.callOnClick();
                 }
             }
         });

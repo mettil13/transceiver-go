@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +24,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
 import androidx.room.Room;
+
+import java.security.Provider;
 
 import app_mobili.transceiver_go.databinding.ActivityMainBinding;
 
@@ -64,8 +67,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
 
         // coordinate setup
         coordinateListener = new CoordinateListener();
-        lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        startListenForCoordinates();
+        startListenForCoordinates(coordinateListener);
 
         // measurements setup
         noiseStrength = new NoiseStrength(this);
@@ -99,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
                     new String[]{Manifest.permission.POST_NOTIFICATIONS},
                     333);
         }
+
 
         // service setup
         Intent serviceIntent = new Intent(this, MeasurementService.class);
@@ -334,7 +337,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
             return true;
         });
     }
-    public void startListenForCoordinates() {
+    public void startListenForCoordinates(CoordinateListener coordinateListener) {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
@@ -344,6 +347,18 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
                     809);
             return;
         }
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000L, 10F, coordinateListener);
+
+        lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+        criteria.setPowerRequirement(Criteria.POWER_MEDIUM);
+        criteria.setAltitudeRequired(false);
+        criteria.setBearingRequired(true);
+
+        String provider = lm.getBestProvider(criteria, true);
+        if(provider != null){
+            lm.requestLocationUpdates(provider, 3000L, 50L, coordinateListener);
+        }
     }
 }
