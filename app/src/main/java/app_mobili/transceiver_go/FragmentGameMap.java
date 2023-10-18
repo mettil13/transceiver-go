@@ -3,9 +3,11 @@ package app_mobili.transceiver_go;
 import static android.content.Context.LOCATION_SERVICE;
 
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Interpolator;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.location.GnssMeasurementsEvent;
@@ -26,6 +28,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -51,8 +54,12 @@ public class FragmentGameMap extends FragmentMainMap {
 
     private Latitude myLocationLatitude;
     private Longitude myLocationLongitude;
+    private Latitude oldLocationLatitude;
+    private Longitude oldLocationLongitude;
     private float myLocationBearing;
     private ImageView myAvatar;
+    private Latitude avatarLatitude;
+    private Longitude avatarLongitude;
 
     public FragmentGameMap() {
         // Required empty public constructor
@@ -103,11 +110,50 @@ public class FragmentGameMap extends FragmentMainMap {
                 public void onLocationChanged(@NonNull Location location) {
                     Log.println(Log.ASSERT, "", new Date() + " " + location.getLatitude() + " " + location.getLongitude());
                     Toast.makeText(getContext(), new Date() + " " + location.getLatitude() + " " + location.getLongitude(), Toast.LENGTH_SHORT).show();
+                    if (myLocationLatitude == null || myLocationLongitude == null) { // if a previous location does not exist, make the old location equal to the current one
+                        oldLocationLatitude = new Latitude(location.getLatitude());
+                        oldLocationLongitude = new Longitude(location.getLongitude());
+                    } else {
+                        oldLocationLatitude = new Latitude(myLocationLatitude.getValue());
+                        oldLocationLongitude = new Longitude(myLocationLongitude.getValue());
+                    }
+
                     myLocationLatitude = new Latitude(location.getLatitude());
                     myLocationLongitude = new Longitude(location.getLongitude());
                     myLocationBearing = location.getBearing();
-                    moveMyAvatar(myLocationLatitude, myLocationLongitude);
-                    myAvatar.setVisibility(View.VISIBLE);
+                    //moveMyAvatar(myLocationLatitude, myLocationLongitude);
+
+
+                    ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, 1);
+                    valueAnimator.setDuration(1000); // duration 1 second
+                    valueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+                    valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            try {
+                                float v = animation.getAnimatedFraction();
+
+                                avatarLatitude = new Latitude((myLocationLatitude.getValue() - oldLocationLatitude.getValue()) * v + oldLocationLatitude.getValue());
+
+                                // Take the shortest path across the 180th meridian.
+                                double lngDelta = myLocationLongitude.getValue() - oldLocationLongitude.getValue();
+                                if (Math.abs(lngDelta) > 180) {
+                                    lngDelta -= Math.signum(lngDelta) * 360;
+                                }
+                                avatarLongitude = new Longitude(lngDelta * v + oldLocationLongitude.getValue());
+
+
+                            } catch (Exception e) {
+                                avatarLatitude = new Latitude(myLocationLatitude.getValue());
+                                avatarLongitude = new Longitude(myLocationLongitude.getValue());
+                            } finally {
+                                moveMyAvatar(avatarLatitude, avatarLongitude);
+                                myAvatar.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    });
+
+                    valueAnimator.start();
                 }
             });
         }
@@ -118,8 +164,8 @@ public class FragmentGameMap extends FragmentMainMap {
     @Override
     public void onCameraMove() {
         super.onCameraMove();
-        if (myLocationLatitude != null && myLocationLongitude != null) {
-            moveMyAvatar(myLocationLatitude, myLocationLongitude);
+        if (avatarLatitude != null && avatarLongitude != null) {
+            moveMyAvatar(avatarLatitude, avatarLongitude);
         }
     }
 

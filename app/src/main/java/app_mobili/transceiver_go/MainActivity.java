@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         boolean get_auto_wifi = sharedPreferences.getBoolean("measure_wifi", false);
         boolean get_auto_network = sharedPreferences.getBoolean("measure_lte_umps", false);
         boolean get_auto_noise = sharedPreferences.getBoolean("measure_noise", false);
-        
+
         Log.d("Luizo", "automatic_measurements: " + automatic_measurements + "\n measure_interval: " + measure_interval + "\n get_auto_wifi: " + get_auto_wifi + "\n get_auto_network: " + get_auto_network + "\n get_auto_noise: " + get_auto_noise);
 
 
@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
             }
         }
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this ,
+            ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.POST_NOTIFICATIONS},
                     333);
         }
@@ -300,7 +300,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
 
             networkSignalStrength.stopMonitoringSignalStrength();
 
-            measurementListener.updateNetworkMeasurement(umts,lte);
+            measurementListener.updateNetworkMeasurement(umts, lte);
 
             Toast toast = Toast.makeText(view.getContext(), R.string.taken_internet_connection_measurement, Toast.LENGTH_SHORT);
             toast.show();
@@ -337,6 +337,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
             return true;
         });
     }
+
     public void startListenForCoordinates(CoordinateListener coordinateListener) {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
@@ -357,8 +358,8 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         criteria.setBearingRequired(true);
 
         String provider = lm.getBestProvider(criteria, true);
-        if(provider != null){
-            lm.requestLocationUpdates(provider, 3000L, 50L, coordinateListener);
+        if (provider != null) {
+            lm.requestLocationUpdates(provider, 3000L, 20L, coordinateListener);
         }
     }
 }
