@@ -1,9 +1,6 @@
 package app_mobili.transceiver_go;
 
 import android.Manifest;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,7 +22,6 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
 import androidx.room.Room;
 
-import java.security.Provider;
 
 import app_mobili.transceiver_go.databinding.ActivityMainBinding;
 
@@ -89,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         setContentView(binding.getRoot());
 
 
-        //TODO move these checks in order to happen when activating automatic measurements
+        // TODO move these checks in order to happen when activating automatic measurements
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             // Request the FOREGROUND_SERVICE permission at runtime
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED) {

@@ -27,7 +27,9 @@ import androidx.preference.PreferenceManager;
 
 public class MeasurementService extends Service {
 
-    //TODO handle when measurement delay gets changed
+    // TODO refactor with big measurement class?
+    // or do i just copy over all the main activity shit?
+
     private static final int NOTIFICATION_ID = 1;
     private static final String NOTIFICATION_CHANNEL_ID = "persistent_notification_channel";
     private Runnable updateTimeRunnable;
@@ -39,12 +41,20 @@ public class MeasurementService extends Service {
 
             int measure_interval = sharedPreferences.getInt("measure_interval", 10);
             boolean automatic_measurements = sharedPreferences.getBoolean("automatic_measurements", false);
+            boolean network_measurement = sharedPreferences.getBoolean("measure_lte_umps", false);
+            boolean wifi_measurement = sharedPreferences.getBoolean("measure_wifi", false);
+            boolean noise_measurement = sharedPreferences.getBoolean("measure_noise", false);
+
+            if(network_measurement) {
+
+            }
 
             // Perform your task here
             Log.d("LuizoMeasure", "Task executed at: " + System.currentTimeMillis());
 
             // Reschedule the task to run again in one minute if needed
             if (automatic_measurements) {
+                // TODO REMOVE WHEN TESTING IS DONE
                 handler.postDelayed(this, /*measure_interval * 60_000*/ 10_000);
             }
 
@@ -95,13 +105,12 @@ public class MeasurementService extends Service {
         return null;
     }
 
-//TODO add captured measurement info (?)
     private Notification createNotification() {
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 
         Notification notification = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.drawable.account_dark) //TODO TEMP DRAWABLE, change it UI designer Matilde :)
+                .setSmallIcon(R.drawable.transciever_logo_android)
                 .setContentTitle("Automatic measurements taken!")
                 .setContentText("At time: " + getCurrentTime())
                 .setContentIntent(pendingIntent)
