@@ -2,46 +2,35 @@ package app_mobili.transceiver_go;
 
 import static android.content.Context.LOCATION_SERVICE;
 
-import android.animation.ObjectAnimator;
+import android.Manifest;
 import android.animation.ValueAnimator;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Interpolator;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
-import android.location.GnssMeasurementsEvent;
-import android.location.GnssStatus;
 import android.location.Location;
 import android.location.LocationManager;
-import android.location.OnNmeaMessageListener;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 
+import androidx.fragment.app.Fragment;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.Date;
 
@@ -98,7 +87,15 @@ public class FragmentGameMap extends FragmentMainMap {
         });
 
         // LUIZO TI PREGO FA QUALCOSA, QUESTO MOSTRO L'HA GENERATO INTELLIJ
+        // 🐰 ok fatto :)
         if (ActivityCompat.checkSelfPermission(getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    808);
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    809);
+            // ask permissions and return, if we don't have 'em we do nothing
             return;
         }
         LocationManager lm = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
@@ -109,6 +106,8 @@ public class FragmentGameMap extends FragmentMainMap {
                 @Override
                 public void onLocationChanged(@NonNull Location location) {
                     Log.println(Log.ASSERT, "", new Date() + " " + location.getLatitude() + " " + location.getLongitude());
+                    // 🐰 mi è crashata l'app a caso dandomi questo errore e mandandmi qui, giusto per farti sapere (il Toast)
+                    // java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.String android.content.Context.getPackageName()' on a null object reference
                     Toast.makeText(getContext(), new Date() + " " + location.getLatitude() + " " + location.getLongitude(), Toast.LENGTH_SHORT).show();
                     if (myLocationLatitude == null || myLocationLongitude == null) { // if a previous location does not exist, make the old location equal to the current one
                         oldLocationLatitude = new Latitude(location.getLatitude());

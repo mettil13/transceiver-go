@@ -2,31 +2,96 @@ package app_mobili.transceiver_go;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.preference.PreferenceManager;
 import androidx.room.Room;
 
+public class MeasurementSingleton implements NoiseStrength.RecordingListener {
+    private static MeasurementSingleton measurementSingleton;
+    private final Context context;
+    private final CoordinateListener coordinateListener;
+    private double longitude;
+    private double latitude;
+    //stuff for measurement
+    private final NoiseStrength noiseStrength;
 
-/*------------- IF I DID EVERYTHING RIGHT, THIS IS DEPRECATED ------------*/
-// still leaving this here in case i messed up :P
-public class MeasurementListener implements NoiseStrength.RecordingListener {
-    Context context;
-    double longitude;
-    double latitude;
+    private final NetworkSignalStrength networkSignalStrength;
+    private final WifiSignalStrength wifiSignalStrength;
 
-    MeasurementListener(Context context) {
+    private MeasurementSingleton(Context context, CoordinateListener coordinateListener) {
         this.context = context;
-        longitude = 0;
-        latitude = 0;
+        // coordinate setup
+        this.coordinateListener = coordinateListener;
+
+        // measurements setup
+        noiseStrength = new NoiseStrength(context);
+        noiseStrength.setRecordingListener(this);
+
+        networkSignalStrength = new NetworkSignalStrength(context);
+
+        wifiSignalStrength = new WifiSignalStrength(context);
+
+
     }
 
-    public void updateCoordinates(double longitude, double latitude) {
-        this.longitude = longitude;
-        this.latitude = latitude;
+    // creates the singleton and assigns it
+    public static MeasurementSingleton create(Context context, CoordinateListener coordinateListener) {
+        if (measurementSingleton == null) {
+            measurementSingleton = new MeasurementSingleton(context, coordinateListener);
+        }
+        return measurementSingleton;
     }
 
-    // updateNoiseMeasurement basically lol
+    public void takeWifiMeasurement() {
+        // update current coordinates
+        longitude = coordinateListener.getLongitude();
+        latitude = coordinateListener.getLatitude();
+
+
+        int wifi = wifiSignalStrength.getSignalLevel();
+        updateWifiMeasurement(wifi);
+
+        Toast toast = Toast.makeText(context, R.string.taken_wifi_measurement, Toast.LENGTH_SHORT);
+        toast.show();
+    }
+
+    private void updateWifiMeasurement(int wifi) {
+        new Thread(() -> {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+            String dbname = sharedPreferences.getString("account_name", "squaredb");
+            SquareDatabase squaredb = Room.databaseBuilder(context, SquareDatabase.class, dbname).build();
+
+            Square square = new Square(longitude, latitude);
+            // returns the square we're in, if it exists
+            Square squareInDb = squaredb.getSquareDAO().getSquare(square.getCoordinates());
+
+            // if such database exists, copy everything in the square used to update
+            // information, if not update the new one
+            if (squareInDb != null) square = squareInDb;
+
+            // actual update
+            square.updateWifi(wifi);
+
+            // update the database with updated square
+            squaredb.getSquareDAO().upsertSquare(square);
+
+            squaredb.close();
+            // TODO: Update map view to reflect new measurement
+        }).start();
+    }
+
+    public void takeNoiseMeasurement() {
+        longitude = coordinateListener.getLongitude();
+        latitude = coordinateListener.getLatitude();
+        noiseStrength.startRecording();
+        // when recording is finished, onRecordingFinished (just below) gets called
+        // operations of db updates are done there
+    }
+
+    // updateNoiseMeasurement equivalent
     @Override
     public void onRecordingFinished(int noise) {
         new Thread(() -> {
@@ -56,34 +121,26 @@ public class MeasurementListener implements NoiseStrength.RecordingListener {
         toast.show();
     }
 
-    public void updateWifiMeasurement(int wifi) {
-        new Thread(() -> {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-            String dbname = sharedPreferences.getString("account_name", "squaredb");
-            SquareDatabase squaredb = Room.databaseBuilder(context, SquareDatabase.class, dbname).build();
+    public void takeNetworkMeasurement(){
+        networkSignalStrength.startMonitoringSignalStrength();
 
-            Square square = new Square(longitude, latitude);
-            // returns the square we're in, if it exists
-            Square squareInDb = squaredb.getSquareDAO().getSquare(square.getCoordinates());
+        longitude = coordinateListener.getLongitude();
+        latitude = coordinateListener.getLatitude();
 
-            // if such database exists, copy everything in the square used to update
-            // information, if not update the new one
-            if (squareInDb != null) square = squareInDb;
+        int umts = networkSignalStrength.getUmtsSignalStrength();
+        int lte = networkSignalStrength.getLteSignalStrength();
 
-            // actual update
-            square.updateWifi(wifi);
+        networkSignalStrength.stopMonitoringSignalStrength();
 
-            // update the database with updated square
-            squaredb.getSquareDAO().upsertSquare(square);
+        updateNetworkMeasurement(umts, lte);
 
-            squaredb.close();
-            // TODO: Update map view to reflect new measurement
-        }).start();
+        // notify the user
+        Toast toast = Toast.makeText(context, R.string.taken_wifi_measurement, Toast.LENGTH_SHORT);
+        toast.show();
     }
 
-    public void updateNetworkMeasurement(int umts, int lte) {
-
+    private void updateNetworkMeasurement(int umts, int lte) {
         // save measurement
         new Thread(() -> {
             int updatedValue;
@@ -114,4 +171,5 @@ public class MeasurementListener implements NoiseStrength.RecordingListener {
             // TODO: Update map view to reflect new measurement
         }).start();
     }
+
 }

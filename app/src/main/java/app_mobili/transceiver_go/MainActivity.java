@@ -1,9 +1,11 @@
 package app_mobili.transceiver_go;
 
+
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.LocationManager;
@@ -12,14 +14,11 @@ import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.preference.PreferenceManager;
 import androidx.room.Room;
 
 
@@ -29,49 +28,14 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
 
     private boolean isAddSelected = false;
 
-    // stuff for coordinates
-    CoordinateListener coordinateListener;
-    LocationManager lm;
-    double longitude;
-    double latitude;
+    MeasurementSingleton measurementSingleton;
 
-    //stuff for measurement
-    NoiseStrength noiseStrength;
-    MeasurementListener measurementListener;
-    NetworkSignalStrength networkSignalStrength;
-    WifiSignalStrength wifiSignalStrength;
+    CoordinateListener coordinateListener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // retrieving preferences
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this); // Use getContext() in a Fragment or this in an Activity
-
-        int lastMeasurements = sharedPreferences.getInt("num_kept_measurements", 0);
-
-        boolean automatic_measurements = sharedPreferences.getBoolean("automatic_measurements", false);
-
-        int measure_interval = sharedPreferences.getInt("measure_interval", 10);
-
-        boolean get_auto_wifi = sharedPreferences.getBoolean("measure_wifi", false);
-        boolean get_auto_network = sharedPreferences.getBoolean("measure_lte_umps", false);
-        boolean get_auto_noise = sharedPreferences.getBoolean("measure_noise", false);
-
-        Log.d("Luizo", "automatic_measurements: " + automatic_measurements + "\n measure_interval: " + measure_interval + "\n get_auto_wifi: " + get_auto_wifi + "\n get_auto_network: " + get_auto_network + "\n get_auto_noise: " + get_auto_noise);
-
-
-        // coordinate setup
-        coordinateListener = new CoordinateListener();
-        startListenForCoordinates(coordinateListener);
-
-        // measurements setup
-        noiseStrength = new NoiseStrength(this);
-        measurementListener = new MeasurementListener(this);
-        noiseStrength.setRecordingListener(measurementListener);
-
-        networkSignalStrength = new NetworkSignalStrength(this);
-        wifiSignalStrength = new WifiSignalStrength(this);
 
         // fragment setup
         Fragment mainMap = new FragmentMainMap();
@@ -84,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-
+/*
         // TODO move these checks in order to happen when activating automatic measurements
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             // Request the FOREGROUND_SERVICE permission at runtime
@@ -97,7 +61,15 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
                     new String[]{Manifest.permission.POST_NOTIFICATIONS},
                     333);
         }
+*/
+        // coordinate setup
+        coordinateListener = new CoordinateListener();
+        startListenForCoordinates(coordinateListener);
 
+        // setting up measurement
+        measurementSingleton = MeasurementSingleton.create(getApplicationContext(), coordinateListener);
+
+        setUpMeasurementButtons(binding);
 
         // service setup
         Intent serviceIntent = new Intent(this, MeasurementService.class);
@@ -125,8 +97,6 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         });
         replaceFragment(R.id.fragmentContainer, mainMap);
 
-
-        setUpMeasurementButtons(binding);
 
 
         new Thread(() -> {
@@ -270,46 +240,9 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
                 binding.newNoiseMeasurementButton.setLongClickable(false);
             }
         });
-        binding.newWiFiMeasurementButton.setOnClickListener(view -> {
-            // update current coordinates
-            longitude = coordinateListener.getLongitude();
-            latitude = coordinateListener.getLatitude();
-            measurementListener.updateCoordinates(longitude, latitude);
-
-            // get wifi signal
-            int wifi = wifiSignalStrength.getSignalLevel();
-            measurementListener.updateWifiMeasurement(wifi);
-
-            // notify the user
-            Toast toast = Toast.makeText(view.getContext(), R.string.taken_wifi_measurement, Toast.LENGTH_SHORT);
-            toast.show();
-        });
-        binding.newInternetConnectionMeasurementButton.setOnClickListener(view -> {
-            networkSignalStrength.startMonitoringSignalStrength();
-
-            longitude = coordinateListener.getLongitude();
-            latitude = coordinateListener.getLatitude();
-            measurementListener.updateCoordinates(longitude, latitude);
-
-            int umts = networkSignalStrength.getUmtsSignalStrength();
-            int lte = networkSignalStrength.getLteSignalStrength();
-
-            networkSignalStrength.stopMonitoringSignalStrength();
-
-            measurementListener.updateNetworkMeasurement(umts, lte);
-
-            Toast toast = Toast.makeText(view.getContext(), R.string.taken_internet_connection_measurement, Toast.LENGTH_SHORT);
-            toast.show();
-
-        });
-        binding.newNoiseMeasurementButton.setOnClickListener(view -> {
-            longitude = coordinateListener.getLongitude();
-            latitude = coordinateListener.getLatitude();
-            measurementListener.updateCoordinates(longitude, latitude);
-            noiseStrength.startRecording();
-            // when recording is finished, onRecordingFinished over "MeasurementListener" gets called
-            // operations of db updates are done there
-        });
+        binding.newWiFiMeasurementButton.setOnClickListener(view -> measurementSingleton.takeWifiMeasurement());
+        binding.newInternetConnectionMeasurementButton.setOnClickListener(view -> measurementSingleton.takeNetworkMeasurement());
+        binding.newNoiseMeasurementButton.setOnClickListener(view -> measurementSingleton.takeNoiseMeasurement());
 
         // on long click
         binding.newMeasurementButton.setOnLongClickListener(view -> {
@@ -334,19 +267,23 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         });
     }
 
+
     public void startListenForCoordinates(CoordinateListener coordinateListener) {
+
+        // check if i have permission
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+            ActivityCompat.requestPermissions((Activity) this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     808);
-            ActivityCompat.requestPermissions(this,
+            ActivityCompat.requestPermissions((Activity) this,
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                     809);
             return;
         }
 
-        lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
+        //set criteria to save battery during getCoordinates
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_COARSE);
         criteria.setPowerRequirement(Criteria.POWER_MEDIUM);
