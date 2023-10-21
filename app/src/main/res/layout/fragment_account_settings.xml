@@ -20,7 +20,7 @@
         android:id="@+id/player_hat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/hat_rodolfo"
+        android:src="@drawable/hat_empty"
         app:layout_constraintBottom_toBottomOf="@+id/player_avatar"
         app:layout_constraintEnd_toEndOf="@+id/player_avatar"
         app:layout_constraintStart_toStartOf="@+id/player_avatar"
@@ -28,7 +28,7 @@
         app:layout_constraintVertical_bias="0.1" />
 
     <ImageButton
-        android:id="@+id/button"
+        android:id="@+id/button_prev_hat"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:src="@drawable/arrow_back_dark"
@@ -38,7 +38,7 @@
         app:layout_constraintVertical_bias="0.3" />
 
     <ImageButton
-        android:id="@+id/button2"
+        android:id="@+id/button_next_hat"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:src="@drawable/arrow_forward_dark"

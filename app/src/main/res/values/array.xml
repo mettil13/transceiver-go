@@ -12,4 +12,13 @@
         <item>Network</item>
         <item>Wi-fi</item>
     </string-array>
+    <integer-array name="avatar_hats">
+        <item name="empty">@drawable/hat_empty</item>
+        <item name="android">@drawable/hat_android</item>
+        <item name="headset">@drawable/hat_headset</item>
+        <item name="bunny">@drawable/hat_luizo</item>
+        <item name="nerd">@drawable/hat_nerd</item>
+        <item name="leaves">@drawable/hat_rodolfo</item>
+    </integer-array>
+
 </resources>

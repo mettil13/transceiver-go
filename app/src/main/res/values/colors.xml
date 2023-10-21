@@ -7,4 +7,27 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- clothes colors -->
+    <color name="red">#FFFF0000</color>
+    <color name="orange">#FF6600</color>
+    <color name="blue">#002AFF</color>
+    <color name="light_blue">#00EAFF</color>
+    <color name="green">#17E300</color>
+    <color name="yellow">#FFE600</color>
+    <color name="pink_soft">#FF7EB2</color>
+    <color name="pink_strong">#FF00B7</color>
+    <color name="purple">#D000FF</color>
+    <!-- white -->
+    <!-- black -->
+    <color name="grey">#AFAFAF</color>
+
+    <!-- skin colors -->
+    <color name="skin_00">#FDE7BC</color>
+    <color name="skin_01">#FFE8D9</color>
+    <color name="skin_02">#EDC6AC</color>
+    <color name="skin_03">#D39F7D</color>
+    <color name="skin_04">#9C6A49</color>
+    <color name="skin_05">#633F27</color>
+
 </resources>
