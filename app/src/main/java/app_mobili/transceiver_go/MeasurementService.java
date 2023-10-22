@@ -27,8 +27,7 @@ import androidx.preference.PreferenceManager;
 
 public class MeasurementService extends Service {
 
-    // TODO refactor with big measurement class?
-    // or do i just copy over all the main activity shit?
+    MeasurementSingleton measurementSingleton;
 
     private static final int NOTIFICATION_ID = 1;
     private static final String NOTIFICATION_CHANNEL_ID = "persistent_notification_channel";
@@ -66,6 +65,8 @@ public class MeasurementService extends Service {
         super.onCreate();
 
         createNotificationChannel();
+
+        measurementSingleton = MeasurementSingleton.create(getApplicationContext(), new CoordinateListener());
 
         // Set up a recurring task to update the notification
         updateTimeRunnable = new Runnable() {
@@ -110,7 +111,7 @@ public class MeasurementService extends Service {
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 
         Notification notification = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.drawable.transciever_logo_android)
+                .setSmallIcon(R.drawable.transciever_icon_marker_dark)
                 .setContentTitle("Automatic measurements taken!")
                 .setContentText("At time: " + getCurrentTime())
                 .setContentIntent(pendingIntent)
