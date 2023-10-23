@@ -53,7 +53,7 @@ public class FragmentAccountSettings extends Fragment implements SharedPreferenc
         hats = getResources().obtainTypedArray(R.array.avatar_hats);
         clothes = getResources().obtainTypedArray(R.array.avatar_clothes_idle);
 
-        LorenzoHelper.buildLorenzoFromPreferences(getContext(), avatarSkin, avatarClothes, avatarHat);
+        LorenzoHelper.buildLorenzoIdleFromPreferences(getContext(), avatarSkin, avatarClothes, avatarHat);
 
         hatIndex = PreferenceManager.getDefaultSharedPreferences(getContext()).getInt("hat_index", 0);
         clothesIndex = PreferenceManager.getDefaultSharedPreferences(getContext()).getInt("clothes_index", 0);
@@ -130,7 +130,7 @@ public class FragmentAccountSettings extends Fragment implements SharedPreferenc
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         if (s.equals("skin_color")) {
-            LorenzoHelper.lorenzoSkinBuilder(avatarSkin, getContext(), LorenzoHelper.nameToColor(getContext(), sharedPreferences.getString(s, "skin_00")));
+            LorenzoHelper.lorenzoIdleSkinBuilder(avatarSkin, getContext(), LorenzoHelper.nameToColor(getContext(), sharedPreferences.getString(s, "skin_00")));
             ((AnimatedVectorDrawable) avatarSkin.getDrawable()).start();
         }
     }

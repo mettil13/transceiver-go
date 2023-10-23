@@ -26,6 +26,10 @@
         <item name="default">@drawable/lorenzo_idle_clothes</item>
         <item name="pride">@drawable/lorenzo_idle_clothes_pride</item>
     </integer-array>
+    <integer-array name="avatar_clothes_walk">
+        <item name="default">@drawable/lorenzo_walk_clothes</item>
+        <item name="pride">@drawable/lorenzo_walk_clothes_pride</item>
+    </integer-array>
     <string-array name="skin_colors_entries">
         <item>@string/skin_00</item>
         <item>@string/skin_01</item>

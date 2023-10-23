@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Point;
+import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
@@ -47,7 +48,9 @@ public class FragmentGameMap extends FragmentMainMap {
     private Latitude oldLocationLatitude;
     private Longitude oldLocationLongitude;
     private float myLocationBearing;
-    private ImageView myAvatar;
+    private ImageView myAvatarSkin;
+    private ImageView myAvatarClothes;
+    private ImageView myAvatarHat;
     private Latitude avatarLatitude;
     private Longitude avatarLongitude;
 
@@ -59,16 +62,21 @@ public class FragmentGameMap extends FragmentMainMap {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // creates the my position avatar
-        myAvatar = new ImageView(getContext());
-        myAvatar.setImageResource(R.drawable.lorenzo_idle);
-        ((ViewGroup) getView().findViewById(R.id.fragment_main_map_layout)).addView(myAvatar);
+        myAvatarSkin = new ImageView(getContext());
+        myAvatarClothes = new ImageView(getContext());
+        myAvatarHat = new ImageView(getContext());
+        setUpMyAvatar(myAvatarSkin, myAvatarClothes, myAvatarHat);
+        /*
+        myAvatarSkin.setImageResource(R.drawable.lorenzo_idle);
+        ((ViewGroup) getView().findViewById(R.id.fragment_main_map_layout)).addView(myAvatarSkin);
         // resize the image
-        ViewGroup.LayoutParams params = myAvatar.getLayoutParams();
-        params.height = 250; //pixels
+        ViewGroup.LayoutParams params = myAvatarSkin.getLayoutParams();
+        params.height = 250; // pixels
         params.width = 250;
-        myAvatar.setLayoutParams(params);
+        myAvatarSkin.setLayoutParams(params);
         // hides the avatar until it needs to be shown
-        myAvatar.setVisibility(View.INVISIBLE);
+        myAvatarSkin.setVisibility(View.INVISIBLE);
+         */
     }
 
     @Override
@@ -149,7 +157,13 @@ public class FragmentGameMap extends FragmentMainMap {
                                 avatarLongitude = new Longitude(myLocationLongitude.getValue());
                             } finally {
                                 moveMyAvatar(avatarLatitude, avatarLongitude);
-                                myAvatar.setVisibility(View.VISIBLE);
+                                myAvatarSkin.setVisibility(View.VISIBLE);
+                                myAvatarClothes.setVisibility(View.VISIBLE);
+                                myAvatarHat.setVisibility(View.VISIBLE);
+                                ((AnimatedVectorDrawable) myAvatarSkin.getDrawable()).start();
+                                ((AnimatedVectorDrawable) myAvatarClothes.getDrawable()).start();
+
+                                orientationButton.callOnClick();
                             }
                         }
                     });
@@ -180,10 +194,40 @@ public class FragmentGameMap extends FragmentMainMap {
 
     }
 
+    private void setUpMyAvatar(ImageView avatarSkin, ImageView avatarClothes, ImageView avatarHat) {
+        LorenzoHelper.buildLorenzoWalkFromPreferences(getContext(), avatarSkin, avatarClothes, avatarHat);
+        ((android.widget.FrameLayout) getView().findViewById(R.id.fragment_main_map_layout)).addView(avatarSkin);
+        ((android.widget.FrameLayout) getView().findViewById(R.id.fragment_main_map_layout)).addView(avatarClothes);
+        ((android.widget.FrameLayout) getView().findViewById(R.id.fragment_main_map_layout)).addView(avatarHat);
+
+        // resize the images
+        ViewGroup.LayoutParams skinParams = avatarSkin.getLayoutParams();
+        skinParams.height = 250; // pixels
+        skinParams.width = 250;
+        avatarSkin.setLayoutParams(skinParams);
+        ViewGroup.LayoutParams clothesParams = avatarClothes.getLayoutParams();
+        clothesParams.height = 250; // pixels
+        clothesParams.width = 250;
+        avatarClothes.setLayoutParams(clothesParams);
+        ViewGroup.LayoutParams hatParams = avatarHat.getLayoutParams();
+        hatParams.height = 250; // pixels
+        hatParams.width = 250;
+        avatarHat.setLayoutParams(hatParams);
+
+        // hides the avatar until it needs to be shown
+        avatarSkin.setVisibility(View.INVISIBLE);
+        avatarClothes.setVisibility(View.INVISIBLE);
+        avatarHat.setVisibility(View.INVISIBLE);
+    }
+
     private void moveMyAvatar(Latitude newLatitude, Longitude newLongitude) {
         Point myPositionOnScreen = map.getProjection().toScreenLocation(new LatLng(newLatitude.getValue(), newLongitude.getValue()));
-        myAvatar.setTranslationX(myPositionOnScreen.x - myAvatar.getLayoutParams().width / 2f);
-        myAvatar.setTranslationY(myPositionOnScreen.y - myAvatar.getLayoutParams().height);
+        myAvatarSkin.setTranslationX(myPositionOnScreen.x - myAvatarSkin.getLayoutParams().width / 2f);
+        myAvatarSkin.setTranslationY(myPositionOnScreen.y - myAvatarSkin.getLayoutParams().height);
+        myAvatarClothes.setTranslationX(myPositionOnScreen.x - myAvatarClothes.getLayoutParams().width / 2f);
+        myAvatarClothes.setTranslationY(myPositionOnScreen.y - myAvatarClothes.getLayoutParams().height);
+        myAvatarHat.setTranslationX(myPositionOnScreen.x - myAvatarHat.getLayoutParams().width / 2f);
+        myAvatarHat.setTranslationY(myPositionOnScreen.y - myAvatarHat.getLayoutParams().height - (myAvatarSkin.getLayoutParams().height * 0.1f));
     }
 
     // code from https://stackoverflow.com/questions/18053156/set-image-from-drawable-as-marker-in-google-map-version-2

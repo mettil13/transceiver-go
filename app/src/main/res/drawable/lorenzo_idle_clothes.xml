@@ -16,6 +16,9 @@
                         android:translateY="-25">
                         <group
                             android:name="_R_G_L_7_G"
+                            android:pivotX="319"
+                            android:pivotY="257"
+                            android:rotation="0"
                             android:translateX="-1"
                             android:translateY="-2">
                             <path
@@ -44,6 +47,9 @@
                             android:translateY="-9">
                             <group
                                 android:name="_R_G_L_6_G"
+                                android:pivotX="311"
+                                android:pivotY="362"
+                                android:rotation="0"
                                 android:translateX="-4"
                                 android:translateY="2">
                                 <path
@@ -111,6 +117,9 @@
                             android:translateY="-9">
                             <group
                                 android:name="_R_G_L_4_G"
+                                android:pivotX="242"
+                                android:pivotY="363"
+                                android:rotation="0"
                                 android:translateY="1">
                                 <path
                                     android:name="_R_G_L_4_G_D_0_P_0"
@@ -166,6 +175,9 @@
                         android:translateY="-25">
                         <group
                             android:name="_R_G_L_2_G"
+                            android:pivotX="238"
+                            android:pivotY="260"
+                            android:rotation="0"
                             android:translateX="-6.5"
                             android:translateY="-5">
                             <path
