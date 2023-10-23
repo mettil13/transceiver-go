@@ -6,16 +6,16 @@
         android:entries="@array/type_of_data_entries"
         android:entryValues="@array/type_of_data_values"
         android:key="type_of_data"
-        android:title="Type of data"
+        android:title="@string/list_title"
         app:defaultValue="@string/none"
-        app:dialogTitle="Select the data to visualize"
+        app:dialogTitle="@string/list_dialog_title"
         app:useSimpleSummaryProvider="true" />
 
     <PreferenceCategory
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:key="available_maps"
-        android:title="Available maps">
+        android:title="@string/available_maps_title">
 
         <!-- Populated at runtime -->
 

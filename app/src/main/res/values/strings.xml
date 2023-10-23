@@ -52,12 +52,36 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
     <!-- Layer Preferences -->
+    <string name="list_title">Type of data</string>
+    <string name="list_dialog_title">Select the data to visualize</string>
     <string name="none">None</string>
     <string name="noise">Noise</string>
     <string name="network">Network</string>
     <string name="wifi">Wi-fi</string>
+    <string name="available_maps_title">Available maps</string>
 
     <!-- Account Preferences -->
     <string name="account_name">Username</string>
+    <string name="skin_color">Skin color</string>
+    <string name="select_color">Select color</string>
 
+    <!-- Colors -->
+    <string name="red">Red</string>
+    <string name="orange">Orange</string>
+    <string name="blue">Blue</string>
+    <string name="light_blue">Light blue</string>
+    <string name="green">Green</string>
+    <string name="yellow">Yellow</string>
+    <string name="pink_soft">Pink soft</string>
+    <string name="pink_strong">Pink strong</string>
+    <string name="purple">Purple</string>
+    <string name="white">White</string>
+    <string name="black">Black</string>
+    <string name="gray">Gray</string>
+    <string name="skin_00">Skin 00</string>
+    <string name="skin_01">Skin 01</string>
+    <string name="skin_02">Skin 02</string>
+    <string name="skin_03">Skin 03</string>
+    <string name="skin_04">Skin 04</string>
+    <string name="skin_05">Skin 05</string>
 </resources>

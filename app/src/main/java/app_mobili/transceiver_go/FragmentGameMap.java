@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
 import androidx.fragment.app.Fragment;
+
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -106,6 +107,7 @@ public class FragmentGameMap extends FragmentMainMap {
                 @Override
                 public void onLocationChanged(@NonNull Location location) {
                     Log.println(Log.ASSERT, "", new Date() + " " + location.getLatitude() + " " + location.getLongitude());
+                    // TEORICAMENTE non dovrebbe essere un problema: questo toast è solo di debug ed a breve lo toglierò
                     // 🐰 mi è crashata l'app a caso dandomi questo errore e mandandmi qui, giusto per farti sapere (il Toast)
                     // java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.String android.content.Context.getPackageName()' on a null object reference
                     Toast.makeText(getContext(), new Date() + " " + location.getLatitude() + " " + location.getLongitude(), Toast.LENGTH_SHORT).show();

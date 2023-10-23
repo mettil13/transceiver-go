@@ -11,4 +11,13 @@
         android:singleLine="true"
         android:title="@string/account_name"
         app:useSimpleSummaryProvider="true" />
+
+    <ListPreference
+        android:entries="@array/skin_colors_entries"
+        android:entryValues="@array/skin_colors_values"
+        android:key="skin_color"
+        android:title="@string/skin_color"
+        app:defaultValue="skin_00"
+        app:dialogTitle="@string/select_color"
+        app:useSimpleSummaryProvider="true" />
 </PreferenceScreen>

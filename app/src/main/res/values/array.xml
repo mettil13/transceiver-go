@@ -12,6 +12,8 @@
         <item>Network</item>
         <item>Wi-fi</item>
     </string-array>
+
+
     <integer-array name="avatar_hats">
         <item name="empty">@drawable/hat_empty</item>
         <item name="android">@drawable/hat_android</item>
@@ -20,5 +22,57 @@
         <item name="nerd">@drawable/hat_nerd</item>
         <item name="leaves">@drawable/hat_rodolfo</item>
     </integer-array>
+    <integer-array name="avatar_clothes_idle">
+        <item name="default">@drawable/lorenzo_idle_clothes</item>
+        <item name="pride">@drawable/lorenzo_idle_clothes_pride</item>
+    </integer-array>
+    <string-array name="skin_colors_entries">
+        <item>@string/skin_00</item>
+        <item>@string/skin_01</item>
+        <item>@string/skin_02</item>
+        <item>@string/skin_03</item>
+        <item>@string/skin_04</item>
+        <item>@string/skin_05</item>
+        <item>@string/red</item>
+        <item>@string/orange</item>
+        <item>@string/blue</item>
+        <item>@string/light_blue</item>
+        <item>@string/green</item>
+        <item>@string/yellow</item>
+        <item>@string/pink_soft</item>
+        <item>@string/pink_strong</item>
+        <item>@string/purple</item>
+        <item>@string/white</item>
+        <item>@string/black</item>
+        <item>@string/gray</item>
+    </string-array>
+    <string-array name="skin_colors_values">
+        <item>skin_00</item>
+        <item>skin_01</item>
+        <item>skin_02</item>
+        <item>skin_03</item>
+        <item>skin_04</item>
+        <item>skin_05</item>
+        <item>red</item>
+        <item>orange</item>
+        <item>blue</item>
+        <item>light_blue</item>
+        <item>green</item>
+        <item>yellow</item>
+        <item>pink_soft</item>
+        <item>pink_strong</item>
+        <item>purple</item>
+        <item>white</item>
+        <item>black</item>
+        <item>gray</item>
+    </string-array>
+    <string-array name="skin_colors">
+        <item>@color/skin_00</item>
+        <item>@color/skin_01</item>
+        <item>@color/skin_02</item>
+        <item>@color/skin_03</item>
+        <item>@color/skin_04</item>
+        <item>@color/skin_05</item>
+    </string-array>
 
 </resources>
