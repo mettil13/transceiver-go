@@ -136,7 +136,7 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
         updateNetworkMeasurement(umts, lte);
 
         // notify the user
-        Toast toast = Toast.makeText(context, R.string.taken_wifi_measurement, Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(context, R.string.taken_internet_connection_measurement, Toast.LENGTH_SHORT);
         toast.show();
     }
 

@@ -48,4 +48,13 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        app:title="@string/exportdb">
+
+        <Preference
+            app:title="pulsante per luizo"
+            android:key="pref_share_button"/>
+
+    </PreferenceCategory>
+
 </PreferenceScreen>
