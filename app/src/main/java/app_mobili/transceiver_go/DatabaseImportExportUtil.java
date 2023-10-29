@@ -1,17 +1,21 @@
 package app_mobili.transceiver_go;
 
+import android.Manifest;
 import android.app.Activity;
 
 import android.content.Context;
 import android.content.Intent;
 
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.preference.PreferenceManager;
@@ -19,6 +23,7 @@ import androidx.room.Room;
 
 import java.io.File;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +34,7 @@ import java.nio.file.Files;
 public class DatabaseImportExportUtil {
     private static final String TAG = "DatabaseImportExportUtil";
     private static final int REQUEST_CODE_EXPORT_DB = 69;
+    private static final int REQUEST_CODE_IMPORT_DB = 420;
 
     private static final int sleepTime = 1000; // ms
 
@@ -78,7 +84,7 @@ public class DatabaseImportExportUtil {
 
             // Start the activity to share the file
             activity.startActivityForResult(Intent.createChooser(shareIntent, "Share Database"), REQUEST_CODE_EXPORT_DB);
-        });
+        }).start();
 
     }
 
@@ -176,9 +182,6 @@ public class DatabaseImportExportUtil {
         new Thread(() -> {
             try {
                 Looper.prepare();
-                final String databaseDirectoryPath = activity.getDatabasePath(dbname).getParent();
-                File destinationFile = new File(databaseDirectoryPath, dbname);
-
                 // try to build the database to see if it's compatible
                 SquareDatabase imported = Room.databaseBuilder(activity, SquareDatabase.class, dbname).build();
                 Square e = new Square(69, 420);
@@ -192,9 +195,8 @@ public class DatabaseImportExportUtil {
             } catch (IllegalStateException e) {
                 Log.e(TAG, "Error checking db: " + e.getMessage());
 
-                final String databaseDirectoryPath = activity.getDataDir().getPath();
+                final String databaseDirectoryPath = activity.getDatabasePath(dbname).getParent();
                 File destinationFile = new File(databaseDirectoryPath, dbname);
-
 
                 boolean isDeleted = destinationFile.delete();
                 if (isDeleted) {

@@ -17,6 +17,10 @@
     <string name="wrong_db_version">Failed Import: Wrong database version :/</string>
     <string name="not_a_db">Failed Import: Selected file not compatible :(</string>
 
+    <!-- Permissions -->
+    <string name="permission_granted_bg_measurement">Permission granted! enable again to use the background measurements!</string>
+    <string name="permission_denied">Permission denied! functionality not accessible :(</string>
+
     <!-- Bottom nav menu -->
     <string name="map">Map</string>
     <string name="game">Game map</string>

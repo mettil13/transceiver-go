@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.LocationManager;
@@ -19,6 +20,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.PreferenceManager;
 import androidx.room.Room;
 
 
@@ -48,20 +50,6 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-/*
-        // TODO move these checks in order to happen when activating automatic measurements
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            // Request the FOREGROUND_SERVICE permission at runtime
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.FOREGROUND_SERVICE}, 444);
-            }
-        }
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.POST_NOTIFICATIONS},
-                    333);
-        }
-*/
         // coordinate setup
         coordinateListener = new CoordinateListener();
         startListenForCoordinates(coordinateListener);
@@ -71,9 +59,15 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
 
         setUpMeasurementButtons(binding);
 
-        // service setup
-        Intent serviceIntent = new Intent(this, MeasurementService.class);
-        startService(serviceIntent);
+        //service setup at startup (if enabled)
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean automaticMeasurements = sharedPreferences.getBoolean("automatic_measurements", false);
+        if (automaticMeasurements){
+            // service setup
+            Intent serviceIntent = new Intent(this, MeasurementService.class);
+            startService(serviceIntent);
+        }
+
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {

@@ -81,7 +81,7 @@ public class MeasurementService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // Start the task when the service is started
-        Log.d("LuizoMeasure", "onStartCommand works");
+        Log.d("LuizoMeasure", "Service started");
         handler.post(measuringRun);
 
         handler.post(updateTimeRunnable);
