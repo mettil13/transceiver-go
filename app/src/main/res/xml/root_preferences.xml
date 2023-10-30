@@ -49,15 +49,24 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        app:title="@string/exportdb">
+        app:title="Sharing">
 
         <Preference
-            app:title="Share"
+            app:title="@string/exportdb"
             android:key="pref_share_button"/>
         <Preference
-            app:title="Import"
+            app:title="@string/importdb"
             android:key="pref_import_button"/>
 
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="Calibration">
+
+        <Preference
+            app:title="Microphone Calibration"
+            android:key="to_calibration_button"/>
+        
     </PreferenceCategory>
 
 </PreferenceScreen>

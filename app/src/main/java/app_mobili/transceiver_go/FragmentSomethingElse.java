@@ -56,24 +56,6 @@ public class FragmentSomethingElse extends Fragment implements NoiseStrength.Rec
         return fragment;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-
-        // needed for the importing process
-        importLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    int resultCode = result.getResultCode();
-                    Intent data = result.getData();
-                    DatabaseImportExportUtil.handleImportFileResult(getActivity(),resultCode,data);
-                }
-        );
-    }
 
     @Override
     public void onRecordingFinished(int noise) {

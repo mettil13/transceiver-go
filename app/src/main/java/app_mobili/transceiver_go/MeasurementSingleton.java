@@ -16,7 +16,6 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
     private double latitude;
     //stuff for measurement
     private final NoiseStrength noiseStrength;
-
     private final NetworkSignalStrength networkSignalStrength;
     private final WifiSignalStrength wifiSignalStrength;
 
@@ -84,8 +83,15 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
     }
 
     public void takeNoiseMeasurement() {
+        //update coordinates
         longitude = coordinateListener.getLongitude();
         latitude = coordinateListener.getLatitude();
+
+        //keep thresholds synced
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        noiseStrength.setClapAmplitude(sharedPreferences.getInt("clap_value", 100));
+        noiseStrength.setSilenceAmplitude(sharedPreferences.getInt("silence_value", 0));
+
         noiseStrength.startRecording();
         // when recording is finished, onRecordingFinished (just below) gets called
         // operations of db updates are done there

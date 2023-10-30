@@ -10,6 +10,18 @@
     <string name="taken_internet_connection_measurement">Internet connection measurement taken!</string>
     <string name="taken_noise_measurement">Noise measurement taken!</string>
 
+    <!-- Calibration -->
+    <string name="calibration_title">Calibrate your Mic</string>
+    <string name="calibration_explain">How it works:\n
+    Calibrating your mic will take no more than few seconds, and it will ensure that your measured noise values are on par with everyone else according to your mic sensitivity! you just need to set both silence and clap thresholds, as explained below.
+    </string>
+    <string name="calibration_silence">Click the button and wait 3 seconds in a quiet environment. The dBm result value will be based on the average noise detected in these 3 seconds.</string>
+    <string name="calibration_clap">Click the button and clap at least once at about 30cm from your phone microphone in the span of 3 seconds. The dBm result value will be based on the maximum noise detected in these 3 seconds. </string>
+    <string name="silence_button">Set silence threshold</string>
+    <string name="clap_button">Set clap threshold</string>
+    <string name="silence_threshold">Silence Threshold (dBm)</string>
+    <string name="clap_threshold">Clap Threshold (dBm)</string>
+
     <!-- Import / Export -->
     <string name="exportdb">Share your progress!</string>
     <string name="importdb">Import your friends\' progress!</string>

@@ -204,6 +204,14 @@ public class NoiseStrength extends Sensor {
         return clapAmplitude;
     }
 
+    public void setSilenceAmplitude(int silenceAmplitude) {
+        this.silenceAmplitude = silenceAmplitude;
+    }
+
+    public void setClapAmplitude(int clapAmplitude) {
+        this.clapAmplitude = clapAmplitude;
+    }
+
     // getter in case we need it
     public int getNoiseScale() {
         return SensorValue;

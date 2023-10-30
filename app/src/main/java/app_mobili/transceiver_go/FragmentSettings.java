@@ -14,6 +14,9 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
@@ -84,6 +87,13 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
             return true;
         });
 
+        Preference toCalibrationButton = findPreference("to_calibration_button");
+        Objects.requireNonNull(toCalibrationButton).setOnPreferenceClickListener(preference -> {
+            Fragment micCalibration = new FragmentMicCalibration();
+            replaceFragment(R.id.fragmentContainer, micCalibration);
+            return true;
+        });
+
     }
 
     @Override
@@ -106,7 +116,6 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
                 }
                 restartService();
                 break;
-
             default:
                 break;
         }
@@ -145,12 +154,20 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
         }
     }
 
-    public void restartService(){
+    private void restartService(){
         // Stop service
         Intent serviceIntent = new Intent(requireContext(), MeasurementService.class);
         requireContext().stopService(serviceIntent);
         // Start service
         serviceIntent = new Intent(requireContext(), MeasurementService.class);
         requireActivity().startService(serviceIntent);
+    }
+
+    private void replaceFragment(int containerId, Fragment newFragment) {
+        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.setReorderingAllowed(true);
+        fragmentTransaction.replace(containerId, newFragment);
+        fragmentTransaction.commit();
     }
 }
