@@ -403,7 +403,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         }
     }
 
-    private int calculateProperHeatmapRadiusBasedOnZoom(float zoom) { //TODO: fix
+    private int calculateProperHeatmapRadiusBasedOnZoom(float zoom) {
         Point p1 = map.getProjection().toScreenLocation(map.getCameraPosition().target);
         Point p2 = map.getProjection().toScreenLocation(new LatLng(new Latitude(map.getCameraPosition().target.latitude).add(Square.SIDE_LENGTH).getValue(), new Longitude(map.getCameraPosition().target.longitude).add(Square.SIDE_LENGTH).getValue()));
         int distanceInPixel = (int) (Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2)) / 2);

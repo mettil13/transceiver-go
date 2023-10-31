@@ -12,9 +12,12 @@ import android.location.Criteria;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -34,17 +37,25 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
 
     CoordinateListener coordinateListener;
 
+    Menu coinsMenu;
+
+    Fragment mainMap;
+    Fragment gameMap;
+    Fragment somethingElse;
+    Fragment account;
+    Fragment settings;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // fragment setup
-        Fragment mainMap = new FragmentMainMap();
-        Fragment gameMap = new FragmentGameMap();
-        Fragment somethingElse = new FragmentSomethingElse();
-        Fragment account = new FragmentAccountSettings();
-        Fragment settings = new FragmentSettings();
+        mainMap = new FragmentMainMap();
+        gameMap = new FragmentGameMap();
+        somethingElse = new FragmentSomethingElse();
+        account = new FragmentAccountSettings();
+        settings = new FragmentSettings();
 
         ActivityMainBinding binding;
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -90,7 +101,6 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
             return true;
         });
         replaceFragment(R.id.fragmentContainer, mainMap);
-
 
 
         new Thread(() -> {
@@ -186,6 +196,17 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         stopService(new Intent(this, MeasurementService.class));
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.coins, menu);
+
+        coinsMenu = menu;
+        coinsMenu.getItem(0).setTitle("ciao");
+        return true;
+    }
+
 
     private void replaceFragment(int containerId, Fragment newFragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -261,6 +282,17 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         });
     }
 
+    public void refreshMaps() {
+        try {
+            ((FragmentMainMap) mainMap).onCameraIdle();
+        } catch (Exception ignored) {
+        }
+
+        try {
+            ((FragmentGameMap) gameMap).onCameraIdle();
+        } catch (Exception ignored) {
+        }
+    }
 
     public void startListenForCoordinates(CoordinateListener coordinateListener) {
 

@@ -115,10 +115,6 @@ public class FragmentGameMap extends FragmentMainMap {
                 @Override
                 public void onLocationChanged(@NonNull Location location) {
                     Log.println(Log.ASSERT, "", new Date() + " " + location.getLatitude() + " " + location.getLongitude());
-                    // TEORICAMENTE non dovrebbe essere un problema: questo toast è solo di debug ed a breve lo toglierò
-                    // 🐰 mi è crashata l'app a caso dandomi questo errore e mandandmi qui, giusto per farti sapere (il Toast)
-                    // java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.String android.content.Context.getPackageName()' on a null object reference
-                    Toast.makeText(getContext(), new Date() + " " + location.getLatitude() + " " + location.getLongitude(), Toast.LENGTH_SHORT).show();
                     if (myLocationLatitude == null || myLocationLongitude == null) { // if a previous location does not exist, make the old location equal to the current one
                         oldLocationLatitude = new Latitude(location.getLatitude());
                         oldLocationLongitude = new Longitude(location.getLongitude());
