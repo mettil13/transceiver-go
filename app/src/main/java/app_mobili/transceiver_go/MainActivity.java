@@ -191,6 +191,12 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        refreshMaps();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         stopService(new Intent(this, MeasurementService.class));
@@ -255,9 +261,9 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
                 binding.newNoiseMeasurementButton.setLongClickable(false);
             }
         });
-        binding.newWiFiMeasurementButton.setOnClickListener(view -> measurementSingleton.takeWifiMeasurement());
-        binding.newInternetConnectionMeasurementButton.setOnClickListener(view -> measurementSingleton.takeNetworkMeasurement());
-        binding.newNoiseMeasurementButton.setOnClickListener(view -> measurementSingleton.takeNoiseMeasurement());
+        binding.newWiFiMeasurementButton.setOnClickListener(view -> measurementSingleton.takeWifiMeasurement(this));
+        binding.newInternetConnectionMeasurementButton.setOnClickListener(view -> measurementSingleton.takeNetworkMeasurement(this));
+        binding.newNoiseMeasurementButton.setOnClickListener(view -> measurementSingleton.takeNoiseMeasurement(this));
 
         // on long click
         binding.newMeasurementButton.setOnLongClickListener(view -> {

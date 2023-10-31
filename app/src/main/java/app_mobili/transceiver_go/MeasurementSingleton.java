@@ -1,7 +1,9 @@
 package app_mobili.transceiver_go;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -37,13 +39,14 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
 
     // creates the singleton and assigns it
     public static MeasurementSingleton create(Context context, CoordinateListener coordinateListener) {
+
         if (measurementSingleton == null) {
             measurementSingleton = new MeasurementSingleton(context, coordinateListener);
         }
         return measurementSingleton;
     }
 
-    public void takeWifiMeasurement() {
+    public void takeWifiMeasurement(MainActivity activity) {
         // update current coordinates
         longitude = coordinateListener.getLongitude();
         latitude = coordinateListener.getLatitude();
@@ -51,6 +54,10 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
 
         int wifi = wifiSignalStrength.getSignalLevel();
         updateWifiMeasurement(wifi);
+
+        if(activity != null) {
+            activity.refreshMaps();
+        }
 
         Toast toast = Toast.makeText(context, R.string.taken_wifi_measurement, Toast.LENGTH_SHORT);
         toast.show();
@@ -78,11 +85,11 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
             squaredb.getSquareDAO().upsertSquare(square);
 
             squaredb.close();
-            // TODO: Update map view to reflect new measurement
+
         }).start();
     }
 
-    public void takeNoiseMeasurement() {
+    public void takeNoiseMeasurement(MainActivity activity) {
         //update coordinates
         longitude = coordinateListener.getLongitude();
         latitude = coordinateListener.getLatitude();
@@ -95,6 +102,22 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
         noiseStrength.startRecording();
         // when recording is finished, onRecordingFinished (just below) gets called
         // operations of db updates are done there
+
+        // handler to update the map after 3.5 seconds of measurement started
+        // needed here because we cannot pass an activity on callback
+        // Create a handler
+        Handler handler = new Handler();
+
+        int delayInMillis = 3500;
+
+        // Create a runnable to be executed after the delay
+        Runnable updateMap = () -> {
+            if(activity != null) {
+                activity.refreshMaps();
+                Log.d("Refresh", "refresh function called");
+            }
+        };
+        handler.postDelayed(updateMap, delayInMillis);
     }
 
     // updateNoiseMeasurement equivalent
@@ -128,7 +151,7 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
     }
 
 
-    public void takeNetworkMeasurement(){
+    public void takeNetworkMeasurement(MainActivity activity){
         networkSignalStrength.startMonitoringSignalStrength();
 
         longitude = coordinateListener.getLongitude();
@@ -140,6 +163,10 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
         networkSignalStrength.stopMonitoringSignalStrength();
 
         updateNetworkMeasurement(umts, lte);
+
+        if(activity != null) {
+            activity.refreshMaps();
+        }
 
         // notify the user
         Toast toast = Toast.makeText(context, R.string.taken_internet_connection_measurement, Toast.LENGTH_SHORT);

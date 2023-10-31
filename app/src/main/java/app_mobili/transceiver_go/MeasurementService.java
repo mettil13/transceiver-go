@@ -1,5 +1,6 @@
 package app_mobili.transceiver_go;
 
+
 import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -28,7 +29,6 @@ import androidx.preference.PreferenceManager;
 public class MeasurementService extends Service {
 
     MeasurementSingleton measurementSingleton;
-
     private static final int NOTIFICATION_ID = 1;
     private static final String NOTIFICATION_CHANNEL_ID = "persistent_notification_channel";
     private Runnable updateTimeRunnable;
@@ -73,6 +73,7 @@ public class MeasurementService extends Service {
             @Override
             public void run() {
                 updateNotification();
+
                 handler.postDelayed(this, /*measure_interval * 60_000*/ 10_000); // Update every second
             }
         };
