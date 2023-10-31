@@ -44,8 +44,17 @@ public class MeasurementService extends Service {
             boolean wifi_measurement = sharedPreferences.getBoolean("measure_wifi", false);
             boolean noise_measurement = sharedPreferences.getBoolean("measure_noise", false);
 
+            // activity management in services are bad practice, so we don't do it
+            // the functions are prepared to handle this situation, the app will reload
+            // measurements on resume, no problem
             if(network_measurement) {
-
+                measurementSingleton.takeNetworkMeasurement(null);
+            }
+            if(wifi_measurement) {
+                measurementSingleton.takeWifiMeasurement(null);
+            }
+            if(noise_measurement) {
+                measurementSingleton.takeNoiseMeasurement(null);
             }
 
             // Perform your task here
