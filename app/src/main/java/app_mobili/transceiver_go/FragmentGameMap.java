@@ -95,8 +95,6 @@ public class FragmentGameMap extends FragmentMainMap {
             }
         });
 
-        // LUIZO TI PREGO FA QUALCOSA, QUESTO MOSTRO L'HA GENERATO INTELLIJ
-        // 🐰 ok fatto :)
         if (ActivityCompat.checkSelfPermission(getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},

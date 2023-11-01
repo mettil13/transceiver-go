@@ -54,7 +54,7 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
         int wifi = wifiSignalStrength.getSignalLevel();
         updateWifiMeasurement(wifi);
 
-        if(activity != null) {
+        if (activity instanceof MainActivity) {
             activity.refreshMaps();
         }
 
@@ -111,7 +111,7 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
 
         // Create a runnable to be executed after the delay
         Runnable updateMap = () -> {
-            if(activity != null) {
+            if (activity instanceof MainActivity) {
                 activity.refreshMaps();
                 Log.d("Refresh", "refresh function called");
             }
@@ -150,7 +150,7 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
     }
 
 
-    public void takeNetworkMeasurement(MainActivity activity){
+    public void takeNetworkMeasurement(MainActivity activity) {
         networkSignalStrength.startMonitoringSignalStrength();
 
         longitude = coordinateListener.getLongitude();
@@ -163,7 +163,7 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
 
         updateNetworkMeasurement(umts, lte);
 
-        if(activity != null) {
+        if (activity instanceof MainActivity) {
             activity.refreshMaps();
         }
 

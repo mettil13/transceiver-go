@@ -1,6 +1,7 @@
 package app_mobili.transceiver_go;
 
 import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -99,6 +101,15 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         super.onViewCreated(view, savedInstanceState);
         ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.mainMap)).getMapAsync(this);
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Activity currentActivity = getActivity();
+        if (currentActivity instanceof MainActivity) {
+            ((MainActivity)currentActivity).refreshMaps();
+        }
     }
 
     @Override
