@@ -21,6 +21,7 @@
     <string name="clap_button">Set clap threshold</string>
     <string name="silence_threshold">Silence Threshold (dBm)</string>
     <string name="clap_threshold">Clap Threshold (dBm)</string>
+    <string name="noise_value">noise: %d</string>
 
     <!-- Import / Export -->
     <string name="exportdb">Share your progress!</string>
@@ -51,6 +52,7 @@
     <string name="measure_noise">Measure Noise</string>
     <string name="measure_interval">Measure Every (minutes)</string>
     <string name="num_kept_measurements">Number of Accounted Measurements</string>
+    <string name="noise_summary">automatic noise measurements will be taken only when the app is in foreground</string>
 
     <!-- Message Preferences Titles -->
     <string name="messages_header">Messages</string>

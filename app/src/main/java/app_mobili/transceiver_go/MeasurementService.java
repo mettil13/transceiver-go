@@ -32,13 +32,16 @@ public class MeasurementService extends Service {
     private static final int NOTIFICATION_ID = 1;
     private static final String NOTIFICATION_CHANNEL_ID = "persistent_notification_channel";
     private Runnable updateTimeRunnable;
-    private Handler handler = new Handler(Looper.getMainLooper());
-    private Runnable measuringRun = new Runnable() {
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Runnable measuringRun = new Runnable() {
         @Override
         public void run() {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); // Use getContext() in a Fragment or this in an Activity
 
             int measure_interval = sharedPreferences.getInt("measure_interval", 10);
+            //security check just in case
+            if (measure_interval == 0) measure_interval = 1;
+
             boolean automatic_measurements = sharedPreferences.getBoolean("automatic_measurements", false);
             boolean network_measurement = sharedPreferences.getBoolean("measure_lte_umps", false);
             boolean wifi_measurement = sharedPreferences.getBoolean("measure_wifi", false);
@@ -60,10 +63,9 @@ public class MeasurementService extends Service {
             // Perform your task here
             Log.d("LuizoMeasure", "Task executed at: " + System.currentTimeMillis());
 
-            // Reschedule the task to run again in one minute if needed
+            // Reschedule the task to run again in X minutes if needed
             if (automatic_measurements) {
-                // TODO REMOVE WHEN TESTING IS DONE
-                handler.postDelayed(this, /*measure_interval * 60_000*/ 10_000);
+                handler.postDelayed(this, measure_interval * 60_000L);
             }
 
         }
@@ -120,17 +122,15 @@ public class MeasurementService extends Service {
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 
-        Notification notification = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+        return new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.transciever_icon_marker_dark)
                 .setContentTitle("Automatic measurements taken!")
                 .setContentText("At time: " + getCurrentTime())
                 .setContentIntent(pendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setOngoing(true) // Makes the notification non-dismissable
+                .setOngoing(true) // Makes the notification non-dismissible
                 .setSilent(true)
                 .build();
-
-        return notification;
     }
 
     private void updateNotification() {

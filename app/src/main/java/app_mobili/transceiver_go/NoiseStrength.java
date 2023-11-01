@@ -1,5 +1,6 @@
 package app_mobili.transceiver_go;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -40,17 +41,13 @@ public class NoiseStrength extends Sensor {
         bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT);
     }
 
-    public void startRecording() {
+    @SuppressLint("MissingPermission")
+    public void startRecording(Activity activity) {
         if (isRecording) {
             return;
         }
         // Check for the RECORD_AUDIO permission at runtime
-        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.RECORD_AUDIO)
-                != PackageManager.PERMISSION_GRANTED) {
-            // Request the RECORD_AUDIO permission
-            ActivityCompat.requestPermissions((Activity) context,
-                    new String[]{android.Manifest.permission.RECORD_AUDIO},
-                    RECORD_AUDIO_PERMISSION_REQUEST_CODE);
+        if (!hasPermission(activity)) {
             return;
         }
         audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT, bufferSize);
@@ -165,19 +162,15 @@ public class NoiseStrength extends Sensor {
     }
 
     // starts a recording that upon ending calculates and stores the silenceAmplitude
-    public void calibrateSilence() {
+    @SuppressLint("MissingPermission")
+    public void calibrateSilence(Activity activity) {
 
         if (isRecording) {
             return;
         }
 
         // Check for the RECORD_AUDIO permission at runtime
-        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.RECORD_AUDIO)
-                != PackageManager.PERMISSION_GRANTED) {
-            // Request the RECORD_AUDIO permission
-            ActivityCompat.requestPermissions((Activity) context,
-                    new String[]{android.Manifest.permission.RECORD_AUDIO},
-                    RECORD_AUDIO_PERMISSION_REQUEST_CODE);
+        if (!hasPermission(activity)) {
             return;
         }
         audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT, bufferSize);
@@ -212,25 +205,17 @@ public class NoiseStrength extends Sensor {
         this.clapAmplitude = clapAmplitude;
     }
 
-    // getter in case we need it
-    public int getNoiseScale() {
-        return SensorValue;
-    }
-
-    public void calibrateClap() {
+    @SuppressLint("MissingPermission")
+    public void calibrateClap(Activity activity) {
         if (isRecording) {
             return;
         }
 
         // Check for the RECORD_AUDIO permission at runtime
-        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.RECORD_AUDIO)
-                != PackageManager.PERMISSION_GRANTED) {
-            // Request the RECORD_AUDIO permission
-            ActivityCompat.requestPermissions((Activity) context,
-                    new String[]{android.Manifest.permission.RECORD_AUDIO},
-                    RECORD_AUDIO_PERMISSION_REQUEST_CODE);
+        if (!hasPermission(activity)) {
             return;
         }
+
         audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT, bufferSize);
 
         if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED) {
@@ -245,5 +230,22 @@ public class NoiseStrength extends Sensor {
 
         Handler handler = new Handler();
         handler.postDelayed(this::setClapFromRecording, millis); // Record for 3 seconds
+    }
+
+    // needs to be like this for human readability
+    // i know it's always inverted
+    private boolean hasPermission(Activity activity){
+        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+            if(activity == null){
+                return false;
+            }
+            // Request the RECORD_AUDIO permission
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{android.Manifest.permission.RECORD_AUDIO},
+                    RECORD_AUDIO_PERMISSION_REQUEST_CODE);
+            return false;
+        }
+        return true;
     }
 }

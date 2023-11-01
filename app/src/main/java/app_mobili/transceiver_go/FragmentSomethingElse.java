@@ -85,15 +85,15 @@ public class FragmentSomethingElse extends Fragment implements NoiseStrength.Rec
 
 
         noiseButton.setOnClickListener(v -> {
-            noiseStrength.startRecording();
+            noiseStrength.startRecording(getActivity());
         });
 
         silenceButton.setOnClickListener(v -> {
-            noiseStrength.calibrateSilence();
+            noiseStrength.calibrateSilence(getActivity());
         });
 
         clapButton.setOnClickListener(v -> {
-            noiseStrength.calibrateClap();
+            noiseStrength.calibrateClap(getActivity());
 
         });
 

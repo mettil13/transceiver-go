@@ -1,5 +1,6 @@
 package app_mobili.transceiver_go;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
@@ -10,6 +11,7 @@ import androidx.preference.PreferenceManager;
 import androidx.room.Room;
 
 public class MeasurementSingleton implements NoiseStrength.RecordingListener {
+    @SuppressLint("StaticFieldLeak")
     private static MeasurementSingleton measurementSingleton;
     private final Context context;
     private final CoordinateListener coordinateListener;
@@ -54,7 +56,7 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
         int wifi = wifiSignalStrength.getSignalLevel();
         updateWifiMeasurement(wifi);
 
-        if (activity instanceof MainActivity) {
+        if (activity != null) {
             activity.refreshMaps();
         }
 
@@ -98,7 +100,10 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
         noiseStrength.setClapAmplitude(sharedPreferences.getInt("clap_value", 100));
         noiseStrength.setSilenceAmplitude(sharedPreferences.getInt("silence_value", 0));
 
-        noiseStrength.startRecording();
+        if (activity == null)
+        {return;}
+
+        noiseStrength.startRecording(activity);
         // when recording is finished, onRecordingFinished (just below) gets called
         // operations of db updates are done there
 
@@ -111,10 +116,8 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
 
         // Create a runnable to be executed after the delay
         Runnable updateMap = () -> {
-            if (activity instanceof MainActivity) {
-                activity.refreshMaps();
-                Log.d("Refresh", "refresh function called");
-            }
+            activity.refreshMaps();
+            Log.d("Refresh", "refresh function called");
         };
         handler.postDelayed(updateMap, delayInMillis);
     }
@@ -163,7 +166,7 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
 
         updateNetworkMeasurement(umts, lte);
 
-        if (activity instanceof MainActivity) {
+        if (activity != null) {
             activity.refreshMaps();
         }
 

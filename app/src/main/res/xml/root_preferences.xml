@@ -24,7 +24,8 @@
         <CheckBoxPreference
             app:dependency="automatic_measurements"
             app:key="measure_noise"
-            app:title="@string/measure_noise" />
+            app:title="@string/measure_noise"
+            app:summary="@string/noise_summary"/>
 
         <!-- Edit TextPreference for Measure every n minutes -->
         <SeekBarPreference

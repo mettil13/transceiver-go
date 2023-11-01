@@ -29,6 +29,8 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
 
     private ActivityResultLauncher<String> requestPermissionLauncher;
 
+    private ActivityResultLauncher<String> requestPermissionForImport;
+
     public FragmentSettings() {
         // Required empty public constructor
     }
@@ -53,6 +55,13 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
                 }
         );
 
+        requestPermissionForImport = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+            if (isGranted) {
+                importLauncher.launch(DatabaseImportExportUtil.importFileToDatabaseDirectory());
+            }
+        });
+
+
         requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
             Toast toast = new Toast(requireContext());
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
@@ -74,14 +83,14 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
 
         Preference importButton = findPreference("pref_import_button");
         Objects.requireNonNull(importButton).setOnPreferenceClickListener(preference -> {
-            // Check for permission at runtime
-            if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
-                // Request permission
-                ActivityCompat.requestPermissions(requireActivity(),
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        420);
-            } else {
+            boolean write_external_permission = ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED;
+
+            if(!write_external_permission) {
+                requestPermissionForImport.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            }
+
+            if (write_external_permission /*|| read_phone_permission*/) {
                 importLauncher.launch(DatabaseImportExportUtil.importFileToDatabaseDirectory());
             }
             return true;
@@ -135,7 +144,7 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
                 if (!foreground_permission) requestPermissionLauncher.launch(Manifest.permission.FOREGROUND_SERVICE);
             }
             if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                notification_permission = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED;
+                notification_permission = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
                 if (!notification_permission) requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
 
             }
@@ -163,6 +172,8 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
         requireActivity().startService(serviceIntent);
     }
 
+    // containerId is always the same, but function may need to handle different containerIds in the future
+    // hence why we left the warning be
     private void replaceFragment(int containerId, Fragment newFragment) {
         FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();

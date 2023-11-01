@@ -52,19 +52,15 @@ public class FragmentMicCalibration extends Fragment implements NoiseStrength.Re
         int delayMillis = 3500;
 
         // Create a runnable to be executed after the delay
-        Runnable updateValues = new Runnable() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void run() {
-                sharedPreferences.edit().putInt("silence_value", noiseStrength.getSilenceAmplitude()).apply();
-                sharedPreferences.edit().putInt("clap_value", noiseStrength.getClapAmplitude()).apply();
+        @SuppressLint("SetTextI18n") Runnable updateValues = () -> {
+            sharedPreferences.edit().putInt("silence_value", noiseStrength.getSilenceAmplitude()).apply();
+            sharedPreferences.edit().putInt("clap_value", noiseStrength.getClapAmplitude()).apply();
 
-                TextView silenceThreshold = rootView.findViewById(R.id.silence_threshold);
-                TextView clapThreshold = rootView.findViewById(R.id.clap_threshold);
+            TextView silenceThreshold = rootView.findViewById(R.id.silence_threshold);
+            TextView clapThreshold = rootView.findViewById(R.id.clap_threshold);
 
-                silenceThreshold.setText(noiseStrength.getSilenceAmplitude() + " dBm");
-                clapThreshold.setText(noiseStrength.getClapAmplitude() + " dBm");
-            }
+            silenceThreshold.setText(noiseStrength.getSilenceAmplitude() + " dBm");
+            clapThreshold.setText(noiseStrength.getClapAmplitude() + " dBm");
         };
 
         // sync values when creating the app
@@ -72,12 +68,12 @@ public class FragmentMicCalibration extends Fragment implements NoiseStrength.Re
 
         // buttons listeners
         silenceButton.setOnClickListener(v -> {
-            noiseStrength.calibrateSilence();
+            noiseStrength.calibrateSilence(getActivity());
             handler.postDelayed(updateValues, delayMillis);
         });
 
         clapButton.setOnClickListener(v -> {
-            noiseStrength.calibrateClap();
+            noiseStrength.calibrateClap(getActivity());
             handler.postDelayed(updateValues, delayMillis);
 
         });
@@ -94,7 +90,7 @@ public class FragmentMicCalibration extends Fragment implements NoiseStrength.Re
 
     @Override
     public void onRecordingFinished(int noise) {
-        TextView noiseView = getActivity().findViewById(R.id.noiseInfo);
-        noiseView.setText("noise: " + noise);
+        TextView noiseView = requireActivity().findViewById(R.id.noiseInfo);
+        noiseView.setText(String.format(getString(R.string.noise_value), noise));
     }
 }
