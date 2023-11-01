@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.preference.PreferenceManager;
@@ -100,9 +99,6 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
         noiseStrength.setClapAmplitude(sharedPreferences.getInt("clap_value", 100));
         noiseStrength.setSilenceAmplitude(sharedPreferences.getInt("silence_value", 0));
 
-        if (activity == null)
-        {return;}
-
         noiseStrength.startRecording(activity);
         // when recording is finished, onRecordingFinished (just below) gets called
         // operations of db updates are done there
@@ -116,8 +112,9 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
 
         // Create a runnable to be executed after the delay
         Runnable updateMap = () -> {
-            activity.refreshMaps();
-            Log.d("Refresh", "refresh function called");
+            if (activity!= null) {
+                activity.refreshMaps();
+            }
         };
         handler.postDelayed(updateMap, delayInMillis);
     }
@@ -145,7 +142,6 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
             // update the database with updated square
             squaredb.getSquareDAO().upsertSquare(square);
             squaredb.close();
-            // TODO: Update map view to reflect new measurement
         }).start();
 
         Toast toast = Toast.makeText(context, R.string.taken_noise_measurement, Toast.LENGTH_SHORT);
