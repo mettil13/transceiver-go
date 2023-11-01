@@ -167,7 +167,7 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
         FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.setReorderingAllowed(true);
-        fragmentTransaction.replace(containerId, newFragment);
+        fragmentTransaction.replace(containerId, newFragment).addToBackStack("");
         fragmentTransaction.commit();
     }
 }

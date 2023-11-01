@@ -191,12 +191,6 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        refreshMaps();
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
         stopService(new Intent(this, MeasurementService.class));
