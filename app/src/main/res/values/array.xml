@@ -22,13 +22,28 @@
         <item name="nerd">@drawable/hat_nerd</item>
         <item name="leaves">@drawable/hat_rodolfo</item>
     </integer-array>
+    <integer-array name="avatar_hats_price">
+        <item name="empty">0</item>
+        <item name="android">150</item>
+        <item name="headset">100</item>
+        <item name="bunny">150</item>
+        <item name="nerd">100</item>
+        <item name="leaves">100</item>
+    </integer-array>
     <integer-array name="avatar_clothes_idle">
         <item name="default">@drawable/lorenzo_idle_clothes</item>
         <item name="pride">@drawable/lorenzo_idle_clothes_pride</item>
+        <item name="pride">@drawable/lorenzo_idle_clothes_frisk</item>
     </integer-array>
     <integer-array name="avatar_clothes_walk">
         <item name="default">@drawable/lorenzo_walk_clothes</item>
         <item name="pride">@drawable/lorenzo_walk_clothes_pride</item>
+        <item name="pride">@drawable/lorenzo_walk_clothes_frisk</item>
+    </integer-array>
+    <integer-array name="avatar_clothes_price">
+        <item name="default">0</item>
+        <item name="pride">0</item>
+        <item name="frisk">50</item>
     </integer-array>
     <string-array name="skin_colors_entries">
         <item>@string/skin_00</item>
@@ -69,14 +84,6 @@
         <item>white</item>
         <item>black</item>
         <item>gray</item>
-    </string-array>
-    <string-array name="skin_colors">
-        <item>@color/skin_00</item>
-        <item>@color/skin_01</item>
-        <item>@color/skin_02</item>
-        <item>@color/skin_03</item>
-        <item>@color/skin_04</item>
-        <item>@color/skin_05</item>
     </string-array>
 
 </resources>

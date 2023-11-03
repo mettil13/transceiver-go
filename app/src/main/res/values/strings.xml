@@ -102,4 +102,7 @@
     <string name="skin_03">Skin 03</string>
     <string name="skin_04">Skin 04</string>
     <string name="skin_05">Skin 05</string>
+
+    <!-- Shop -->
+    <string name="purchase_denied">You don\'t have enough transceiver coins to purchase this item</string>
 </resources>

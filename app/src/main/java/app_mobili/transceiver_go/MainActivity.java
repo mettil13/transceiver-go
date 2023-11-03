@@ -8,14 +8,18 @@ import android.content.Intent;
 
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.AnimatedVectorDrawable;
 import android.location.Criteria;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,7 +33,7 @@ import androidx.room.Room;
 
 import app_mobili.transceiver_go.databinding.ActivityMainBinding;
 
-public class MainActivity extends AppCompatActivity implements NoiseStrength.RecordingListener {
+public class MainActivity extends AppCompatActivity implements NoiseStrength.RecordingListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private boolean isAddSelected = false;
 
@@ -37,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
 
     CoordinateListener coordinateListener;
 
-    Menu coinsMenu;
+    TextView coinsNumber;
 
     Fragment mainMap;
     Fragment gameMap;
@@ -73,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         //service setup at startup (if enabled)
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean automaticMeasurements = sharedPreferences.getBoolean("automatic_measurements", false);
-        if (automaticMeasurements){
+        if (automaticMeasurements) {
             // service setup
             Intent serviceIntent = new Intent(this, MeasurementService.class);
             startService(serviceIntent);
@@ -202,11 +206,26 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.coins, menu);
 
-        coinsMenu = menu;
-        coinsMenu.getItem(0).setTitle("ciao");
+        View layout = menu.getItem(0).getActionView();
+        coinsNumber = layout.findViewById(R.id.coins_number);
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
+        updateCoinsMenu();
         return true;
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        if (s.equals("coins")) {
+            if(coinsNumber != null){ // if the menu has been initialized
+                updateCoinsMenu();
+            }
+        }
+    }
+
+    private void updateCoinsMenu(){
+        String value = String.valueOf(PreferenceManager.getDefaultSharedPreferences(this).getInt("coins", 0));
+        coinsNumber.setText(value);
+    }
 
     private void replaceFragment(int containerId, Fragment newFragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
