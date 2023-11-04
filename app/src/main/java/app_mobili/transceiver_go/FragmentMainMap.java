@@ -108,7 +108,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         super.onResume();
         Activity currentActivity = getActivity();
         if (currentActivity instanceof MainActivity) {
-            ((MainActivity)currentActivity).refreshMaps();
+            ((MainActivity) currentActivity).refreshMaps();
         }
     }
 
@@ -121,6 +121,13 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
 
         // disables the camera tilting
         map.getUiSettings().setTiltGesturesEnabled(false);
+
+        // makes squares clickable
+        map.setOnPolygonClickListener(new GoogleMap.OnPolygonClickListener() {
+            public void onPolygonClick(Polygon polygon) {
+                Toast.makeText(getContext(), polygon.getTag().toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
 
         // hides default compass button and creates another one with the same use (just an aesthetic thing)
         View defalutOrientationButton = getView().findViewById((int) 5); // "5" is the id of google maps compass button
@@ -374,19 +381,16 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         }
     }
 
-    private void drawSquareOfType(String typeOfData, Square squareToDraw) {
+    private Polygon drawSquareOfType(String typeOfData, Square squareToDraw) {
         switch (typeOfData) {
             case "Noise":
-                squareToDraw.drawNoiseTile(map, getContext());
-                break;
+                return squareToDraw.drawNoiseTile(map, getContext());
             case "Network":
-                squareToDraw.drawNetworkTile(map, getContext());
-                break;
+                return squareToDraw.drawNetworkTile(map, getContext());
             case "Wi-fi":
-                squareToDraw.drawWifiTile(map, getContext());
-                break;
+                return squareToDraw.drawWifiTile(map, getContext());
             default:
-                squareToDraw.drawEmptyTile(map, getContext());
+                return squareToDraw.drawEmptyTile(map, getContext());
         }
     }
 
@@ -406,7 +410,11 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
                 Square tileToDraw = squaresToDraw[i][j];
                 getActivity().runOnUiThread(new Runnable() {
                     public void run() {
-                        drawSquareOfType(typeOfData, tileToDraw);
+                        Polygon drawnSquare = drawSquareOfType(typeOfData, tileToDraw);
+                        if(getValueOfType(typeOfData, tileToDraw) >= 0){
+                            drawnSquare.setClickable(true);
+                            drawnSquare.setTag(getLabelBasedOnType(typeOfData) + ": " + getValueOfType(typeOfData, tileToDraw));
+                        }
                     }
                 });
 
@@ -531,4 +539,31 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
 
         return westernSquaresWithData;
     }
+
+    private float getValueOfType(String typeOfData, Square squareToDraw) {
+        switch (typeOfData) {
+            case "Noise":
+                return squareToDraw.getNoise();
+            case "Network":
+                return squareToDraw.getNetwork();
+            case "Wi-fi":
+                return squareToDraw.getWifi();
+            default:
+                return -1;
+        }
+    }
+
+    private String getLabelBasedOnType(String typeOfData) {
+        switch (typeOfData) {
+            case "Noise":
+                return getResources().getString(R.string.noise);
+            case "Network":
+                return getResources().getString(R.string.network);
+            case "Wi-fi":
+                return getResources().getString(R.string.wifi);
+            default:
+                return getResources().getString(R.string.none);
+        }
+    }
+
 }
