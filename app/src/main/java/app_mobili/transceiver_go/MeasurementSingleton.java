@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.preference.PreferenceManager;
@@ -53,6 +54,7 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
 
 
         int wifi = wifiSignalStrength.getSignalLevel();
+        Log.d("WifiMeasurement", "Wifi value registered: "+ wifi);
         updateWifiMeasurement(wifi);
 
         if (activity != null) {
@@ -123,6 +125,8 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
     @Override
     public void onRecordingFinished(int noise) {
         new Thread(() -> {
+
+            Log.d("NoiseMeasurement", "noise value registered: "+ noise);
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
             String dbname = sharedPreferences.getString("account_name", "squaredb");
@@ -159,7 +163,7 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
         int lte = networkSignalStrength.getLteSignalStrength();
 
         networkSignalStrength.stopMonitoringSignalStrength();
-
+        Log.d("NetworkMeasurement", "Network values registered:\numts: "+ umts+"\nlte: "+lte);
         updateNetworkMeasurement(umts, lte);
 
         if (activity != null) {
