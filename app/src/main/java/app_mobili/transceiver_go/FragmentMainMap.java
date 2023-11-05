@@ -35,6 +35,7 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +58,8 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
     protected HeatmapTileProvider heatmapProvider;
     protected FragmentLayerSelector layerSelector; // contains the names of the data to display
     protected static int minClusterDimensionInPixel = 15;
+
+    public List<Square> lastDrawnSquares; // contains the last cluster of squares drawn on the map
 
     public FragmentMainMap() {
         // Required empty public constructor
@@ -211,6 +214,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         String typeOfData = PreferenceManager.getDefaultSharedPreferences(getContext()).getString("type_of_data", "None");
 
         new Thread(() -> {
+            lastDrawnSquares = new ArrayList<>();
             if (positiveLeft != null && positiveRight != null) {
                 Map<String, Square> easternSquaresWithData = retrieveEasternSquares(getActiveMapNames(), positiveLeft, topLeftY, positiveRight, bottomRightY);
                 drawGridOnOneHemisphere(easternSquaresWithData, positiveLeft, topLeftY, positiveRight, bottomRightY, typeOfData);
@@ -336,7 +340,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
     // returns an array containing the boundaries of the area between leftLng and rightLng but truncated to the eastern hemisphere.
     // the first element [0] represents the left boundary, the second [1] represents the right one.
     // the array is null if the entire area is outside the eastern hemisphere.
-    private Longitude[] truncateLongitudeToEasternHemisphere(Longitude leftLng, Longitude rightLng) {
+    protected Longitude[] truncateLongitudeToEasternHemisphere(Longitude leftLng, Longitude rightLng) {
         Longitude positiveLeft;
         Longitude positiveRight;
 
@@ -360,7 +364,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
     // returns an array containing the boundaries of the area between leftLng and rightLng but truncated to the western hemisphere.
     // the first element [0] represents the left boundary, the second [1] represents the right one.
     // the array is null if the entire area is outside the western hemisphere.
-    private Longitude[] truncateLongitudeToWesternHemisphere(Longitude leftLng, Longitude rightLng) {
+    protected Longitude[] truncateLongitudeToWesternHemisphere(Longitude leftLng, Longitude rightLng) {
         Longitude negativeLeft;
         Longitude negativeRight;
 
@@ -381,7 +385,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         }
     }
 
-    private Polygon drawSquareOfType(String typeOfData, Square squareToDraw) {
+    protected Polygon drawSquareOfType(String typeOfData, Square squareToDraw) {
         switch (typeOfData) {
             case "Noise":
                 return squareToDraw.drawNoiseTile(map, getContext());
@@ -394,7 +398,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         }
     }
 
-    private void drawGridOnOneHemisphere(Map<String, Square> squaresWithData, Longitude topLeftX, Latitude topLeftY, Longitude bottomRightX, Latitude bottomRightY, String typeOfData) { // BEWARE: it doesn't behave correctly if the drawing area extends over two hemispheres
+    protected void drawGridOnOneHemisphere(Map<String, Square> squaresWithData, Longitude topLeftX, Latitude topLeftY, Longitude bottomRightX, Latitude bottomRightY, String typeOfData) { // BEWARE: it doesn't behave correctly if the drawing area extends over two hemispheres
         // creates a bidimensional array to store all the square that are going to be drawn
         //    y  x
         Square[][] squaresToDraw = new Square[(int) ((topLeftY.getValue() - bottomRightY.getValue()) / Square.SIDE_LENGTH) + 1][(int) ((bottomRightX.getValue() - topLeftX.getValue()) / Square.SIDE_LENGTH) + 1];
@@ -420,6 +424,10 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
 
             }
         }
+
+        for (Square[] array : squaresToDraw) { // adds all the squares to lastDrawnSquares
+            lastDrawnSquares.addAll(Arrays.asList(array));
+        }
     }
 
     private int calculateProperHeatmapRadiusBasedOnZoom(float zoom) {
@@ -436,7 +444,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         }
     }
 
-    private List<String> getActiveMapNames() {
+    protected List<String> getActiveMapNames() {
         List<String> ret = new ArrayList<>();
         String[] dbList = getContext().databaseList();
         for (String s : dbList) {
@@ -448,7 +456,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         return ret;
     }
 
-    private Map<String, Square> retrieveEasternSquares(List<String> mapNames, Longitude topLeftX, Latitude topLeftY, Longitude bottomRightX, Latitude bottomRightY) {
+    protected Map<String, Square> retrieveEasternSquares(List<String> mapNames, Longitude topLeftX, Latitude topLeftY, Longitude bottomRightX, Latitude bottomRightY) {
         Map<String, Square> easternSquaresWithData = new HashMap<>();
         Map<String, Integer> numberOfNoise = new HashMap<>();
         Map<String, Integer> numberOfNetwork = new HashMap<>();
@@ -494,7 +502,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         return easternSquaresWithData;
     }
 
-    private Map<String, Square> retrieveWesternSquares(List<String> mapNames, Longitude topLeftX, Latitude topLeftY, Longitude bottomRightX, Latitude bottomRightY) {
+    protected Map<String, Square> retrieveWesternSquares(List<String> mapNames, Longitude topLeftX, Latitude topLeftY, Longitude bottomRightX, Latitude bottomRightY) {
         Map<String, Square> westernSquaresWithData = new HashMap<>();
         Map<String, Integer> numberOfNoise = new HashMap<>();
         Map<String, Integer> numberOfNetwork = new HashMap<>();

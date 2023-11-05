@@ -211,6 +211,14 @@ public class Square {
         return coordinates;
     }
 
+    public Longitude getLongitude() {
+        return longitude;
+    }
+
+    public Latitude getLatitude() {
+        return latitude;
+    }
+
     public long getLastNetworkMeasurement() {
         return lastNetworkMeasurement;
     }
@@ -247,6 +255,27 @@ public class Square {
         @Override
         public int compare(Square square1, Square square2) {
             return Double.compare(square1.longitude.getValue(), square2.longitude.getValue());
+        }
+    }
+
+    public static class NetworkComparator implements java.util.Comparator<Square> {
+        @Override
+        public int compare(Square square1, Square square2) {
+            return Double.compare(square1.getNetwork(), square2.getNetwork());
+        }
+    }
+
+    public static class NoiseComparator implements java.util.Comparator<Square> {
+        @Override
+        public int compare(Square square1, Square square2) {
+            return Double.compare(square1.getNoise(), square2.getNoise());
+        }
+    }
+
+    public static class WifiComparator implements java.util.Comparator<Square> {
+        @Override
+        public int compare(Square square1, Square square2) {
+            return Double.compare(square1.getWifi(), square2.getWifi());
         }
     }
 }

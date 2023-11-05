@@ -19,6 +19,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 
 import android.util.Log;
 import android.view.View;
@@ -33,8 +34,15 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.TileOverlay;
+import com.google.android.gms.maps.model.TileOverlayOptions;
+import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -53,6 +61,7 @@ public class FragmentGameMap extends FragmentMainMap {
     private ImageView myAvatarHat;
     private Latitude avatarLatitude;
     private Longitude avatarLongitude;
+    private GameManager gameInstance;
 
     public FragmentGameMap() {
         // Required empty public constructor
@@ -61,6 +70,7 @@ public class FragmentGameMap extends FragmentMainMap {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        gameInstance = new GameManager();
         // creates the my position avatar
         myAvatarSkin = new ImageView(getContext());
         myAvatarClothes = new ImageView(getContext());
@@ -186,6 +196,7 @@ public class FragmentGameMap extends FragmentMainMap {
             map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().target(pos.target).tilt(getMaximumTilt(pos.zoom)).bearing(pos.bearing).zoom(pos.zoom).build()));
         }
 
+        updateGameInstance();
     }
 
     private void setUpMyAvatar(ImageView avatarSkin, ImageView avatarClothes, ImageView avatarHat) {
@@ -224,15 +235,41 @@ public class FragmentGameMap extends FragmentMainMap {
         myAvatarHat.setTranslationY(myPositionOnScreen.y - myAvatarHat.getLayoutParams().height - (myAvatarSkin.getLayoutParams().height * 0.1f));
     }
 
-    // code from https://stackoverflow.com/questions/18053156/set-image-from-drawable-as-marker-in-google-map-version-2
-    private BitmapDescriptor getMarkerIconFromDrawable(Drawable drawable, int width, int height) {
-        Canvas canvas = new Canvas();
-        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        canvas.setBitmap(bitmap);
-        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-        drawable.draw(canvas);
-        bitmap = Bitmap.createScaledBitmap(bitmap, width, height, false);
-        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    protected void updateGameInstance() {
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(500); // awaits for half a second in order to let the squares fully render
+            } catch (InterruptedException ignored) {
+            }
+
+            String typeOfData = PreferenceManager.getDefaultSharedPreferences(getContext()).getString("type_of_data", "None");
+            Square currentTarget = gameInstance.getCurrentTarget();
+
+            if (currentTarget != null) {
+                Map<String, Square> EasternTargetSquares = retrieveEasternSquares(getActiveMapNames(), currentTarget.getLongitude(), currentTarget.getLatitude(), currentTarget.getLongitude(), currentTarget.getLatitude());
+                Map<String, Square> WesternTargetSquares = retrieveWesternSquares(getActiveMapNames(), currentTarget.getLongitude(), currentTarget.getLatitude(), currentTarget.getLongitude(), currentTarget.getLatitude());
+                List<Square> targetSquares = new ArrayList<Square>(EasternTargetSquares.values());
+                targetSquares.addAll(WesternTargetSquares.values());
+
+                if (gameInstance.isTargetUpdated(targetSquares, typeOfData)) {
+                    currentTarget = gameInstance.generateNewTarget(lastDrawnSquares, typeOfData);
+                }
+            } else {
+                currentTarget = gameInstance.generateNewTarget(lastDrawnSquares, typeOfData); // if lastDrawnSquares is null, then also currentTarget is set to null
+            }
+
+            if (currentTarget != null) {
+                Square finalCurrentTarget = currentTarget;
+                getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        map.addMarker(new MarkerOptions().position(new LatLng(finalCurrentTarget.getLatitude().getValue(), finalCurrentTarget.getLongitude().getValue())));
+                    }
+                });
+            }
+
+        }).start();
+
     }
 
     // code from https://gist.github.com/bharris47/5057910
