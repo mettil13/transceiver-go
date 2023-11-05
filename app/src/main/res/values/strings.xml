@@ -51,8 +51,9 @@
     <string name="measure_wifi">Measure Wifi</string>
     <string name="measure_noise">Measure Noise</string>
     <string name="measure_interval">Measure Every (minutes)</string>
-    <string name="num_kept_measurements">Number of Accounted Measurements</string>
-    <string name="noise_summary">automatic noise measurements will be taken only when the app is in foreground</string>
+    <string name="num_kept_measurements">Measurement weight</string>
+    <string name="noise_summary">Automatic noise measurements will be taken only when the app is in foreground</string>
+    <string name="measurement_weight_summary">The higher the value, the more importance will be given to new measurements, while the older measurement will be considered less important</string>
 
     <!-- Message Preferences Titles -->
     <string name="messages_header">Messages</string>
@@ -65,8 +66,7 @@
     <!-- Sync Preferences -->
     <string name="sync_title">Sync email periodically</string>
     <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails</string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
     <!-- Layer Preferences -->
@@ -77,6 +77,7 @@
     <string name="network">Network</string>
     <string name="wifi">Wi-fi</string>
     <string name="available_maps_title">Available maps</string>
+    <string name="delete_unselected_maps">Delete unselected maps</string>
 
     <!-- Account Preferences -->
     <string name="account_name">Username</string>

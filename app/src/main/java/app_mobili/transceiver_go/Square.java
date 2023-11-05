@@ -5,6 +5,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -14,6 +15,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
+
+import java.util.Date;
 
 @Entity(tableName = "Square")
 public class Square {
@@ -31,14 +34,14 @@ public class Square {
     @ColumnInfo(name = "Y")
     protected Latitude latitude;
     @ColumnInfo(name = "Network Signal Strength")
-    protected int network;
+    protected float network;
     @ColumnInfo(name = "Wifi Signal Strength")
-    protected int wifi;
+    protected float wifi;
     @ColumnInfo(name = "Noise Strength")
-    protected int noise;
-    protected int noiseAverageCounter = 1;
-    protected int wifiAverageCounter = 1;
-    protected int networkAverageCounter = 1;
+    protected float noise;
+    protected long lastNetworkMeasurement = -1;
+    protected long lastWifiMeasurement = -1;
+    protected long lastNoiseMeasurement = -1;
 
     // Empty constructor for room
     public Square() {
@@ -89,93 +92,116 @@ public class Square {
         return tile;
     }
 
-    public String getSquareId(){
+    public String getSquareId() {
         return coordinates;
     }
 
-    public Polygon drawNoiseTile(GoogleMap googleMap, Context context){
-        if(noise < 0){
+    public Polygon drawNoiseTile(GoogleMap googleMap, Context context) {
+        if (noise < 0) {
             return drawTile(googleMap, ContextCompat.getColor(context, R.color.no_data_intensity_border), ContextCompat.getColor(context, R.color.no_data_intensity_filler));
-        } else if(noise <= context.getResources().getInteger(R.integer.noise_low_upper_bound)){
+        } else if (noise <= context.getResources().getInteger(R.integer.noise_low_upper_bound)) {
             return drawTile(googleMap, ContextCompat.getColor(context, R.color.low_intensity_border), ContextCompat.getColor(context, R.color.low_intensity_filler));
-        } else if(noise <= context.getResources().getInteger(R.integer.noise_medium_upper_bound)){
+        } else if (noise <= context.getResources().getInteger(R.integer.noise_medium_upper_bound)) {
             return drawTile(googleMap, ContextCompat.getColor(context, R.color.medium_intensity_border), ContextCompat.getColor(context, R.color.medium_intensity_filler));
-        } else  {
+        } else {
             return drawTile(googleMap, ContextCompat.getColor(context, R.color.high_intensity_border), ContextCompat.getColor(context, R.color.high_intensity_filler));
         }
     }
 
-    public Polygon drawWifiTile(GoogleMap googleMap, Context context){
-        if(wifi < 0){
+    public Polygon drawWifiTile(GoogleMap googleMap, Context context) {
+        if (wifi < 0) {
             return drawTile(googleMap, ContextCompat.getColor(context, R.color.no_data_intensity_border), ContextCompat.getColor(context, R.color.no_data_intensity_filler));
-        } else if(wifi <= context.getResources().getInteger(R.integer.wifi_low_upper_bound)){
+        } else if (wifi <= context.getResources().getInteger(R.integer.wifi_low_upper_bound)) {
             return drawTile(googleMap, ContextCompat.getColor(context, R.color.low_intensity_border), ContextCompat.getColor(context, R.color.low_intensity_filler));
-        } else if(wifi <= context.getResources().getInteger(R.integer.wifi_medium_upper_bound)){
+        } else if (wifi <= context.getResources().getInteger(R.integer.wifi_medium_upper_bound)) {
             return drawTile(googleMap, ContextCompat.getColor(context, R.color.medium_intensity_border), ContextCompat.getColor(context, R.color.medium_intensity_filler));
-        } else  {
+        } else {
             return drawTile(googleMap, ContextCompat.getColor(context, R.color.high_intensity_border), ContextCompat.getColor(context, R.color.high_intensity_filler));
         }
     }
 
-    public Polygon drawNetworkTile(GoogleMap googleMap, Context context){
-        if(network < 0){
+    public Polygon drawNetworkTile(GoogleMap googleMap, Context context) {
+        if (network < 0) {
             return drawTile(googleMap, ContextCompat.getColor(context, R.color.no_data_intensity_border), ContextCompat.getColor(context, R.color.no_data_intensity_filler));
-        } else if(network <= context.getResources().getInteger(R.integer.network_low_upper_bound)){
+        } else if (network <= context.getResources().getInteger(R.integer.network_low_upper_bound)) {
             return drawTile(googleMap, ContextCompat.getColor(context, R.color.low_intensity_border), ContextCompat.getColor(context, R.color.low_intensity_filler));
-        } else if(network <= context.getResources().getInteger(R.integer.network_medium_upper_bound)){
+        } else if (network <= context.getResources().getInteger(R.integer.network_medium_upper_bound)) {
             return drawTile(googleMap, ContextCompat.getColor(context, R.color.medium_intensity_border), ContextCompat.getColor(context, R.color.medium_intensity_filler));
-        } else  {
+        } else {
             return drawTile(googleMap, ContextCompat.getColor(context, R.color.high_intensity_border), ContextCompat.getColor(context, R.color.high_intensity_filler));
         }
     }
 
-    public Polygon drawEmptyTile(GoogleMap googleMap, Context context){
+    public Polygon drawEmptyTile(GoogleMap googleMap, Context context) {
         return drawTile(googleMap, ContextCompat.getColor(context, R.color.no_data_intensity_border), ContextCompat.getColor(context, R.color.no_data_intensity_filler));
     }
 
-    public void updateNetwork(int network) {
-        // (currentAverage * numberOfElements) + newNumber) / (numberOfElements + 1);
-        //        numberOfElements++;
-        this.network = (this.network * networkAverageCounter + network) / ++networkAverageCounter;
+    public void updateNetwork(Context context, int network) {
+        Log.println(Log.ASSERT, "", "network: " + network);
+        float measurementWeight = convertMeasurementWeightToDecimal(PreferenceManager.getDefaultSharedPreferences(context).getInt("num_kept_measurements", 50));
+        if (this.network < 0) {
+            this.network = network;
+        } else {
+            // newMeasurement * measurementWeight + oldMeasurements * ( 1 - measurementWeight )
+            this.network = ((float) network) * measurementWeight + this.network * (1f - measurementWeight);
+        }
+        lastNetworkMeasurement = System.currentTimeMillis();
     }
 
-    public void updateWifi(int wifi) {
-        this.wifi = (this.wifi * wifiAverageCounter + wifi) / ++wifiAverageCounter;
+    public void updateWifi(Context context, int wifi) {
+        float measurementWeight = convertMeasurementWeightToDecimal(PreferenceManager.getDefaultSharedPreferences(context).getInt("num_kept_measurements", 50));
+        if (this.wifi < 0) {
+            this.wifi = wifi;
+        } else {
+            // newMeasurement * measurementWeight + oldMeasurements * ( 1 - measurementWeight )
+            this.wifi = ((float) wifi) * measurementWeight +  this.wifi * (1f - measurementWeight);
+        }
+        lastWifiMeasurement = System.currentTimeMillis();
     }
 
-    public void updateNoise(int noise) {
-        this.noise = (this.noise * noiseAverageCounter + noise) / ++noiseAverageCounter;
+    public void updateNoise(Context context, int noise) {
+        float measurementWeight = convertMeasurementWeightToDecimal(PreferenceManager.getDefaultSharedPreferences(context).getInt("num_kept_measurements", 50));
+        if (this.noise < 0) {
+            this.noise = noise;
+        } else {
+            // newMeasurement * measurementWeight + oldMeasurements * ( 1 - measurementWeight )
+            this.noise = ((float) noise) * measurementWeight + ((float) this.noise) * (1f - measurementWeight);
+        }
+        lastNoiseMeasurement = System.currentTimeMillis();
     }
 
+    private float convertMeasurementWeightToDecimal(int measurementWeight) {
+        if (measurementWeight > 95) {
+            measurementWeight = 95;
+        } else if (measurementWeight < 5) {
+            measurementWeight = 5;
+        }
+        return ((float) measurementWeight) / 100;
+    }
 
     // SETTERS
-    // NOTE: Set functions reset the average counters of a square
-    // for the interested value, eg. setNetwork resets the networkAverageCounter
-    public void setNetwork(int network) {
-        networkAverageCounter = 1;
+    public void setNetwork(float network) {
         this.network = network;
     }
 
-    public void setWifi(int wifi) {
-        wifiAverageCounter = 1;
+    public void setWifi(float wifi) {
         this.wifi = wifi;
     }
 
-    public void setNoise(int noise) {
-        noiseAverageCounter = 1;
+    public void setNoise(float noise) {
         this.noise = noise;
     }
 
     // GETTERS
-    public int getNetwork() {
+    public float getNetwork() {
         return network;
     }
 
-    public int getWifi() {
+    public float getWifi() {
         return wifi;
     }
 
-    public int getNoise() {
+    public float getNoise() {
         return noise;
     }
 
@@ -183,6 +209,18 @@ public class Square {
     @NonNull
     public String getCoordinates() {
         return coordinates;
+    }
+
+    public long getLastNetworkMeasurement() {
+        return lastNetworkMeasurement;
+    }
+
+    public long getLastWifiMeasurement() {
+        return lastWifiMeasurement;
+    }
+
+    public long getLastNoiseMeasurement() {
+        return lastNoiseMeasurement;
     }
 
     @NonNull

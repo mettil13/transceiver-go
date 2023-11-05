@@ -6,12 +6,15 @@ import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Xml;
+import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.preference.CheckBoxPreference;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.sqlite.db.SimpleSQLiteQuery;
@@ -53,9 +56,24 @@ public class FragmentLayerSelector extends PreferenceFragmentCompat {
                 }
             }).start();
 
-
         }
 
 
+        Preference deleteDBs = findPreference("delete_maps");
+        deleteDBs.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(@NonNull Preference preference) {
+                new Thread(() -> {
+                    String[] dbList = getContext().databaseList();
+                    for (String s : dbList) {
+                        if (!s.endsWith("-wal") && !s.endsWith("-shm") && !PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(s, true)) {
+                            Log.println(Log.ASSERT, "", "I should delete " + s);
+                            //TODO: delete database
+                        }
+                    }
+                }).start();
+                return true;
+            }
+        });
     }
 }

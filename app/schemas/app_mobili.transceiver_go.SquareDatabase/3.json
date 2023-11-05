@@ -1,0 +1,82 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 3,
+    "identityHash": "46e865c3415f9b110b74a95c6d80a6e8",
+    "entities": [
+      {
+        "tableName": "Square",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`SquareID` TEXT NOT NULL, `X` REAL, `Y` REAL, `Network Signal Strength` REAL NOT NULL, `Wifi Signal Strength` REAL NOT NULL, `Noise Strength` REAL NOT NULL, `lastNetworkMeasurement` INTEGER NOT NULL, `lastWifiMeasurement` INTEGER NOT NULL, `lastNoiseMeasurement` INTEGER NOT NULL, PRIMARY KEY(`SquareID`))",
+        "fields": [
+          {
+            "fieldPath": "coordinates",
+            "columnName": "SquareID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "X",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "Y",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "network",
+            "columnName": "Network Signal Strength",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wifi",
+            "columnName": "Wifi Signal Strength",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noise",
+            "columnName": "Noise Strength",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastNetworkMeasurement",
+            "columnName": "lastNetworkMeasurement",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastWifiMeasurement",
+            "columnName": "lastWifiMeasurement",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastNoiseMeasurement",
+            "columnName": "lastNoiseMeasurement",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "SquareID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '46e865c3415f9b110b74a95c6d80a6e8')"
+    ]
+  }
+}

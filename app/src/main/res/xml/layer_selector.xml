@@ -20,4 +20,13 @@
         <!-- Populated at runtime -->
 
     </PreferenceCategory>
+
+    <PreferenceCategory>
+
+        <Preference
+            android:title="@string/delete_unselected_maps"
+            android:key="delete_maps" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

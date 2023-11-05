@@ -57,9 +57,17 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
         Log.d("WifiMeasurement", "Wifi value registered: "+ wifi);
         updateWifiMeasurement(wifi);
 
-        if (activity != null) {
-            activity.refreshMaps();
-        }
+        Handler handler = new Handler();
+
+        int delayInMillis = 500;
+
+        // Create a runnable to be executed after the delay
+        Runnable updateMap = () -> {
+            if (activity!= null) {
+                activity.refreshMaps();
+            }
+        };
+        handler.postDelayed(updateMap, delayInMillis);
 
         Toast toast = Toast.makeText(context, R.string.taken_wifi_measurement, Toast.LENGTH_SHORT);
         toast.show();
@@ -69,7 +77,7 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
         new Thread(() -> {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-            String dbname = sharedPreferences.getString("account_name", "squaredb");
+            String dbname = sharedPreferences.getString("account_name", "user");
             SquareDatabase squaredb = Room.databaseBuilder(context, SquareDatabase.class, dbname).build();
 
             Square square = new Square(longitude, latitude);
@@ -81,7 +89,7 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
             if (squareInDb != null) square = squareInDb;
 
             // actual update
-            square.updateWifi(wifi);
+            square.updateWifi(context, wifi);
 
             // update the database with updated square
             squaredb.getSquareDAO().upsertSquare(square);
@@ -129,7 +137,7 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
             Log.d("NoiseMeasurement", "noise value registered: "+ noise);
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-            String dbname = sharedPreferences.getString("account_name", "squaredb");
+            String dbname = sharedPreferences.getString("account_name", "user");
 
             SquareDatabase squaredb = Room.databaseBuilder(context, SquareDatabase.class, dbname).build();
             Square square = new Square(longitude, latitude);
@@ -141,7 +149,7 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
             if (squareInDb != null) square = squareInDb;
 
             // actual update
-            square.updateNoise(noise);
+            square.updateNoise(context, noise);
 
             // update the database with updated square
             squaredb.getSquareDAO().upsertSquare(square);
@@ -158,6 +166,7 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
 
         longitude = coordinateListener.getLongitude();
         latitude = coordinateListener.getLatitude();
+        Log.println(Log.ASSERT, "", "measurement coords: " + longitude + " " + latitude);
 
         int umts = networkSignalStrength.getUmtsSignalStrength();
         int lte = networkSignalStrength.getLteSignalStrength();
@@ -166,9 +175,17 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
         Log.d("NetworkMeasurement", "Network values registered:\numts: "+ umts+"\nlte: "+lte);
         updateNetworkMeasurement(umts, lte);
 
-        if (activity != null) {
-            activity.refreshMaps();
-        }
+        Handler handler = new Handler();
+
+        int delayInMillis = 500;
+
+        // Create a runnable to be executed after the delay
+        Runnable updateMap = () -> {
+            if (activity!= null) {
+                activity.refreshMaps();
+            }
+        };
+        handler.postDelayed(updateMap, delayInMillis);
 
         // notify the user
         Toast toast = Toast.makeText(context, R.string.taken_internet_connection_measurement, Toast.LENGTH_SHORT);
@@ -185,8 +202,9 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
 
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-            String dbname = sharedPreferences.getString("account_name", "squaredb");
+            String dbname = sharedPreferences.getString("account_name", "user");
             SquareDatabase squaredb = Room.databaseBuilder(context, SquareDatabase.class, dbname).build();
+            Log.println(Log.ASSERT, "", "database built: " + squaredb.toString());
 
             Square square = new Square(longitude, latitude);
             // returns the square we're in, if it exists
@@ -197,13 +215,12 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
             if (squareInDb != null) square = squareInDb;
 
             // actual update
-            square.updateNetwork(updatedValue);
+            square.updateNetwork(context, updatedValue);
 
             // update the database with updated square
             squaredb.getSquareDAO().upsertSquare(square);
 
             squaredb.close();
-            // TODO: Update map view to reflect new measurement
         }).start();
     }
 

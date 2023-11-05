@@ -40,12 +40,13 @@
 
         <!-- Edit TextPreference for Number of Kept Measurements -->
         <SeekBarPreference
-            android:max="10"
-            app:defaultValue="5"
+            android:max="100"
+            app:defaultValue="50"
             app:key="num_kept_measurements"
             app:showSeekBarValue="true"
             app:title="@string/num_kept_measurements"
-            app:useSimpleSummaryProvider="true" />
+            app:useSimpleSummaryProvider="true"
+            app:summary="@string/measurement_weight_summary"/>
 
     </PreferenceCategory>
 

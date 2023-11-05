@@ -189,6 +189,12 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
                 squaredb.getSquareDAO().upsertSquare(square);
             }
             squaredb.close();
+/*
+            SquareDatabase aa = Room.databaseBuilder(this, SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
+            SquareDatabase bb = Room.databaseBuilder(this, SquareDatabase.class, "user").addMigrations(SquareDatabase.migration).build();
+            bb.getSquareDAO().getSquare("a");
+
+ */
 
         }).start();
 
