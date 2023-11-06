@@ -54,6 +54,15 @@
     <string name="num_kept_measurements">Measurement weight</string>
     <string name="noise_summary">Automatic noise measurements will be taken only when the app is in foreground</string>
     <string name="measurement_weight_summary">The higher the value, the more importance will be given to new measurements, while the older measurement will be considered less important</string>
+    <string name="measure_interval_summary">If set to 0, measurements will be taken every 10 seconds</string>
+
+
+    <!-- Battery Optimization message -->
+    <string name="battery_msg_title">Disable battery optimization</string>
+    <string name="battery_msg_text">To make sure background measurements are taken, please disable battery optimization for this app. Dismissing this message will enable automatic measurements only while the app is in foreground.</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+
 
     <!-- Message Preferences Titles -->
     <string name="messages_header">Messages</string>

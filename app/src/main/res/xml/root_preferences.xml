@@ -36,6 +36,7 @@
             app:key="measure_interval"
             app:showSeekBarValue="true"
             app:title="@string/measure_interval"
+            app:summary="@string/measure_interval_summary"
             app:useSimpleSummaryProvider="true" />
 
         <!-- Edit TextPreference for Number of Kept Measurements -->

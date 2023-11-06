@@ -22,8 +22,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -49,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
     Fragment account;
     Fragment settings;
 
+    private ActivityResultLauncher<String> requestPermissionForCoordinates;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +71,12 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         setContentView(binding.getRoot());
 
         // coordinate setup
+        requestPermissionForCoordinates = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+            if (isGranted) {
+                startListenForCoordinates(coordinateListener);
+            }
+        });
+
         coordinateListener = new CoordinateListener();
         startListenForCoordinates(coordinateListener);
 
@@ -321,14 +332,13 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
 
     public void startListenForCoordinates(CoordinateListener coordinateListener) {
 
-        // check if i have permission
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions((Activity) this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    808);
-            ActivityCompat.requestPermissions((Activity) this,
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                    809);
+        boolean location_permission = ContextCompat.checkSelfPermission(this,  android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        boolean coarse_permission = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        if (!location_permission || !coarse_permission) {
+            if (!location_permission)
+                requestPermissionForCoordinates.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+            if (!coarse_permission)
+                requestPermissionForCoordinates.launch(Manifest.permission.ACCESS_COARSE_LOCATION);
             return;
         }
 

@@ -39,8 +39,6 @@ public class MeasurementService extends Service {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); // Use getContext() in a Fragment or this in an Activity
 
             int measure_interval = sharedPreferences.getInt("measure_interval", 10);
-            //security check just in case
-            if (measure_interval == 0) measure_interval = 1;
 
             boolean automatic_measurements = sharedPreferences.getBoolean("automatic_measurements", false);
             boolean network_measurement = sharedPreferences.getBoolean("measure_lte_umps", false);
@@ -65,7 +63,10 @@ public class MeasurementService extends Service {
 
             // Reschedule the task to run again in X minutes if needed
             if (automatic_measurements) {
-                handler.postDelayed(this, measure_interval * 60_000L);
+                if (measure_interval == 0) handler.postDelayed(this, 1000 * 10); // 10 seconds
+                else {
+                    handler.postDelayed(this, measure_interval * 60_000L);
+                }
             }
 
         }
@@ -85,7 +86,14 @@ public class MeasurementService extends Service {
             public void run() {
                 updateNotification();
 
-                handler.postDelayed(this, /*measure_interval * 60_000*/ 10_000); // Update every second
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); // Use getContext() in a Fragment or this in an Activity
+
+                int measure_interval = sharedPreferences.getInt("measure_interval", 10);
+
+                if (measure_interval == 0) handler.postDelayed(this, 1000 * 10); // 10 seconds
+                else {
+                    handler.postDelayed(this, measure_interval * 60_000L);
+                }
             }
         };
     }

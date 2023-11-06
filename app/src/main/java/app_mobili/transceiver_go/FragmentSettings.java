@@ -2,11 +2,15 @@ package app_mobili.transceiver_go;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -116,13 +120,7 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
             case "measure_lte_umps":
             case "measure_noise":
             case "measure_wifi":
-                restartService();
-                break;
             case "measure_interval":
-                // handling invalid case and restarting service
-                if(sharedPreferences.getInt("measure_interval", 1) == 0){
-                    sharedPreferences.edit().putInt("measure_interval", 1).apply();
-                }
                 restartService();
                 break;
             default:
@@ -150,11 +148,16 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
             }
 
             if (foreground_permission && notification_permission) {
+                PowerManager powerManager = (PowerManager) requireActivity().getSystemService(Context.POWER_SERVICE);
+                    if (!powerManager.isIgnoringBatteryOptimizations( requireContext().getPackageName())) {
+                        // App is not exempt from battery optimization; show a pop-up to request exemption.
+                        showBatteryOptimizationDialog();
+                    }
+                }
                 // Start service
                 Intent serviceIntent = new Intent(requireContext(), MeasurementService.class);
                 requireActivity().startService(serviceIntent);
             }
-        }
         // otherwise stop
         else {
             // Stop service
@@ -180,5 +183,22 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
         fragmentTransaction.setReorderingAllowed(true);
         fragmentTransaction.replace(containerId, newFragment).addToBackStack("");
         fragmentTransaction.commit();
+    }
+    // Function to show a pop-up dialog to request battery optimization exemption
+    private void showBatteryOptimizationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle(R.string.battery_msg_title)
+                .setMessage(R.string.battery_msg_text)
+                .setPositiveButton(R.string.ok, (dialog, which) -> {
+                    // Open battery optimization settings
+                    Intent intent = new Intent();
+                    intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+                    startActivity(intent);
+                })
+                .setNegativeButton(R.string.cancel, (dialog, which) -> {
+                    // User canceled the request
+                    dialog.dismiss();
+                })
+                .show();
     }
 }
