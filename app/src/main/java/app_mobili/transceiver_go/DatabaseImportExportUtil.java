@@ -1,21 +1,17 @@
 package app_mobili.transceiver_go;
 
-import android.Manifest;
 import android.app.Activity;
 
 import android.content.Context;
 import android.content.Intent;
 
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.preference.PreferenceManager;
@@ -23,7 +19,6 @@ import androidx.room.Room;
 
 import java.io.File;
 
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,8 +29,6 @@ import java.nio.file.Files;
 public class DatabaseImportExportUtil {
     private static final String TAG = "DatabaseImportExportUtil";
     private static final int REQUEST_CODE_EXPORT_DB = 69;
-    private static final int REQUEST_CODE_IMPORT_DB = 420;
-
     private static final int sleepTime = 1000; // ms
 
 
@@ -43,7 +36,7 @@ public class DatabaseImportExportUtil {
     /*                                Share Utils                                 */
     /* -------------------------------------------------------------------------- */
     // Export the database sharing it to some application chosen by the user
-    //TODO DATABASE MUST BE CLOSE WHEN EXPORTING, OTHERWISE IT WILL BE EMPTY
+    // DATABASE MUST BE CLOSE WHEN EXPORTING, OTHERWISE IT WILL BE EMPTY
     public static void shareDatabase(Context context, Activity activity) {
         new Thread(() -> {
 
@@ -72,14 +65,9 @@ public class DatabaseImportExportUtil {
 
             SquareDatabase squaredb = Room.databaseBuilder(context, SquareDatabase.class, dbname).build();
 
-            // yes, busy waiting
-            while (squaredb.isOpen()) {
+            // close the db
+            if (squaredb.isOpen()) {
                 squaredb.close();
-                try {
-                    Thread.sleep(sleepTime);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
             }
 
             // Start the activity to share the file
@@ -165,10 +153,14 @@ public class DatabaseImportExportUtil {
             OutputStream outputStream;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 outputStream = Files.newOutputStream(destinationFile.toPath());
-            } else outputStream = new FileOutputStream(destinationFile);
+            }
+            // To address warning: we need to use this for api level 24 and 25
+            else outputStream = new FileOutputStream(destinationFile);
             byte[] buffer = new byte[1024];
             int length;
-            while ((length = inputStream.read(buffer)) > 0) {
+            while (true) {
+                assert inputStream != null;
+                if (!((length = inputStream.read(buffer)) > 0)) break;
                 outputStream.write(buffer, 0, length);
             }
             outputStream.flush();
