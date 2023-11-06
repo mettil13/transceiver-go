@@ -73,7 +73,7 @@ public class DatabaseImportExportUtil {
             SquareDatabase squaredb = Room.databaseBuilder(context, SquareDatabase.class, dbname).build();
 
             // yes, busy waiting
-            while(squaredb.isOpen()) {
+            while (squaredb.isOpen()) {
                 squaredb.close();
                 try {
                     Thread.sleep(sleepTime);
@@ -142,6 +142,7 @@ public class DatabaseImportExportUtil {
             }
         }
     }
+
     private static void importSelectedFile(Activity activity, Uri selectedUri, String dbname) {
         try {
             final String databaseDirectoryPath = activity.getDatabasePath(dbname).getParent();
@@ -208,5 +209,35 @@ public class DatabaseImportExportUtil {
                 }
             }
         }).start();
+    }
+
+
+    /* -------------------------------------------------------------------------- */
+    /*                                Delete Utils                                */
+    /* -------------------------------------------------------------------------- */
+
+    // deletes the database given in input, requires a context
+    // returns true if successfully deleted, false otherwise
+    public static boolean deleteDatabase(SquareDatabase db, Context context) {
+
+        // Close the database if it's open
+        db.close();
+
+        // Get the database file
+        File dbFile = context.getDatabasePath(db.getOpenHelper().getDatabaseName());
+
+        // Check if the database file exists and delete it
+        if (dbFile.exists()) {
+            if (dbFile.delete()) {
+                Log.d("DatabaseDeletion", "Database deleted successfully");
+                return true;
+            } else {
+                Log.e("DatabaseDeletion", "Failed to delete database");
+                return false;
+            }
+        } else {
+            Log.d("DatabaseDeletion", "Database file does not exist");
+            return false;
+        }
     }
 }
