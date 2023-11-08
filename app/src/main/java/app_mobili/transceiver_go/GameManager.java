@@ -41,10 +41,10 @@ public class GameManager {
 
         int bound = Math.min(poolSize, loadedSquares.size());
         Random rand = new Random();
-        int indexOfTarget = rand.nextInt(bound + 1); // generates a random number between 1 and bound
+        int indexOfTarget = rand.nextInt(bound); // generates a random number between 0 and bound - 1
 
         typeOfDataUsed = typeOfData;
-        currentTarget = loadedSquares.get(indexOfTarget - 1); // arrays starts at 0! ;)
+        currentTarget = loadedSquares.get(indexOfTarget);
         return currentTarget;
     }
 

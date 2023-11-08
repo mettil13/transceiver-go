@@ -2,6 +2,9 @@
 <resources>
     <!-- The dimension of the side of the squares is stored in the class Square -->
 
+    <color name="game_target_border">#E10CE9</color>
+    <color name="game_target_filler">#00000000</color>
+
     <color name="no_data_intensity_border">#4C4C4C</color>
     <color name="no_data_intensity_filler">#00000000</color>
     <color name="low_intensity_border">#4CAF50</color>
@@ -21,6 +24,7 @@
     <integer name="network_medium_upper_bound">2</integer>
 
     <!-- Grid config-->
+    <integer name="square_single_measurement_reward">10</integer>
 
     <!-- Heatmap config-->
     <integer name="min_cluster_dimension_in_pixel">15</integer>

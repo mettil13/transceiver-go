@@ -8,7 +8,14 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- clothes colors -->
+    <!-- skin colors -->
+    <color name="skin_00">#FDE7BC</color>
+    <color name="skin_01">#FFE8D9</color>
+    <color name="skin_02">#EDC6AC</color>
+    <color name="skin_03">#D39F7D</color>
+    <color name="skin_04">#9C6A49</color>
+    <color name="skin_05">#633F27</color>
+
     <color name="red">#FFFF0000</color>
     <color name="orange">#FF6600</color>
     <color name="blue">#002AFF</color>
@@ -21,13 +28,5 @@
     <!-- white -->
     <!-- black -->
     <color name="gray">#AFAFAF</color>
-
-    <!-- skin colors -->
-    <color name="skin_00">#FDE7BC</color>
-    <color name="skin_01">#FFE8D9</color>
-    <color name="skin_02">#EDC6AC</color>
-    <color name="skin_03">#D39F7D</color>
-    <color name="skin_04">#9C6A49</color>
-    <color name="skin_05">#633F27</color>
 
 </resources>

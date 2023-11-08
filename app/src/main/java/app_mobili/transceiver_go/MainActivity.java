@@ -71,13 +71,18 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         setContentView(binding.getRoot());
 
         // coordinate setup
+        coordinateListener = new CoordinateListener() {
+            // without this execution on api 24 would result in a crash
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
+        };
         requestPermissionForCoordinates = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
             if (isGranted) {
                 startListenForCoordinates(coordinateListener);
             }
         });
 
-        coordinateListener = new CoordinateListener();
         startListenForCoordinates(coordinateListener);
 
         // setting up measurement
@@ -233,13 +238,13 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         if (s.equals("coins")) {
-            if(coinsNumber != null){ // if the menu has been initialized
+            if (coinsNumber != null) { // if the menu has been initialized
                 updateCoinsMenu();
             }
         }
     }
 
-    private void updateCoinsMenu(){
+    private void updateCoinsMenu() {
         String value = String.valueOf(PreferenceManager.getDefaultSharedPreferences(this).getInt("coins", 0));
         coinsNumber.setText(value);
     }
@@ -332,7 +337,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
 
     public void startListenForCoordinates(CoordinateListener coordinateListener) {
 
-        boolean location_permission = ContextCompat.checkSelfPermission(this,  android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        boolean location_permission = ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
         boolean coarse_permission = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
         if (!location_permission || !coarse_permission) {
             if (!location_permission)

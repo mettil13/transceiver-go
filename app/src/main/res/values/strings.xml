@@ -56,13 +56,11 @@
     <string name="measurement_weight_summary">The higher the value, the more importance will be given to new measurements, while the older measurement will be considered less important</string>
     <string name="measure_interval_summary">If set to 0, measurements will be taken every 10 seconds</string>
 
-
     <!-- Battery Optimization message -->
     <string name="battery_msg_title">Disable battery optimization</string>
     <string name="battery_msg_text">To make sure background measurements are taken, please disable battery optimization for this app. Dismissing this message will enable automatic measurements only while the app is in foreground.</string>
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
-
 
     <!-- Message Preferences Titles -->
     <string name="messages_header">Messages</string>
@@ -115,4 +113,12 @@
 
     <!-- Shop -->
     <string name="purchase_denied">You don\'t have enough transceiver coins to purchase this item</string>
+
+    <!-- Game -->
+    <string name="cannot_give_prize">In order to receive the prize, you must measure</string> <!-- after this string there is the name of the measurement-->
+    <string name="you_earned">You earned</string> <!-- number of coins -->
+    <string name="coins">coins</string>
+    <string name="too_far_title">You are too far</string>
+    <string name="too_far_text">You must be in the same square of the target in order to collect the reward</string>
+    <string name="measurements_and_reward_title">Select the measurements and collect the reward</string>
 </resources>

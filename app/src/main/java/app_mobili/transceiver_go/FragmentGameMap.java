@@ -5,11 +5,8 @@ import static android.content.Context.LOCATION_SERVICE;
 import android.Manifest;
 import android.animation.ValueAnimator;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.drawable.AnimatedVectorDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -18,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
@@ -26,18 +24,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.TileOverlay;
-import com.google.android.gms.maps.model.TileOverlayOptions;
-import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -62,6 +53,9 @@ public class FragmentGameMap extends FragmentMainMap {
     private Latitude avatarLatitude;
     private Longitude avatarLongitude;
     private GameManager gameInstance;
+    private ImageView gameMarker;
+    private Latitude gameMarkerLatitude;
+    private Longitude gameMarkerLongitude;
 
     public FragmentGameMap() {
         // Required empty public constructor
@@ -76,17 +70,9 @@ public class FragmentGameMap extends FragmentMainMap {
         myAvatarClothes = new ImageView(getContext());
         myAvatarHat = new ImageView(getContext());
         setUpMyAvatar(myAvatarSkin, myAvatarClothes, myAvatarHat);
-        /*
-        myAvatarSkin.setImageResource(R.drawable.lorenzo_idle);
-        ((ViewGroup) getView().findViewById(R.id.fragment_main_map_layout)).addView(myAvatarSkin);
-        // resize the image
-        ViewGroup.LayoutParams params = myAvatarSkin.getLayoutParams();
-        params.height = 250; // pixels
-        params.width = 250;
-        myAvatarSkin.setLayoutParams(params);
-        // hides the avatar until it needs to be shown
-        myAvatarSkin.setVisibility(View.INVISIBLE);
-         */
+
+        gameMarker = new ImageView(getContext());
+        setUpGameMarker(gameMarker);
     }
 
     @Override
@@ -174,6 +160,12 @@ public class FragmentGameMap extends FragmentMainMap {
 
                     valueAnimator.start();
                 }
+
+                // without this execution on api 24 would result in a crash
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {
+                }
+
             });
         }
 
@@ -185,6 +177,9 @@ public class FragmentGameMap extends FragmentMainMap {
         super.onCameraMove();
         if (avatarLatitude != null && avatarLongitude != null) {
             moveMyAvatar(avatarLatitude, avatarLongitude);
+        }
+        if (gameMarkerLatitude != null && gameMarkerLongitude != null) {
+            moveGameMarker(gameMarkerLatitude, gameMarkerLongitude);
         }
     }
 
@@ -235,6 +230,69 @@ public class FragmentGameMap extends FragmentMainMap {
         myAvatarHat.setTranslationY(myPositionOnScreen.y - myAvatarHat.getLayoutParams().height - (myAvatarSkin.getLayoutParams().height * 0.1f));
     }
 
+    private void setUpGameMarker(ImageView gameMarker) {
+        gameMarker.setImageResource(R.drawable.marker);
+        ((android.widget.FrameLayout) getView().findViewById(R.id.fragment_main_map_layout)).addView(gameMarker);
+
+        // resize the images
+        ViewGroup.LayoutParams sizeParams = gameMarker.getLayoutParams();
+        sizeParams.height = 200; // pixels
+        sizeParams.width = 200;
+
+        FragmentGameMap thisFragment = this;
+
+        gameMarker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().target(new LatLng(gameMarkerLatitude.getValue(), gameMarkerLongitude.getValue())).zoom(map.getCameraPosition().zoom).bearing(map.getCameraPosition().bearing).tilt(map.getCameraPosition().tilt).build()));
+
+                Square playerSquare = new Square(myLocationLongitude.getValue(), myLocationLatitude.getValue());
+                if (playerSquare.getLatitude().getValue() == gameInstance.getCurrentTarget().getLatitude().getValue() && playerSquare.getLongitude().getValue() == gameInstance.getCurrentTarget().getLongitude().getValue()) {
+                    GameMeasurementDialog gameDialog = new GameMeasurementDialog(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("type_of_data", "None"), gameInstance, thisFragment, new CoordinateListener() {
+                        // without this execution on api 24 would result in a crash
+                        @Override
+                        public void onStatusChanged(String provider, int status, Bundle extras) {
+                        }
+                    });
+                    gameDialog.show(getParentFragmentManager(), "");
+                } else {
+                    GameTooFarDialog tooFarDialog = new GameTooFarDialog();
+                    tooFarDialog.show(getParentFragmentManager(), "");
+                }
+
+
+            }
+        });
+
+        // hides the marker until it needs to be shown
+        gameMarker.setVisibility(View.INVISIBLE);
+    }
+
+    private void moveGameMarker(Latitude newLatitude, Longitude newLongitude) {
+        // toScreenLocation has some overflow issues, how should I handle them?
+        Point myPositionOnScreen = map.getProjection().toScreenLocation(new LatLng(newLatitude.getValue(), newLongitude.getValue()));
+        Log.println(Log.ASSERT, "", "" + myPositionOnScreen);
+        if (myPositionOnScreen.x < gameMarker.getLayoutParams().width / 2) {
+            myPositionOnScreen.x = gameMarker.getLayoutParams().width / 2;
+        }
+        if (myPositionOnScreen.y < gameMarker.getLayoutParams().height) {
+            myPositionOnScreen.y = gameMarker.getLayoutParams().height;
+        }
+
+        View view = getView();
+        if (view != null) {
+            if (myPositionOnScreen.x > view.getMeasuredWidth() - gameMarker.getLayoutParams().width / 2) {
+                myPositionOnScreen.x = view.getMeasuredWidth() - gameMarker.getLayoutParams().width / 2;
+            }
+            if (myPositionOnScreen.y > view.getMeasuredHeight()) {
+                myPositionOnScreen.y = view.getMeasuredHeight();
+            }
+        }
+
+        gameMarker.setTranslationX(myPositionOnScreen.x - gameMarker.getLayoutParams().width / 2f);
+        gameMarker.setTranslationY(myPositionOnScreen.y - gameMarker.getLayoutParams().height);
+    }
+
     protected void updateGameInstance() {
 
         new Thread(() -> {
@@ -249,7 +307,7 @@ public class FragmentGameMap extends FragmentMainMap {
             if (currentTarget != null) {
                 Map<String, Square> EasternTargetSquares = retrieveEasternSquares(getActiveMapNames(), currentTarget.getLongitude(), currentTarget.getLatitude(), currentTarget.getLongitude(), currentTarget.getLatitude());
                 Map<String, Square> WesternTargetSquares = retrieveWesternSquares(getActiveMapNames(), currentTarget.getLongitude(), currentTarget.getLatitude(), currentTarget.getLongitude(), currentTarget.getLatitude());
-                List<Square> targetSquares = new ArrayList<Square>(EasternTargetSquares.values());
+                List<Square> targetSquares = new ArrayList<>(EasternTargetSquares.values());
                 targetSquares.addAll(WesternTargetSquares.values());
 
                 if (gameInstance.isTargetUpdated(targetSquares, typeOfData)) {
@@ -259,14 +317,24 @@ public class FragmentGameMap extends FragmentMainMap {
                 currentTarget = gameInstance.generateNewTarget(lastDrawnSquares, typeOfData); // if lastDrawnSquares is null, then also currentTarget is set to null
             }
 
-            if (currentTarget != null) {
-                Square finalCurrentTarget = currentTarget;
-                getActivity().runOnUiThread(new Runnable() {
-                    public void run() {
-                        map.addMarker(new MarkerOptions().position(new LatLng(finalCurrentTarget.getLatitude().getValue(), finalCurrentTarget.getLongitude().getValue())));
+
+            Square finalCurrentTarget = currentTarget;
+            getActivity().runOnUiThread(new Runnable() {
+                public void run() {
+
+                    if (finalCurrentTarget == null) {
+                        gameMarker.setVisibility(View.INVISIBLE);
+                    } else {
+                        finalCurrentTarget.drawTile(map, ContextCompat.getColor(getContext(), R.color.game_target_border), ContextCompat.getColor(getContext(), R.color.game_target_filler));
+                        gameMarkerLatitude = finalCurrentTarget.getLatitude();
+                        gameMarkerLongitude = finalCurrentTarget.getLongitude();
+                        gameMarker.setVisibility(View.VISIBLE);
+                        moveGameMarker(gameMarkerLatitude, gameMarkerLongitude);
                     }
-                });
-            }
+
+                }
+            });
+
 
         }).start();
 
