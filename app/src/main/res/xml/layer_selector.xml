@@ -24,8 +24,35 @@
     <PreferenceCategory>
 
         <Preference
-            android:title="@string/delete_unselected_maps"
-            android:key="delete_maps" />
+            android:key="delete_maps"
+            android:title="@string/delete_unselected_maps" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:key="keys"
+        android:title="How to read the map">
+
+        <Preference
+            android:persistent="false"
+            android:title="@string/color_high_title"
+            android:summary="@string/color_high_description"
+            app:icon="@drawable/color_high" />
+
+        <Preference
+            android:persistent="false"
+            android:title="@string/color_medium_title"
+            android:summary="@string/color_medium_description"
+            app:icon="@drawable/color_medium" />
+
+        <Preference
+            android:persistent="false"
+            android:title="@string/color_low_title"
+            android:summary="@string/color_medium_description"
+            app:icon="@drawable/color_low" />
 
     </PreferenceCategory>
 

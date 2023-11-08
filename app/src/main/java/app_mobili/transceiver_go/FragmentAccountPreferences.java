@@ -58,6 +58,7 @@ public class FragmentAccountPreferences extends PreferenceFragmentCompat impleme
                 .setNegativeButton(R.string.cancel, (dialog, which) -> {
                     // User canceled the request
                     prefs.edit().putString("account_name", old_name).apply();
+                    onCreatePreferences(null, null);
                     dialog.dismiss();
                 })
                 .show();

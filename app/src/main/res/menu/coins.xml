@@ -6,7 +6,8 @@
         android:id="@+id/coins_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="Coins"
+        android:title="@string/coins"
         app:actionLayout="@layout/coins_menu_layout"
         app:showAsAction="always" />
+
 </menu>

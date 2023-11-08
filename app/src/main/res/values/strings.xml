@@ -68,8 +68,7 @@
 
     <!-- Merge DB message -->
     <string name="merge_msg_title">Databases will merge</string>
-    <string name="merge_msg_text">Choosing this username will merge the data from the database with the new name, as it already exists among your databases. Are you sure to continue? Canceling will revert to your old username.</string>
-
+    <string name="merge_msg_text">A database generated with this username already exist, so choosing this username will merge its data with the ones from your database. Do you want to continue? Canceling will revert your username to the old one.</string>
 
     <!-- Message Preferences Titles -->
     <string name="messages_header">Messages</string>
@@ -96,6 +95,15 @@
     <string name="delete_unselected_maps">Delete unselected maps</string>
     <string name="delete_maps_dialog_title">Delete maps</string>
     <string name="delete_maps_dialog_text">Are you sure you want to delete those maps?</string>
+
+    <!-- How to read the map -->
+    <string name="color_high_title">High intensity</string>
+    <string name="color_high_description">This color means that the average measurement of the area has an high value (e.g. noise: very loud, network: good connection)</string>
+    <string name="color_medium_title">Medium intensity</string>
+    <string name="color_medium_description">This color means that the average measurement of the area has a medium value</string>
+    <string name="color_low_title">Low intensity</string>
+    <string name="color_low_description">This color means that the average measurement of the area has a low value</string>
+
 
     <!-- Account Preferences -->
     <string name="account_name">Username</string>
@@ -132,4 +140,5 @@
     <string name="too_far_title">You are too far</string>
     <string name="too_far_text">You must be in the same square of the target in order to collect the reward</string>
     <string name="measurements_and_reward_title">Select the measurements and collect the reward</string>
+    <string name="generate_new_target">Generate new target</string>
 </resources>
