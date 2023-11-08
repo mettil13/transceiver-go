@@ -1,6 +1,12 @@
 <resources>
     <string name="app_name">transceiver-go</string>
 
+    <!-- Misc -->
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
     <!-- Measurement buttons -->
     <string name="new_measurement">new measurement</string>
     <string name="new_wifi_measurement">new wifi measurement</string>
@@ -59,8 +65,6 @@
     <!-- Battery Optimization message -->
     <string name="battery_msg_title">Disable battery optimization</string>
     <string name="battery_msg_text">To make sure background measurements are taken, please disable battery optimization for this app. Dismissing this message will enable automatic measurements only while the app is in foreground.</string>
-    <string name="ok">Ok</string>
-    <string name="cancel">Cancel</string>
 
     <!-- Message Preferences Titles -->
     <string name="messages_header">Messages</string>
@@ -85,6 +89,8 @@
     <string name="wifi">Wi-fi</string>
     <string name="available_maps_title">Available maps</string>
     <string name="delete_unselected_maps">Delete unselected maps</string>
+    <string name="delete_maps_dialog_title">Delete maps</string>
+    <string name="delete_maps_dialog_text">Are you sure you want to delete those maps?</string>
 
     <!-- Account Preferences -->
     <string name="account_name">Username</string>

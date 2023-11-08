@@ -89,7 +89,7 @@ public class GameMeasurementDialog extends DialogFragment {
         }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-
+                dialog.dismiss();
             }
         });
         return builder.create();
