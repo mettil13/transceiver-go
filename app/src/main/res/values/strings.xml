@@ -66,6 +66,11 @@
     <string name="battery_msg_title">Disable battery optimization</string>
     <string name="battery_msg_text">To make sure background measurements are taken, please disable battery optimization for this app. Dismissing this message will enable automatic measurements only while the app is in foreground.</string>
 
+    <!-- Merge DB message -->
+    <string name="merge_msg_title">Databases will merge</string>
+    <string name="merge_msg_text">Choosing this username will merge the data from the database with the new name, as it already exists among your databases. Are you sure to continue? Canceling will revert to your old username.</string>
+
+
     <!-- Message Preferences Titles -->
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>
