@@ -1,146 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".FragmentAccountSettings">
+    android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/player_skin"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:src="@drawable/lorenzo_idle_skin"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".FragmentAccountSettings">
 
-    <ImageView
-        android:id="@+id/player_clothes"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:src="@drawable/lorenzo_idle_clothes"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <ImageView
+            android:id="@+id/player_skin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/lorenzo_idle_skin"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/player_clothes_lock"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/lock"
-        app:layout_constraintBottom_toBottomOf="@+id/player_skin"
-        app:layout_constraintEnd_toEndOf="@+id/player_skin"
-        app:layout_constraintStart_toStartOf="@+id/player_skin"
-        app:layout_constraintTop_toTopOf="@+id/player_skin"
-        app:layout_constraintVertical_bias="0.7"
-        android:visibility="invisible" />
+        <ImageView
+            android:id="@+id/player_clothes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/lorenzo_idle_clothes"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/player_clothes_lock_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="@+id/player_skin"
-        app:layout_constraintEnd_toEndOf="@+id/player_skin"
-        app:layout_constraintStart_toStartOf="@+id/player_skin"
-        app:layout_constraintTop_toTopOf="@+id/player_skin"
-        app:layout_constraintVertical_bias="0.87"
-        android:drawableEnd="@drawable/transciever_coin"
-        android:visibility="invisible" />
+        <ImageView
+            android:id="@+id/player_clothes_lock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/lock"
+            app:layout_constraintBottom_toBottomOf="@+id/player_skin"
+            app:layout_constraintEnd_toEndOf="@+id/player_skin"
+            app:layout_constraintStart_toStartOf="@+id/player_skin"
+            app:layout_constraintTop_toTopOf="@+id/player_skin"
+            app:layout_constraintVertical_bias="0.7"
+            android:visibility="invisible" />
 
-    <ImageView
-        android:id="@+id/player_hat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/hat_empty"
-        app:layout_constraintBottom_toBottomOf="@+id/player_skin"
-        app:layout_constraintEnd_toEndOf="@+id/player_skin"
-        app:layout_constraintStart_toStartOf="@+id/player_skin"
-        app:layout_constraintTop_toTopOf="@+id/player_skin"
-        app:layout_constraintVertical_bias="0.1" />
+        <Button
+            android:id="@+id/player_clothes_lock_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="30sp"
+            app:layout_constraintBottom_toBottomOf="@+id/player_skin"
+            app:layout_constraintEnd_toEndOf="@+id/player_skin"
+            app:layout_constraintStart_toStartOf="@+id/player_skin"
+            app:layout_constraintTop_toTopOf="@+id/player_skin"
+            app:layout_constraintVertical_bias="0.87"
+            android:drawableEnd="@drawable/transciever_coin"
+            android:visibility="invisible" />
 
-    <ImageView
-        android:id="@+id/player_hat_lock"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/lock"
-        app:layout_constraintBottom_toBottomOf="@+id/player_skin"
-        app:layout_constraintEnd_toEndOf="@+id/player_skin"
-        app:layout_constraintStart_toStartOf="@+id/player_skin"
-        app:layout_constraintTop_toTopOf="@+id/player_skin"
-        app:layout_constraintVertical_bias="0.2"
-        android:visibility="invisible" />
+        <ImageView
+            android:id="@+id/player_hat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/hat_empty"
+            app:layout_constraintBottom_toBottomOf="@+id/player_skin"
+            app:layout_constraintEnd_toEndOf="@+id/player_skin"
+            app:layout_constraintStart_toStartOf="@+id/player_skin"
+            app:layout_constraintTop_toTopOf="@+id/player_skin"
+            app:layout_constraintVertical_bias="0.1" />
 
-    <Button
-        android:id="@+id/player_hat_lock_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="@+id/player_skin"
-        app:layout_constraintEnd_toEndOf="@+id/player_skin"
-        app:layout_constraintStart_toStartOf="@+id/player_skin"
-        app:layout_constraintTop_toTopOf="@+id/player_skin"
-        app:layout_constraintVertical_bias="0.47"
-        android:drawableEnd="@drawable/transciever_coin"
-        android:visibility="invisible"/>
+        <ImageView
+            android:id="@+id/player_hat_lock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/lock"
+            app:layout_constraintBottom_toBottomOf="@+id/player_skin"
+            app:layout_constraintEnd_toEndOf="@+id/player_skin"
+            app:layout_constraintStart_toStartOf="@+id/player_skin"
+            app:layout_constraintTop_toTopOf="@+id/player_skin"
+            app:layout_constraintVertical_bias="0.2"
+            android:visibility="invisible" />
 
-    <ImageButton
-        android:id="@+id/button_prev_hat"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:src="@drawable/arrow_back_dark"
-        app:layout_constraintBottom_toBottomOf="@+id/player_skin"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.3" />
+        <Button
+            android:id="@+id/player_hat_lock_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="30sp"
+            app:layout_constraintBottom_toBottomOf="@+id/player_skin"
+            app:layout_constraintEnd_toEndOf="@+id/player_skin"
+            app:layout_constraintStart_toStartOf="@+id/player_skin"
+            app:layout_constraintTop_toTopOf="@+id/player_skin"
+            app:layout_constraintVertical_bias="0.47"
+            android:drawableEnd="@drawable/transciever_coin"
+            android:visibility="invisible"/>
 
-    <ImageButton
-        android:id="@+id/button_next_hat"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:src="@drawable/arrow_forward_dark"
-        app:layout_constraintBottom_toBottomOf="@+id/player_skin"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.3" />
+        <ImageButton
+            android:id="@+id/button_prev_hat"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:src="@drawable/arrow_back_dark"
+            app:layout_constraintBottom_toBottomOf="@+id/player_skin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.3" />
 
-    <ImageButton
-        android:id="@+id/button_prev_clothes"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:src="@drawable/arrow_back_dark"
-        app:layout_constraintBottom_toBottomOf="@+id/player_skin"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.65" />
+        <ImageButton
+            android:id="@+id/button_next_hat"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:src="@drawable/arrow_forward_dark"
+            app:layout_constraintBottom_toBottomOf="@+id/player_skin"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.3" />
 
-    <ImageButton
-        android:id="@+id/button_next_clothes"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:src="@drawable/arrow_forward_dark"
-        app:layout_constraintBottom_toBottomOf="@+id/player_skin"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.65" />
+        <ImageButton
+            android:id="@+id/button_prev_clothes"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:src="@drawable/arrow_back_dark"
+            app:layout_constraintBottom_toBottomOf="@+id/player_skin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.65" />
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/preferenceContainer"
-        android:name="app_mobili.transceiver_go.FragmentAccountPreferences"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/player_skin"
-        app:layout_constraintVertical_bias="0.0"
-        tools:layout="@layout/support_simple_spinner_dropdown_item" />
+        <ImageButton
+            android:id="@+id/button_next_clothes"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:src="@drawable/arrow_forward_dark"
+            app:layout_constraintBottom_toBottomOf="@+id/player_skin"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.65" />
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/preferenceContainer"
+            android:name="app_mobili.transceiver_go.FragmentAccountPreferences"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/player_skin"
+            app:layout_constraintVertical_bias="0.0"
+            tools:layout="@layout/support_simple_spinner_dropdown_item" />
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
+
