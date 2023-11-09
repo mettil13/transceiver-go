@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
 
     Fragment mainMap;
     Fragment gameMap;
-    Fragment somethingElse;
     Fragment account;
     Fragment settings;
 
@@ -62,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         // fragment setup
         mainMap = new FragmentMainMap();
         gameMap = new FragmentGameMap();
-        somethingElse = new FragmentSomethingElse();
         account = new FragmentAccountSettings();
         settings = new FragmentSettings();
 
@@ -107,9 +105,6 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
                     break;
                 case R.id.gameButton:
                     replaceFragment(R.id.fragmentContainer, gameMap);
-                    break;
-                case R.id.somethingElseButton:
-                    replaceFragment(R.id.fragmentContainer, somethingElse);
                     break;
                 case R.id.accountSettingsButton:
                     replaceFragment(R.id.fragmentContainer, account);

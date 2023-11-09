@@ -88,9 +88,4 @@ public class FragmentMicCalibration extends Fragment implements NoiseStrength.Re
         super.onViewCreated(view, savedInstanceState);
     }
 
-    @Override
-    public void onRecordingFinished(int noise) {
-        TextView noiseView = requireActivity().findViewById(R.id.noiseInfo);
-        noiseView.setText(String.format(getString(R.string.noise_value), noise));
-    }
 }

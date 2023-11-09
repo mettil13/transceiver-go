@@ -80,6 +80,7 @@ public class FragmentGameMap extends FragmentMainMap {
         myAvatarHat = new ImageView(getContext());
         setUpMyAvatar(myAvatarSkin, myAvatarClothes, myAvatarHat);
 
+        //creates the target marker
         gameMarker = new ImageView(getContext());
         setUpGameMarker(gameMarker);
     }
@@ -121,6 +122,9 @@ public class FragmentGameMap extends FragmentMainMap {
                     if (myLocationLatitude == null || myLocationLongitude == null) { // if a previous location does not exist, make the old location equal to the current one
                         oldLocationLatitude = new Latitude(location.getLatitude());
                         oldLocationLongitude = new Longitude(location.getLongitude());
+                        // if it's the first time that the location is taken (so no myLocationLatitude and Longitude exist), move the game marker to the player position.
+                        // placing the marker near the player masks some delays in the first update of its position (caused by the faulty Google method map.getProjection().toScreenLocation())
+                        moveGameMarker(oldLocationLatitude, oldLocationLongitude);
                     } else {
                         oldLocationLatitude = new Latitude(myLocationLatitude.getValue());
                         oldLocationLongitude = new Longitude(myLocationLongitude.getValue());
@@ -129,8 +133,6 @@ public class FragmentGameMap extends FragmentMainMap {
                     myLocationLatitude = new Latitude(location.getLatitude());
                     myLocationLongitude = new Longitude(location.getLongitude());
                     myLocationBearing = location.getBearing();
-                    //moveMyAvatar(myLocationLatitude, myLocationLongitude);
-
 
                     ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, 1);
                     valueAnimator.setDuration(1000); // duration 1 second
@@ -273,7 +275,7 @@ public class FragmentGameMap extends FragmentMainMap {
 
     private void moveGameMarker(Latitude newLatitude, Longitude newLongitude) {
         Point myPositionOnScreen = map.getProjection().toScreenLocation(new LatLng(newLatitude.getValue(), newLongitude.getValue()));
-        if(checkForPositionOnScreenOverflow(newLatitude, newLongitude, myPositionOnScreen)){
+        if (checkForPositionOnScreenOverflow(newLatitude, newLongitude, myPositionOnScreen)) {
             return; // if an overflow has occurred, do not update the position of the target
         }
 
@@ -300,20 +302,17 @@ public class FragmentGameMap extends FragmentMainMap {
 
     //returns true if there is an overflow, false otherwise
     private boolean checkForPositionOnScreenOverflow(Latitude targetLatitude, Longitude targetLongitude, Point targetPositionOnScreen) {
+        int precision = 1; // Higher precisions increase false positives
         LatLng targetPosition = new LatLng(targetLatitude.getValue(), targetLongitude.getValue());
-        LatLng roundedTargetPosition = new LatLng(BigDecimal.valueOf(targetPosition.latitude).setScale(3, RoundingMode.HALF_UP).doubleValue(), BigDecimal.valueOf(targetPosition.longitude).setScale(2, RoundingMode.HALF_UP).doubleValue());
+        LatLng roundedTargetPosition = new LatLng(BigDecimal.valueOf(targetPosition.latitude).setScale(precision, RoundingMode.HALF_UP).doubleValue(), BigDecimal.valueOf(targetPosition.longitude).setScale(precision, RoundingMode.HALF_UP).doubleValue());
 
         LatLng convertedTargetPosition = map.getProjection().fromScreenLocation(targetPositionOnScreen);
-        if(convertedTargetPosition != null){ //this warning is not true: convertedTargetPosition becomes null when an overflow occurs!
-            LatLng roundedConvertedTargetPosition = new LatLng(BigDecimal.valueOf(convertedTargetPosition.latitude).setScale(3, RoundingMode.HALF_UP).doubleValue(), BigDecimal.valueOf(convertedTargetPosition.longitude).setScale(2, RoundingMode.HALF_UP).doubleValue());
+        if (convertedTargetPosition != null) { //this warning is not true: convertedTargetPosition becomes null when an overflow occurs!
+            LatLng roundedConvertedTargetPosition = new LatLng(BigDecimal.valueOf(convertedTargetPosition.latitude).setScale(precision, RoundingMode.HALF_UP).doubleValue(), BigDecimal.valueOf(convertedTargetPosition.longitude).setScale(precision, RoundingMode.HALF_UP).doubleValue());;
 
-            Log.println(Log.ASSERT, "", "1" + roundedTargetPosition.toString());
-            Log.println(Log.ASSERT, "", "2" + roundedConvertedTargetPosition.toString());
-
-            if(roundedConvertedTargetPosition.longitude != roundedTargetPosition.longitude || roundedConvertedTargetPosition.latitude != roundedTargetPosition.latitude){
+            if (roundedConvertedTargetPosition.longitude != roundedTargetPosition.longitude || roundedConvertedTargetPosition.latitude != roundedTargetPosition.latitude) {
                 return true;
-            }
-            else {
+            } else {
                 return false;
             }
         } else {

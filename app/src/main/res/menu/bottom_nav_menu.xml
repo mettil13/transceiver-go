@@ -14,12 +14,6 @@
         android:icon="@drawable/game_dark"
         android:title="@string/game" />
     <item
-        android:id="@+id/somethingElseButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:icon="@drawable/something_else_dark"
-        android:title="@string/something_else" />
-    <item
         android:id="@+id/accountSettingsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
