@@ -36,6 +36,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -270,9 +272,11 @@ public class FragmentGameMap extends FragmentMainMap {
     }
 
     private void moveGameMarker(Latitude newLatitude, Longitude newLongitude) {
-        // toScreenLocation has some overflow issues, how should I handle them?
         Point myPositionOnScreen = map.getProjection().toScreenLocation(new LatLng(newLatitude.getValue(), newLongitude.getValue()));
-        Log.println(Log.ASSERT, "", "" + myPositionOnScreen);
+        if(checkForPositionOnScreenOverflow(newLatitude, newLongitude, myPositionOnScreen)){
+            return; // if an overflow has occurred, do not update the position of the target
+        }
+
         if (myPositionOnScreen.x < gameMarker.getLayoutParams().width / 2) {
             myPositionOnScreen.x = gameMarker.getLayoutParams().width / 2;
         }
@@ -292,6 +296,31 @@ public class FragmentGameMap extends FragmentMainMap {
 
         gameMarker.setTranslationX(myPositionOnScreen.x - gameMarker.getLayoutParams().width / 2f);
         gameMarker.setTranslationY(myPositionOnScreen.y - gameMarker.getLayoutParams().height);
+    }
+
+    //returns true if there is an overflow, false otherwise
+    private boolean checkForPositionOnScreenOverflow(Latitude targetLatitude, Longitude targetLongitude, Point targetPositionOnScreen) {
+        LatLng targetPosition = new LatLng(targetLatitude.getValue(), targetLongitude.getValue());
+        LatLng roundedTargetPosition = new LatLng(BigDecimal.valueOf(targetPosition.latitude).setScale(3, RoundingMode.HALF_UP).doubleValue(), BigDecimal.valueOf(targetPosition.longitude).setScale(2, RoundingMode.HALF_UP).doubleValue());
+
+        LatLng convertedTargetPosition = map.getProjection().fromScreenLocation(targetPositionOnScreen);
+        if(convertedTargetPosition != null){ //this warning is not true: convertedTargetPosition becomes null when an overflow occurs!
+            LatLng roundedConvertedTargetPosition = new LatLng(BigDecimal.valueOf(convertedTargetPosition.latitude).setScale(3, RoundingMode.HALF_UP).doubleValue(), BigDecimal.valueOf(convertedTargetPosition.longitude).setScale(2, RoundingMode.HALF_UP).doubleValue());
+
+            Log.println(Log.ASSERT, "", "1" + roundedTargetPosition.toString());
+            Log.println(Log.ASSERT, "", "2" + roundedConvertedTargetPosition.toString());
+
+            if(roundedConvertedTargetPosition.longitude != roundedTargetPosition.longitude || roundedConvertedTargetPosition.latitude != roundedTargetPosition.latitude){
+                return true;
+            }
+            else {
+                return false;
+            }
+        } else {
+            return true;
+        }
+
+
     }
 
     protected void updateGameInstance() {
