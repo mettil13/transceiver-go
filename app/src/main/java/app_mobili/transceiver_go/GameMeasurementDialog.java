@@ -9,7 +9,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
 import java.util.ArrayList;
@@ -83,7 +82,7 @@ public class GameMeasurementDialog extends DialogFragment {
                     }
 
                 } else {
-                    Toast.makeText(getContext(), getResources().getText(R.string.cannot_give_prize) + " " + getResources().getStringArray(R.array.type_of_data_entries)[indexOfMandatoryType + 1], Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), getResources().getText(R.string.cannot_give_reward) + " " + getResources().getStringArray(R.array.type_of_data_entries)[indexOfMandatoryType + 1], Toast.LENGTH_LONG).show();
                 }
             }
         }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

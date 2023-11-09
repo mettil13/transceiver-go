@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">transceiver-go</string>
+    <string name="app_name" translatable="false">transceiver-go</string>
 
     <!-- Misc -->
     <string name="ok">Ok</string>
@@ -17,9 +17,9 @@
     <string name="taken_noise_measurement">Noise measurement taken!</string>
 
     <!-- Calibration -->
-    <string name="calibration_title">Calibrate your Mic</string>
+    <string name="calibration_title">Calibrate your microphone</string>
     <string name="calibration_explain">How it works:\n
-    Calibrating your mic will take no more than few seconds, and it will ensure that your measured noise values are on par with everyone else according to your mic sensitivity! you just need to set both silence and clap thresholds, as explained below.
+    Calibrating your microphone will take no more than a few seconds, and it will ensure that your measured noise values are on par with everyone else according to your mic sensitivity! You just need to set both silence and clap thresholds, as explained below.
     </string>
     <string name="calibration_silence">Click the button and wait 3 seconds in a quiet environment. The dBm result value will be based on the average noise detected in these 3 seconds.</string>
     <string name="calibration_clap">Click the button and clap at least once at about 30cm from your phone microphone in the span of 3 seconds. The dBm result value will be based on the maximum noise detected in these 3 seconds. </string>
@@ -37,8 +37,8 @@
     <string name="not_a_db">Failed Import: Selected file not compatible :(</string>
 
     <!-- Permissions -->
-    <string name="permission_granted_bg_measurement">Permission granted! enable again to use the background measurements!</string>
-    <string name="permission_denied">Permission denied! functionality not accessible :(</string>
+    <string name="permission_granted_bg_measurement">Permission granted! Enable again to use the background measurements!</string>
+    <string name="permission_denied">Permission denied! Functionality not accessible :(</string>
 
     <!-- Bottom nav menu -->
     <string name="map">Map</string>
@@ -50,6 +50,8 @@
     <!-- Measurement preferences Titles -->
     <string name="measurements">Measurement Preferences</string>
     <string name="personalization">Personalization</string>
+    <string name="sharing">Sharing</string>
+    <string name="calibration">Calibration</string>
 
     <!-- Measurements preferences -->
     <string name="automatic_measurements">Automatic Measurements</string>
@@ -70,20 +72,6 @@
     <string name="merge_msg_title">Databases will merge</string>
     <string name="merge_msg_text">A database generated with this username already exist, so choosing this username will merge its data with the ones from your database. Do you want to continue? Canceling will revert your username to the old one.</string>
 
-    <!-- Message Preferences Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
-
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
-
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails</string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
-
     <!-- Layer Preferences -->
     <string name="list_title">Type of data</string>
     <string name="list_dialog_title">Select the data to visualize</string>
@@ -103,7 +91,6 @@
     <string name="color_medium_description">This color means that the average measurement of the area has a medium value</string>
     <string name="color_low_title">Low intensity</string>
     <string name="color_low_description">This color means that the average measurement of the area has a low value</string>
-
 
     <!-- Account Preferences -->
     <string name="account_name">Username</string>
@@ -134,9 +121,9 @@
     <string name="purchase_denied">You don\'t have enough transceiver coins to purchase this item</string>
 
     <!-- Game -->
-    <string name="cannot_give_prize">In order to receive the prize, you must measure</string> <!-- after this string there is the name of the measurement-->
+    <string name="cannot_give_reward">In order to receive the reward, you must measure:</string> <!-- after this string there is the name of the measurement-->
     <string name="you_earned">You earned</string> <!-- number of coins -->
-    <string name="coins">coins</string>
+    <string name="coins">transceiver coins</string>
     <string name="too_far_title">You are too far</string>
     <string name="too_far_text">You must be in the same square of the target in order to collect the reward</string>
     <string name="measurements_and_reward_title">Select the measurements and collect the reward</string>

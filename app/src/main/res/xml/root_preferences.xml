@@ -52,7 +52,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        app:title="Sharing">
+        app:title="@string/sharing">
 
         <Preference
             app:title="@string/exportdb"
@@ -64,10 +64,10 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        app:title="Calibration">
+        app:title="@string/calibration">
 
         <Preference
-            app:title="Microphone Calibration"
+            app:title="@string/calibration_title"
             android:key="to_calibration_button"/>
         
     </PreferenceCategory>

@@ -1,0 +1,134 @@
+<resources>
+    <!-- Misc -->
+    <string name="ok">Ok</string>
+    <string name="cancel">Annulla</string>
+    <string name="yes">Si</string>
+    <string name="no">No</string>
+
+    <!-- Measurement buttons -->
+    <string name="new_measurement">nuova misurazione</string>
+    <string name="new_wifi_measurement">nuova misurazione del Wifi</string>
+    <string name="new_internet_connection_measurement">nuova misurazione della connessione internet</string>
+    <string name="new_noise_measurement">nuova misurazione del rumore</string>
+    <string name="taken_wifi_measurement">Misurazione del Wifi eseguita!</string>
+    <string name="taken_internet_connection_measurement">Misurazione della connessione internet eseguita!</string>
+    <string name="taken_noise_measurement">Misurazione del rumore eseguita!</string>
+
+    <!-- Calibration -->
+    <string name="calibration_title">Calibrazione del microfono</string>
+    <string name="calibration_explain">Come funziona:\n
+        La calibrazione del microfono richiede solo pochi secondi e serve ad assicurare che le tue misurazioni del rumore siano simili a quelle di tutti gli altri (e non dipendenti dalla sensibilità del microfono)!
+        Come spiegato più in basso devi solamente impostare due threshold: uno corrispondente al silezio ed uno corrispondente al battito delle tue mani.
+    </string>
+    <string name="calibration_silence">Posizionati in un ambiente silenzioso, premi il pulsante ed attendi tre secondi in silenzio.
+        Il rumore di fondo del microfono viene calcolato in dBm facendo la media del rumore percepito in quei tre secondi.</string>
+    <string name="calibration_clap">Posizionati con le mani a circa 30cm dal telefono, premi il pulsante e sbatti le mani almeno una volta nell\'arco di 3 secondi.
+        Il relativo Threshold viene calcolato in dBm ed è basato sul massimo rumore percepito in quei tre secondi.</string>
+    <string name="silence_button">Imposta threshold del silenzio</string>
+    <string name="clap_button">Imposta threshold dell\'applauso</string>
+    <string name="silence_threshold">Threshold del silenzio (dBm)</string>
+    <string name="clap_threshold">Threshold dell\'applauso (dBm)</string>
+    <string name="noise_value">rumore: %d</string>
+
+    <!-- Import / Export -->
+    <string name="exportdb">Condividi le tue misurazioni!</string>
+    <string name="importdb">Importa le misurazioni dei tuoi amici!</string>
+    <string name="imported">Importato con successo nella cartella dei database :D</string>
+    <string name="wrong_db_version">Importazione fallita: versione del database errata :/</string>
+    <string name="not_a_db">Importazione fallita: Il file selezionato non è compatibile :(</string>
+
+    <!-- Permissions -->
+    <string name="permission_granted_bg_measurement">Autorizzazione concessa! Attiva nuovamente il campo per utilizzare le misurazioni in background!</string>
+    <string name="permission_denied">Autorizzazione rifiutata! Funzionalità non disponibile :(</string>
+
+    <!-- Bottom nav menu -->
+    <string name="map">Mappa</string>
+    <string name="game">Mappa di gioco</string>
+    <string name="something_else">Altro</string>
+    <string name="settings">Impostazioni</string>
+    <string name="account">Account</string>
+
+    <!-- Measurement preferences Titles -->
+    <string name="measurements">Preferenze delle misurazioni</string>
+    <string name="personalization">Personalizzazioni</string>
+    <string name="sharing">Condivisione</string>
+    <string name="calibration">Calibrazione</string>
+
+    <!-- Measurements preferences -->
+    <string name="automatic_measurements">Misurazioni automatiche</string>
+    <string name="measure_lte_umps">Misura LTE/UMPS</string>
+    <string name="measure_wifi">Misura Wifi</string>
+    <string name="measure_noise">Misura Noise</string>
+    <string name="measure_interval">Misura ogni (minuti)</string>
+    <string name="num_kept_measurements">Peso delle misurazioni</string>
+    <string name="noise_summary">Le misurazioni automatiche del suono saranno effettuate solo con l\'app in primo piano</string>
+    <string name="measurement_weight_summary">Più alto è il valore, più importanza viene data alle nuove misurazioni, mentre le misurazione più vecchie sono considerate meno importanti</string>
+    <string name="measure_interval_summary">Se impostato a 0, le misurazioni saranno fatte ogni 10 secondi</string>
+
+    <!-- Battery Optimization message -->
+    <string name="battery_msg_title">Disattiva l\'ottimizzazione della batteria</string>
+    <string name="battery_msg_text">Per garantire il corretto funzionanamento delle misurazioni in background, disabilita l\'ottimizzazione della batteria per questa app.
+        Ignorare questo messaggio farà in modo che le misurazioni funzionino solo quando l\'app è in primo piano.</string>
+
+    <!-- Merge DB message -->
+    <string name="merge_msg_title">Unione database</string>
+    <string name="merge_msg_text">Esiste già un database generato con questo nome utente, quindi scegliere questo nome utente i suoi dati con quelli del tuo database personale.
+        Desideri continuare? Annullare ripristinerà il tuo nome utente precedente.</string>
+
+    <!-- Layer Preferences -->
+    <string name="list_title">Tipologia dei dati</string>
+    <string name="list_dialog_title">Seleziona i dati da visualizzare</string>
+    <string name="none">Nessuno</string>
+    <string name="noise">Rumore</string>
+    <string name="network">Rete cellulare</string>
+    <string name="wifi">Wi-fi</string>
+    <string name="available_maps_title">Mappe disponibili</string>
+    <string name="delete_unselected_maps">Elimina le mappe non selezionate</string>
+    <string name="delete_maps_dialog_title">Elimina mappe</string>
+    <string name="delete_maps_dialog_text">Sei sicuro di voler cancellare queste mappe?</string>
+
+    <!-- How to read the map -->
+    <string name="color_high_title">Intensità alta</string>
+    <string name="color_high_description">Questo colore indica che la misurazione media dell\'area ha un valore alto (per esempio rumore: molto rumoroso, rete cellulare: buona connessione)</string>
+    <string name="color_medium_title">Intensità media</string>
+    <string name="color_medium_description">Questo colore indica che la misurazione media dell\'area ha un valore medio</string>
+    <string name="color_low_title">Intensità bassa</string>
+    <string name="color_low_description">Questo colore indica che la misurazione media dell\'area ha un valore basso</string>
+
+    <!-- Account Preferences -->
+    <string name="account_name">Nome utente</string>
+    <string name="skin_color">Colore della pelle</string>
+    <string name="select_color">Seleziona un colore</string>
+
+    <!-- Colors -->
+    <string name="red">Rosso</string>
+    <string name="orange">Arancione</string>
+    <string name="blue">Blu</string>
+    <string name="light_blue">Azzurro</string>
+    <string name="green">Verde</string>
+    <string name="yellow">Giallo</string>
+    <string name="pink_soft">Rosa delicato</string>
+    <string name="pink_strong">Rosa acceso</string>
+    <string name="purple">Viola</string>
+    <string name="white">Bianco</string>
+    <string name="black">Nero</string>
+    <string name="gray">Grigio</string>
+    <string name="skin_00">Pelle 00</string>
+    <string name="skin_01">Pelle 01</string>
+    <string name="skin_02">Pelle 02</string>
+    <string name="skin_03">Pelle 03</string>
+    <string name="skin_04">Pelle 04</string>
+    <string name="skin_05">Pelle 05</string>
+
+    <!-- Shop -->
+    <string name="purchase_denied">Non hai abbastanza monete transceiver per comprare questo oggetto</string>
+
+    <!-- Game -->
+    <string name="cannot_give_reward">Per ottenere la ricompensa, devi misurare:</string> <!-- after this string there is the name of the measurement-->
+    <string name="you_earned">Hai guadagnato</string> <!-- number of coins -->
+    <string name="coins">monete transceiver</string>
+    <string name="too_far_title">Sei troppo lontano</string>
+    <string name="too_far_text">Devi essere nello stesso quadrato dell\'obiettivo per ottenere la ricompensa</string>
+    <string name="measurements_and_reward_title">Seleziona le misurazioni ed ottieni la ricompensa</string>
+    <string name="generate_new_target">Genera un nuovo obiettivo</string>
+</resources>
