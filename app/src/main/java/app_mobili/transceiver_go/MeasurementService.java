@@ -131,7 +131,7 @@ public class MeasurementService extends Service {
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 
         return new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.drawable.transciever_icon_marker_dark)
+                .setSmallIcon(R.drawable.transceiver_icon_marker_dark)
                 .setContentTitle("Automatic measurements taken!")
                 .setContentText("At time: " + getCurrentTime())
                 .setContentIntent(pendingIntent)

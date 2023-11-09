@@ -55,7 +55,7 @@
             app:layout_constraintStart_toStartOf="@+id/player_skin"
             app:layout_constraintTop_toTopOf="@+id/player_skin"
             app:layout_constraintVertical_bias="0.87"
-            android:drawableEnd="@drawable/transciever_coin"
+            android:drawableEnd="@drawable/transceiver_coin"
             android:visibility="invisible" />
 
         <ImageView
@@ -92,7 +92,7 @@
             app:layout_constraintStart_toStartOf="@+id/player_skin"
             app:layout_constraintTop_toTopOf="@+id/player_skin"
             app:layout_constraintVertical_bias="0.47"
-            android:drawableEnd="@drawable/transciever_coin"
+            android:drawableEnd="@drawable/transceiver_coin"
             android:visibility="invisible"/>
 
         <ImageButton

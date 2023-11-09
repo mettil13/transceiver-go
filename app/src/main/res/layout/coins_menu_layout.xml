@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:scaleX="0.7"
         android:scaleY="0.7"
-        android:src="@drawable/transciever_coin" />
+        android:src="@drawable/transceiver_coin" />
 
 
 </LinearLayout>
