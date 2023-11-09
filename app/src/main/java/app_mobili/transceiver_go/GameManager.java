@@ -2,6 +2,7 @@ package app_mobili.transceiver_go;
 
 import com.google.android.gms.maps.GoogleMap;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -24,6 +25,8 @@ public class GameManager {
         if(loadedSquares == null || loadedSquares.size() == 0){
             return null;
         }
+
+        Collections.shuffle(loadedSquares); // randomizes the order of loadedSquares, bringing more entropy to the generation
 
         switch (typeOfData) {
             case "Noise":
