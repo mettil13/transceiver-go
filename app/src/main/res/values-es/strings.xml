@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">transceiver-go</string>
+
+    <!-- Misc -->
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancelar</string>
+    <string name="yes">Si</string>
+    <string name="no">No</string>
+
+    <!-- Measurement buttons -->
+    <string name="new_measurement">nueva medición</string>
+    <string name="new_wifi_measurement">nueva medición de Wifi</string>
+    <string name="new_internet_connection_measurement">nueva medición de conexión a internet</string>
+    <string name="new_noise_measurement">nueva medición de ruido</string>
+    <string name="taken_wifi_measurement">Medición de Wifi completada!</string>
+    <string name="taken_internet_connection_measurement">Medición de conexión a internet completada!</string>
+    <string name="taken_noise_measurement">Medición de ruido completada!</string>
+
+    <!-- Calibration -->
+    <string name="calibration_title">Calibración de micrófono</string>
+    <string name="calibration_explain">Cómo funciona:\n
+    La calibración de micrófono tardará unos segundos en asegurar que todas tus mediciones se parezcan a las de todos los demás (y no dependan de la sensibilidad de tu micrófono)! Como explicado a continuación, solo tienes que configurar dos umbrales: uno que corresponda al silencio y uno que corresponda a una palmada.
+    </string>
+    <string name="calibration_silence">Haz clic en el botón y espera tres segundos en un ambiente silencioso. El resultado en dBm será el promedio del ruido detectado en estos tres segundos.</string>
+    <string name="calibration_clap">Haz clic en el botón y a aproximadamente 30cm de tu móvil aplaude al menos una vez dentro de tres segundos. El resultado en dBm conrensponderá al ruido máximo detectado en estos tres segundos.</string>
+    <string name="silence_button">Configura umbral de silencio</string>
+    <string name="clap_button">Configura umbral de aplauso</string>
+    <string name="silence_threshold">Umbral de silencio (dBm)</string>
+    <string name="clap_threshold">Umbral de aplauso (dBm)</string>
+    <string name="noise_value">ruido: %d</string>
+
+    <!-- Import / Export -->
+    <string name="exportdb">Comparte tus mediciones!</string>
+    <string name="importdb">Importa las mediciones de tus amigos!</string>
+    <string name="imported">Importado con éxito en el directorio de bases de datos :D</string>
+    <string name="wrong_db_version">Error de importación: versión incorrecta de la base de datos :/</string>
+    <string name="not_a_db">Error de importación: el archivo seleccionado no es compatible :(</string>
+
+    <!-- Permissions -->
+    <string name="permission_granted_bg_measurement">Permiso concedido! Abilitar nuevamente para utilizar las mediciones en segundo plano!</string>
+    <string name="permission_denied">Permiso denegado! Función no disponible :(</string>
+
+    <!-- Bottom nav menu -->
+    <string name="map">Mapa</string>
+    <string name="game">Mapa del juego</string>
+    <string name="something_else">Otro</string>
+    <string name="settings">Configuración</string>
+    <string name="account">Cuenta</string>
+
+    <!-- Measurement preferences Titles -->
+    <string name="measurements">Preferencias de mediciones</string>
+    <string name="personalization">Personalización</string>
+    <string name="sharing">Compartición</string>
+    <string name="calibration">Calibración</string>
+
+    <!-- Measurements preferences -->
+    <string name="automatic_measurements">Mediciones automáticas</string>
+    <string name="measure_lte_umps">Medición LTE/UMPS</string>
+    <string name="measure_wifi">Medición Wifi</string>
+    <string name="measure_noise">Medición Ruido</string>
+    <string name="measure_interval">Medición cada (minutos)</string>
+    <string name="num_kept_measurements">Peso de las mediciones</string>
+    <string name="noise_summary">Las mediciones automáticas del sonido serán efectuadas solo con la app en primer plano</string>
+    <string name="measurement_weight_summary">Cuanto mayor sea el valor, màs importantes serán consideradas las nuevas mediciones, mientras que las mediciones más antiguas serán consideradas menos importantes</string>
+    <string name="measure_interval_summary">Si se configura a 0, las mediciones se realizarán cada 10 segundos</string>
+
+    <!-- Battery Optimization message -->
+    <string name="battery_msg_title">Desactivar la optimización de bateria</string>
+    <string name="battery_msg_text">Para garantizar el correcto funcionamento de las mediciones en segundo plano, desactivar la optimización de bateria para esta app. Ignorar este mensaje activará las mediciones automáticas solo con la app en primer plano.</string>
+
+    <!-- Merge DB message -->
+    <string name="merge_msg_title">Unificación base de datos</string>
+    <string name="merge_msg_text">Ya existe una base de datos generada con este nombre de usuario, elegir este nombre de usuario unificará sus datos con los de tu base de datos. ¿Deseas continuar? Cancelar restaurará tu nombre de usuario anterior.</string>
+
+    <!-- Layer Preferences -->
+    <string name="list_title">Tipo de datos</string>
+    <string name="list_dialog_title">Selecciona los datos para mostrar</string>
+    <string name="none">Ninguno</string>
+    <string name="noise">Ruido</string>
+    <string name="network">Red móvil</string>
+    <string name="wifi">Wi-fi</string>
+    <string name="available_maps_title">Mapas disponibles</string>
+    <string name="delete_unselected_maps">Eliminar mapas no seleccionadas</string>
+    <string name="delete_maps_dialog_title">Eliminar mapas</string>
+    <string name="delete_maps_dialog_text">¿Deseas eliminar estos mapas?</string>
+
+    <!-- How to read the map -->
+    <string name="color_high_title">Intensidad alta</string>
+    <string name="color_high_description">Este color indica que la medición promedio del área tiene valor elevado (por ejemplo ruido: muy fuerte, red móvil: buena conexión)</string>
+    <string name="color_medium_title">Intensidad media</string>
+    <string name="color_medium_description">Este color indica que la medición promedio del área tiene valor medio</string>
+    <string name="color_low_title">Intensidad baja</string>
+    <string name="color_low_description">Este color indica que la medición promedio del área tiene valor bajo</string>
+
+    <!-- Account Preferences -->
+    <string name="account_name">Nombre de usuario</string>
+    <string name="skin_color">Color de piel</string>
+    <string name="select_color">Elige un color</string>
+
+    <!-- Colors -->
+    <string name="red">Rojo</string>
+    <string name="orange">Naranja</string>
+    <string name="blue">Azul</string>
+    <string name="light_blue">Azul claro</string>
+    <string name="green">Verde</string>
+    <string name="yellow">Amarillo</string>
+    <string name="pink_soft">Rosa suave</string>
+    <string name="pink_strong">Rosa brillante</string>
+    <string name="purple">Morado</string>
+    <string name="white">Blanco</string>
+    <string name="black">Negro</string>
+    <string name="gray">Gris</string>
+    <string name="skin_00">Piel 00</string>
+    <string name="skin_01">Piel 01</string>
+    <string name="skin_02">Piel 02</string>
+    <string name="skin_03">Piel 03</string>
+    <string name="skin_04">Piel 04</string>
+    <string name="skin_05">Piel 05</string>
+
+    <!-- Shop -->
+    <string name="purchase_denied">No tienes suficientes monedas transceiver para comprar este artículo</string>
+
+    <!-- Game -->
+    <string name="cannot_give_reward">Para recibir la recompensa, tienes que medir:</string> <!-- after this string there is the name of the measurement-->
+    <string name="you_earned">Has ganado</string> <!-- number of coins -->
+    <string name="coins">monedas transceiver</string>
+    <string name="too_far_title">Estás demasiado lejos</string>
+    <string name="too_far_text">Tienes que estar en el mismo cuadrado del objetivo para recibir la recompensa</string>
+    <string name="measurements_and_reward_title">Selecciona las mediciones y recibe tu recompensa</string>
+    <string name="generate_new_target">Genera nuevo objetivo</string>
+</resources>
