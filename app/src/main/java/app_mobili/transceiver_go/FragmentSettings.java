@@ -136,6 +136,7 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
         if (automaticMeasurements) {
             boolean foreground_permission = true;
             boolean notification_permission = true;
+            boolean background_permission = true;
 
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
                 foreground_permission = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.FOREGROUND_SERVICE) == PackageManager.PERMISSION_GRANTED;
@@ -146,8 +147,14 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
                 if (!notification_permission) requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
 
             }
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                background_permission = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
+                if (!background_permission) requestPermissionLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION);
 
-            if (foreground_permission && notification_permission) {
+            }
+
+
+            if (foreground_permission && notification_permission && background_permission) {
                 PowerManager powerManager = (PowerManager) requireActivity().getSystemService(Context.POWER_SERVICE);
                     if (!powerManager.isIgnoringBatteryOptimizations( requireContext().getPackageName())) {
                         // App is not exempt from battery optimization; show a pop-up to request exemption.
