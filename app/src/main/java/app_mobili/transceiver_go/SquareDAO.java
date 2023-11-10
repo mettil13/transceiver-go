@@ -11,6 +11,9 @@ import java.util.List;
 
 @Dao
 public interface SquareDAO {
+
+    // DAO has to be a complete interface, even if we don't use these methods,
+    // we might need them in the future, so i'll let the warnings be
     @Insert
     void addSquare(Square square);
     @Update

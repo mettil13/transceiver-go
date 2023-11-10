@@ -71,7 +71,7 @@ public class FragmentLayerSelector extends PreferenceFragmentCompat {
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
                     builder.setTitle(R.string.delete_maps_dialog_title)
-                        .setMessage(getResources().getString(R.string.delete_maps_dialog_text) + "\n" + toDeleteList.toString())
+                        .setMessage(getResources().getString(R.string.delete_maps_dialog_text) + "\n" + toDeleteList)
                         .setPositiveButton(R.string.yes, (dialog, which) -> {
                             for (String s : toDeleteList) {
                                 SquareDatabase db = Room.databaseBuilder(requireActivity(), SquareDatabase.class, s).addMigrations(SquareDatabase.migration).build();

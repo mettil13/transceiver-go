@@ -166,7 +166,6 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
 
         longitude = coordinateListener.getLongitude();
         latitude = coordinateListener.getLatitude();
-        Log.println(Log.ASSERT, "", "measurement coords: " + longitude + " " + latitude);
 
         int umts = networkSignalStrength.getUmtsSignalStrength();
         int lte = networkSignalStrength.getLteSignalStrength();
@@ -204,7 +203,6 @@ public class MeasurementSingleton implements NoiseStrength.RecordingListener {
 
             String dbname = sharedPreferences.getString("account_name", "user");
             SquareDatabase squaredb = Room.databaseBuilder(context, SquareDatabase.class, dbname).build();
-            Log.println(Log.ASSERT, "", "database built: " + squaredb.toString());
 
             Square square = new Square(longitude, latitude);
             // returns the square we're in, if it exists

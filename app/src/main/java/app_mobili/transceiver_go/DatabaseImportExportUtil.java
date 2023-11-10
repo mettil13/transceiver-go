@@ -29,7 +29,7 @@ import java.nio.file.Files;
 public class DatabaseImportExportUtil {
     private static final String TAG = "DatabaseImportExportUtil";
     private static final int REQUEST_CODE_EXPORT_DB = 69;
-    private static final int sleepTime = 1000; // ms
+
 
 
     /* -------------------------------------------------------------------------- */
@@ -76,7 +76,7 @@ public class DatabaseImportExportUtil {
 
     }
 
-    public static boolean changeDatabaseName(Context context, String oldName, String newName) {
+    public static void changeDatabaseName(Context context, String oldName, String newName) {
         try {
             // Close the old database
             SquareDatabase oldDatabase = Room.databaseBuilder(context, SquareDatabase.class, oldName).build();
@@ -91,13 +91,9 @@ public class DatabaseImportExportUtil {
                 // Reopen the database with the new name
                 SquareDatabase newDatabase = Room.databaseBuilder(context, SquareDatabase.class, newName).build();
                 newDatabase.close();
-                return true; // Database name changed successfully
-            } else {
-                return false; // Renaming failed
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return false; // An error occurred
         }
     }
 
@@ -125,6 +121,7 @@ public class DatabaseImportExportUtil {
             Uri selectedUri = data.getData();
             if (selectedUri != null) {
                 assert DocumentFile.fromSingleUri(activity, selectedUri) != null;
+                // asserted, but the warning is still present for some reason
                 String fileName = DocumentFile.fromSingleUri(activity, selectedUri).getName();
                 importSelectedFile(activity, selectedUri, fileName);
             }
@@ -210,7 +207,7 @@ public class DatabaseImportExportUtil {
 
     // deletes the database given in input, requires a context
     // returns true if successfully deleted, false otherwise
-    public static boolean deleteDatabase(SquareDatabase db, Context context) {
+    public static void deleteDatabase(SquareDatabase db, Context context) {
 
         // Close the database if it's open
         db.close();
@@ -222,14 +219,11 @@ public class DatabaseImportExportUtil {
         if (dbFile.exists()) {
             if (dbFile.delete()) {
                 Log.d("DatabaseDeletion", "Database deleted successfully");
-                return true;
             } else {
                 Log.e("DatabaseDeletion", "Failed to delete database");
-                return false;
             }
         } else {
             Log.d("DatabaseDeletion", "Database file does not exist");
-            return false;
         }
     }
 }

@@ -16,7 +16,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 
-import java.util.Date;
 
 @Entity(tableName = "Square")
 public class Square {
@@ -244,6 +243,7 @@ public class Square {
                 '}';
     }
 
+    // might be needed in the future, i'll let the warning be
     public static class LatitudeComparator implements java.util.Comparator<Square> {
         @Override
         public int compare(Square square1, Square square2) {

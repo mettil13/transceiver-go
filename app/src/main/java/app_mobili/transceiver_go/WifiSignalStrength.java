@@ -8,7 +8,6 @@ public class WifiSignalStrength extends Sensor{
     private final WifiManager wifiManager;
     private WifiInfo wifiInfo;
     private int signalStrength = 1; // Default value (dBm)
-    private int signalLevel = 0; // Default value
 
     // initialize and request information, ez! :>
     WifiSignalStrength(Context context) {
@@ -16,6 +15,8 @@ public class WifiSignalStrength extends Sensor{
 
         this.context = context;
     }
+
+    // Usable in the future, i'll let the warning be
     public int getSignalStrength() {
         if (wifiManager.isWifiEnabled()) {
             // Get the Wi-Fi connection info
@@ -28,6 +29,8 @@ public class WifiSignalStrength extends Sensor{
     }
 
     public int getSignalLevel() {
+        // Default value
+        int signalLevel;
         if (wifiManager.isWifiEnabled()) {
             // Get the Wi-Fi connection info
             wifiInfo = wifiManager.getConnectionInfo();

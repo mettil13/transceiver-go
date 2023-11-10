@@ -2,23 +2,19 @@ package app_mobili.transceiver_go;
 
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.AnimatedVectorDrawable;
 import android.location.Criteria;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -200,12 +196,6 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
                 squaredb.getSquareDAO().upsertSquare(square);
             }
             squaredb.close();
-/*
-            SquareDatabase aa = Room.databaseBuilder(this, SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
-            SquareDatabase bb = Room.databaseBuilder(this, SquareDatabase.class, "user").addMigrations(SquareDatabase.migration).build();
-            bb.getSquareDAO().getSquare("a");
-
- */
 
         }).start();
 
@@ -224,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
         inflater.inflate(R.menu.coins, menu);
 
         View layout = menu.getItem(0).getActionView();
+        assert layout != null;
         coinsNumber = layout.findViewById(R.id.coins_number);
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
         updateCoinsMenu();

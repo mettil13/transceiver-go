@@ -47,7 +47,7 @@ public class NoiseStrength extends Sensor {
             return;
         }
         // Check for the RECORD_AUDIO permission at runtime
-        if (!hasPermission(activity)) {
+        if (hasNotPermission(activity)) {
             return;
         }
         audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT, bufferSize);
@@ -170,7 +170,7 @@ public class NoiseStrength extends Sensor {
         }
 
         // Check for the RECORD_AUDIO permission at runtime
-        if (!hasPermission(activity)) {
+        if (hasNotPermission(activity)) {
             return;
         }
         audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT, bufferSize);
@@ -212,7 +212,7 @@ public class NoiseStrength extends Sensor {
         }
 
         // Check for the RECORD_AUDIO permission at runtime
-        if (!hasPermission(activity)) {
+        if (hasNotPermission(activity)) {
             return;
         }
 
@@ -234,18 +234,18 @@ public class NoiseStrength extends Sensor {
 
     // needs to be like this for human readability
     // i know it's always inverted
-    private boolean hasPermission(Activity activity){
+    private boolean hasNotPermission(Activity activity){
         if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {
             if(activity == null){
-                return false;
+                return true;
             }
             // Request the RECORD_AUDIO permission
             ActivityCompat.requestPermissions(activity,
                     new String[]{android.Manifest.permission.RECORD_AUDIO},
                     RECORD_AUDIO_PERMISSION_REQUEST_CODE);
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 }
