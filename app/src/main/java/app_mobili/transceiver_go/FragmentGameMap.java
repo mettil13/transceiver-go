@@ -96,7 +96,7 @@ public class FragmentGameMap extends FragmentMainMap {
             ActivityCompat.requestPermissions(requireActivity(),
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                     809);
-            // ask permissions and return, if we don't have 'em we do nothing
+            // ask permissions and return, if we don't have them we do nothing
             return;
         }
 
@@ -312,10 +312,10 @@ public class FragmentGameMap extends FragmentMainMap {
 
             Context context = getContext();
             if (context != null) {
-                String typeOfData = PreferenceManager.getDefaultSharedPreferences(context).getString("type_of_data", "None");
                 Square currentTarget = gameInstance.getCurrentTarget();
 
                 if (currentTarget == null) {
+                    String typeOfData = PreferenceManager.getDefaultSharedPreferences(context).getString("type_of_data", "None");
                     currentTarget = gameInstance.generateNewTarget(lastDrawnSquares, typeOfData); // if lastDrawnSquares is null, then also currentTarget is set to null
                 }
 
@@ -324,7 +324,7 @@ public class FragmentGameMap extends FragmentMainMap {
                     public void run() {
 
                         Context context = getContext();
-                        if(context != null){
+                        if (context != null) {
                             if (finalCurrentTarget == null) {
                                 gameMarker.setVisibility(View.INVISIBLE);
                             } else {

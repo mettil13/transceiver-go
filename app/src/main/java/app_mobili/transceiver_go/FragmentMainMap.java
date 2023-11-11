@@ -104,7 +104,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
 
         // makes squares clickable
         map.setOnPolygonClickListener(new GoogleMap.OnPolygonClickListener() {
-            public void onPolygonClick(Polygon polygon) {
+            public void onPolygonClick(@NonNull Polygon polygon) {
                 Toast.makeText(getContext(), polygon.getTag().toString(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -392,7 +392,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
                 requireActivity().runOnUiThread(new Runnable() {
                     public void run() {
                         Polygon drawnSquare = drawSquareOfType(typeOfData, tileToDraw);
-                        if(getValueOfType(typeOfData, tileToDraw) >= 0){
+                        if (getValueOfType(typeOfData, tileToDraw) >= 0) {
                             drawnSquare.setClickable(true);
                             drawnSquare.setTag(getLabelBasedOnType(typeOfData) + ": " + getValueOfType(typeOfData, tileToDraw));
                         }

@@ -23,7 +23,6 @@ public class FragmentLayerSelector extends PreferenceFragmentCompat {
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.layer_selector, rootKey);
         PreferenceCategory category = findPreference("available_maps");
-        //Preference pref = (Preference) findPreference("my_database");
 
         XmlPullParser parser = getResources().getXml(R.xml.layer_preference_list);
         try {

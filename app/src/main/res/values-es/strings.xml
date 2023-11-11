@@ -71,7 +71,7 @@
 
     <!-- Merge DB message -->
     <string name="merge_msg_title">Unificación base de datos</string>
-    <string name="merge_msg_text">Ya existe una base de datos generada con este nombre de usuario, elegir este nombre de usuario unificará sus datos con los de tu base de datos. ¿Deseas continuar? Cancelar restaurará tu nombre de usuario anterior.</string>
+    <string name="merge_msg_text">Ya existe una base de datos generada con este nombre de usuario, elegir este nombre de usuario la destruirá reemplazándola con tu base de datos. ¿Deseas continuar? Cancelar restaurará tu nombre de usuario anterior.</string>
 
     <!-- Layer Preferences -->
     <string name="list_title">Tipo de datos</string>
