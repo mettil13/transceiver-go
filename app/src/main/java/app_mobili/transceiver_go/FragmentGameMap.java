@@ -1,18 +1,15 @@
 package app_mobili.transceiver_go;
 
-import static android.content.Context.LOCATION_SERVICE;
-
 import android.Manifest;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -20,10 +17,8 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
-import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,13 +37,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link FragmentGameMap#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class FragmentGameMap extends FragmentMainMap {
 
     private Latitude myLocationLatitude;
@@ -75,13 +64,13 @@ public class FragmentGameMap extends FragmentMainMap {
         super.onViewCreated(view, savedInstanceState);
         gameInstance = new GameManager();
         // creates the my position avatar
-        myAvatarSkin = new ImageView(getContext());
-        myAvatarClothes = new ImageView(getContext());
-        myAvatarHat = new ImageView(getContext());
+        myAvatarSkin = new ImageView(requireContext());
+        myAvatarClothes = new ImageView(requireContext());
+        myAvatarHat = new ImageView(requireContext());
         setUpMyAvatar(myAvatarSkin, myAvatarClothes, myAvatarHat);
 
         //creates the target marker
-        gameMarker = new ImageView(getContext());
+        gameMarker = new ImageView(requireContext());
         setUpGameMarker(gameMarker);
     }
 
@@ -91,7 +80,6 @@ public class FragmentGameMap extends FragmentMainMap {
         CameraPosition position = map.getCameraPosition();
         map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().target(position.target).tilt(90).zoom(position.zoom).build()));
 
-        View defaultOrientationButton = getView().findViewById((int) 5);
         orientationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -101,24 +89,22 @@ public class FragmentGameMap extends FragmentMainMap {
             }
         });
 
-        if (ActivityCompat.checkSelfPermission(getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(),
+        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(),
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     808);
-            ActivityCompat.requestPermissions(getActivity(),
+            ActivityCompat.requestPermissions(requireActivity(),
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                     809);
             // ask permissions and return, if we don't have 'em we do nothing
             return;
         }
-        LocationManager lm = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
-        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER); // todo controlla che non sia null
 
-        if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).startListenForCoordinates(new CoordinateListener() {
+        if (requireActivity() instanceof MainActivity) {
+            ((MainActivity) requireActivity()).startListenForCoordinates(new CoordinateListener() {
                 @Override
                 public void onLocationChanged(@NonNull Location location) {
-                    Log.println(Log.ASSERT, "", new Date() + " " + location.getLatitude() + " " + location.getLongitude());
+                    Log.println(Log.ASSERT, "", "Game location updated:" + new Date() + " " + location.getLatitude() + " " + location.getLongitude());
                     if (myLocationLatitude == null || myLocationLongitude == null) { // if a previous location does not exist, make the old location equal to the current one
                         oldLocationLatitude = new Latitude(location.getLatitude());
                         oldLocationLongitude = new Longitude(location.getLongitude());
@@ -206,10 +192,10 @@ public class FragmentGameMap extends FragmentMainMap {
     }
 
     private void setUpMyAvatar(ImageView avatarSkin, ImageView avatarClothes, ImageView avatarHat) {
-        LorenzoHelper.buildLorenzoWalkFromPreferences(getContext(), avatarSkin, avatarClothes, avatarHat);
-        ((android.widget.FrameLayout) getView().findViewById(R.id.fragment_main_map_layout)).addView(avatarSkin);
-        ((android.widget.FrameLayout) getView().findViewById(R.id.fragment_main_map_layout)).addView(avatarClothes);
-        ((android.widget.FrameLayout) getView().findViewById(R.id.fragment_main_map_layout)).addView(avatarHat);
+        LorenzoHelper.buildLorenzoWalkFromPreferences(requireContext(), avatarSkin, avatarClothes, avatarHat);
+        ((android.widget.FrameLayout) requireView().findViewById(R.id.fragment_main_map_layout)).addView(avatarSkin);
+        ((android.widget.FrameLayout) requireView().findViewById(R.id.fragment_main_map_layout)).addView(avatarClothes);
+        ((android.widget.FrameLayout) requireView().findViewById(R.id.fragment_main_map_layout)).addView(avatarHat);
 
         // resize the images
         ViewGroup.LayoutParams skinParams = avatarSkin.getLayoutParams();
@@ -243,21 +229,19 @@ public class FragmentGameMap extends FragmentMainMap {
 
     private void setUpGameMarker(ImageView gameMarker) {
         gameMarker.setImageResource(R.drawable.marker);
-        ((android.widget.FrameLayout) getView().findViewById(R.id.fragment_main_map_layout)).addView(gameMarker);
+        ((android.widget.FrameLayout) requireView().findViewById(R.id.fragment_main_map_layout)).addView(gameMarker);
 
         // resize the images
         ViewGroup.LayoutParams sizeParams = gameMarker.getLayoutParams();
         sizeParams.height = 200; // pixels
         sizeParams.width = 200;
 
-        FragmentGameMap thisFragment = this;
-
         gameMarker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().target(new LatLng(gameMarkerLatitude.getValue(), gameMarkerLongitude.getValue())).zoom(map.getCameraPosition().zoom).bearing(map.getCameraPosition().bearing).tilt(map.getCameraPosition().tilt).build()));
 
-                String typeOfData = PreferenceManager.getDefaultSharedPreferences(getContext()).getString("type_of_data", "None");
+                String typeOfData = PreferenceManager.getDefaultSharedPreferences(requireContext()).getString("type_of_data", "None");
                 Square playerSquare = new Square(myLocationLongitude.getValue(), myLocationLatitude.getValue());
                 if (playerSquare.getLatitude().getValue() == gameInstance.getCurrentTarget().getLatitude().getValue() && playerSquare.getLongitude().getValue() == gameInstance.getCurrentTarget().getLongitude().getValue()) {
                     createGameMeasurementDialog(typeOfData);
@@ -286,7 +270,7 @@ public class FragmentGameMap extends FragmentMainMap {
             myPositionOnScreen.y = gameMarker.getLayoutParams().height;
         }
 
-        View view = getView();
+        View view = getView(); // in case moveGameMarker is called before the map view is fully loaded
         if (view != null) {
             if (myPositionOnScreen.x > view.getMeasuredWidth() - gameMarker.getLayoutParams().width / 2) {
                 myPositionOnScreen.x = view.getMeasuredWidth() - gameMarker.getLayoutParams().width / 2;
@@ -308,13 +292,9 @@ public class FragmentGameMap extends FragmentMainMap {
 
         LatLng convertedTargetPosition = map.getProjection().fromScreenLocation(targetPositionOnScreen);
         if (convertedTargetPosition != null) { //this warning is not true: convertedTargetPosition becomes null when an overflow occurs!
-            LatLng roundedConvertedTargetPosition = new LatLng(BigDecimal.valueOf(convertedTargetPosition.latitude).setScale(precision, RoundingMode.HALF_UP).doubleValue(), BigDecimal.valueOf(convertedTargetPosition.longitude).setScale(precision, RoundingMode.HALF_UP).doubleValue());;
+            LatLng roundedConvertedTargetPosition = new LatLng(BigDecimal.valueOf(convertedTargetPosition.latitude).setScale(precision, RoundingMode.HALF_UP).doubleValue(), BigDecimal.valueOf(convertedTargetPosition.longitude).setScale(precision, RoundingMode.HALF_UP).doubleValue());
 
-            if (roundedConvertedTargetPosition.longitude != roundedTargetPosition.longitude || roundedConvertedTargetPosition.latitude != roundedTargetPosition.latitude) {
-                return true;
-            } else {
-                return false;
-            }
+            return (roundedConvertedTargetPosition.longitude != roundedTargetPosition.longitude || roundedConvertedTargetPosition.latitude != roundedTargetPosition.latitude);
         } else {
             return true;
         }
@@ -330,30 +310,35 @@ public class FragmentGameMap extends FragmentMainMap {
             } catch (InterruptedException ignored) {
             }
 
-            String typeOfData = PreferenceManager.getDefaultSharedPreferences(getContext()).getString("type_of_data", "None");
-            Square currentTarget = gameInstance.getCurrentTarget();
+            Context context = getContext();
+            if (context != null) {
+                String typeOfData = PreferenceManager.getDefaultSharedPreferences(context).getString("type_of_data", "None");
+                Square currentTarget = gameInstance.getCurrentTarget();
 
-            if (currentTarget == null) {
-                currentTarget = gameInstance.generateNewTarget(lastDrawnSquares, typeOfData); // if lastDrawnSquares is null, then also currentTarget is set to null
-            }
-
-            Square finalCurrentTarget = currentTarget;
-            getActivity().runOnUiThread(new Runnable() {
-                public void run() {
-
-                    if (finalCurrentTarget == null) {
-                        gameMarker.setVisibility(View.INVISIBLE);
-                    } else {
-                        finalCurrentTarget.drawTile(map, ContextCompat.getColor(getContext(), R.color.game_target_border), ContextCompat.getColor(getContext(), R.color.game_target_filler));
-                        gameMarkerLatitude = finalCurrentTarget.getLatitude();
-                        gameMarkerLongitude = finalCurrentTarget.getLongitude();
-                        gameMarker.setVisibility(View.VISIBLE);
-                        moveGameMarker(gameMarkerLatitude, gameMarkerLongitude);
-                    }
-
+                if (currentTarget == null) {
+                    currentTarget = gameInstance.generateNewTarget(lastDrawnSquares, typeOfData); // if lastDrawnSquares is null, then also currentTarget is set to null
                 }
-            });
 
+                Square finalCurrentTarget = currentTarget;
+                requireActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+
+                        Context context = getContext();
+                        if(context != null){
+                            if (finalCurrentTarget == null) {
+                                gameMarker.setVisibility(View.INVISIBLE);
+                            } else {
+                                finalCurrentTarget.drawTile(map, ContextCompat.getColor(context, R.color.game_target_border), ContextCompat.getColor(context, R.color.game_target_filler));
+                                gameMarkerLatitude = finalCurrentTarget.getLatitude();
+                                gameMarkerLongitude = finalCurrentTarget.getLongitude();
+                                gameMarker.setVisibility(View.VISIBLE);
+                                moveGameMarker(gameMarkerLatitude, gameMarkerLongitude);
+                            }
+                        }
+
+                    }
+                });
+            }
 
         }).start();
 
@@ -410,7 +395,7 @@ public class FragmentGameMap extends FragmentMainMap {
             selectedItems.add(getResources().getStringArray(R.array.type_of_data_values)[indexOfMandatoryType + 1]);
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         builder.setTitle(getResources().getString(R.string.measurements_and_reward_title))
                 .setMultiChoiceItems(entries, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
@@ -426,10 +411,9 @@ public class FragmentGameMap extends FragmentMainMap {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         if (selectedItems.contains(getResources().getStringArray(R.array.type_of_data_values)[indexOfMandatoryType + 1])) {
-                            Log.println(Log.ASSERT, "", "" + selectedItems);
-                            Activity currentActivity = getActivity();
+                            Activity currentActivity = requireActivity();
                             if (currentActivity instanceof MainActivity) {
-                                MeasurementSingleton measurementSingleton = MeasurementSingleton.create(getContext(), new CoordinateListener() {
+                                MeasurementSingleton measurementSingleton = MeasurementSingleton.create(requireContext(), new CoordinateListener() {
                                     // without this execution on api 24 would result in a crash
                                     @Override
                                     public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -449,13 +433,13 @@ public class FragmentGameMap extends FragmentMainMap {
                                     coinsReward += getResources().getInteger(R.integer.square_single_measurement_reward);
                                 }
                                 addCoins(coinsReward);
-                                Toast.makeText(getContext(), getResources().getText(R.string.you_earned) + " " + coinsReward + " " + getResources().getString(R.string.coins), Toast.LENGTH_LONG).show();
+                                Toast.makeText(requireContext(), getResources().getText(R.string.you_earned) + " " + coinsReward + " " + getResources().getString(R.string.coins), Toast.LENGTH_LONG).show();
                                 gameInstance.generateNewTarget(lastDrawnSquares, typeOfData);
                                 onCameraIdle();
                             }
 
                         } else {
-                            Toast.makeText(getContext(), getResources().getText(R.string.cannot_give_reward) + " " + getResources().getStringArray(R.array.type_of_data_entries)[indexOfMandatoryType + 1], Toast.LENGTH_LONG).show();
+                            Toast.makeText(requireContext(), getResources().getText(R.string.cannot_give_reward) + " " + getResources().getStringArray(R.array.type_of_data_entries)[indexOfMandatoryType + 1], Toast.LENGTH_LONG).show();
                         }
                     }
                 }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -467,7 +451,7 @@ public class FragmentGameMap extends FragmentMainMap {
     }
 
     private void addCoins(int coins) {
-        int oldCoins = PreferenceManager.getDefaultSharedPreferences(getContext()).getInt("coins", 0);
-        PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putInt("coins", oldCoins + coins).apply();
+        int oldCoins = PreferenceManager.getDefaultSharedPreferences(requireContext()).getInt("coins", 0);
+        PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putInt("coins", oldCoins + coins).apply();
     }
 }

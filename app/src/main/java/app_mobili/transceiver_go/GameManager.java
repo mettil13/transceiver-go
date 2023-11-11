@@ -1,7 +1,5 @@
 package app_mobili.transceiver_go;
 
-import com.google.android.gms.maps.GoogleMap;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;

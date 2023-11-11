@@ -27,7 +27,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
-import androidx.room.Room;
 
 
 import app_mobili.transceiver_go.databinding.ActivityMainBinding;
@@ -93,111 +92,20 @@ public class MainActivity extends AppCompatActivity implements NoiseStrength.Rec
             startService(serviceIntent);
         }
 
-
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.mapButton:
-                    replaceFragment(R.id.fragmentContainer, mainMap);
-                    break;
-                case R.id.gameButton:
-                    replaceFragment(R.id.fragmentContainer, gameMap);
-                    break;
-                case R.id.accountSettingsButton:
-                    replaceFragment(R.id.fragmentContainer, account);
-                    break;
-                case R.id.settingsButton:
-                    replaceFragment(R.id.fragmentContainer, settings);
-                    break;
+            if(item.getItemId() == R.id.mapButton){
+                replaceFragment(R.id.fragmentContainer, mainMap);
+            } else if(item.getItemId() == R.id.gameButton){
+                replaceFragment(R.id.fragmentContainer, gameMap);
+            } else if(item.getItemId() == R.id.accountSettingsButton){
+                replaceFragment(R.id.fragmentContainer, account);
+            } else if(item.getItemId() == R.id.settingsButton){
+                replaceFragment(R.id.fragmentContainer, settings);
             }
+
             return true;
         });
         replaceFragment(R.id.fragmentContainer, mainMap);
-
-
-        new Thread(() -> {
-            this.deleteDatabase("squaredb");
-            // setting the database
-            SquareDatabase squaredb = Room.databaseBuilder(this, SquareDatabase.class, "squaredb").addMigrations(SquareDatabase.migration).build();
-
-            //Square s1;
-            {
-                Square square = new Square(1, 1);
-                square.setNoise(100);
-                squaredb.getSquareDAO().upsertSquare(square);
-            }
-            {
-                Square square = new Square(0, 0);
-                square.setNoise(5);
-                squaredb.getSquareDAO().upsertSquare(square);
-            }
-            {
-                Square square = new Square(10, 10);
-                square.setNoise(100);
-                squaredb.getSquareDAO().upsertSquare(square);
-            }
-            {
-                Square square = new Square(10, 5);
-                square.setNoise(100);
-                squaredb.getSquareDAO().upsertSquare(square);
-            }
-            {
-                Square square = new Square(10, 15);
-                square.setNoise(10);
-                squaredb.getSquareDAO().upsertSquare(square);
-            }
-            {
-                Square square = new Square(20, 0);
-                square.setNoise(10);
-                squaredb.getSquareDAO().upsertSquare(square);
-            }
-            {
-                Square square = new Square(1, -10);
-                square.setNoise(10);
-                squaredb.getSquareDAO().upsertSquare(square);
-            }
-            {
-                Square square = new Square(-15, 5);
-                square.setNoise(100);
-                squaredb.getSquareDAO().upsertSquare(square);
-            }
-            {
-                Square square = new Square(-5, -5);
-                square.setNoise(100);
-                squaredb.getSquareDAO().upsertSquare(square);
-            }
-            {
-                Square square = new Square(-5, 10);
-                square.setNoise(100);
-                squaredb.getSquareDAO().upsertSquare(square);
-            }
-            {
-                Square square = new Square(11.4, 44.500);
-                square.setNoise(100);
-                squaredb.getSquareDAO().upsertSquare(square);
-            }
-            {
-                Square square = new Square(11.4, 44.501);
-                square.setNoise(50);
-                squaredb.getSquareDAO().upsertSquare(square);
-            }
-            {
-                Square square = new Square(11.393, 44.472);
-                square.setNoise(50);
-                squaredb.getSquareDAO().upsertSquare(square);
-            }
-            {
-                Square square = new Square(11.393, 44.473);
-                square.setNoise(10);
-                squaredb.getSquareDAO().upsertSquare(square);
-            }
-            {
-                Square square = new Square(11.394963, 44.473466);
-                square.setNoise(100);
-                squaredb.getSquareDAO().upsertSquare(square);
-            }
-            squaredb.close();
-
-        }).start();
 
     }
 

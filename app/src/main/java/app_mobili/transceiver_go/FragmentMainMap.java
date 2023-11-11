@@ -2,7 +2,6 @@ package app_mobili.transceiver_go;
 
 import android.animation.ObjectAnimator;
 import android.app.Activity;
-import android.database.Cursor;
 import android.graphics.Point;
 import android.os.Bundle;
 
@@ -14,9 +13,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
 import androidx.room.Room;
-import androidx.sqlite.db.SimpleSQLiteQuery;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,32 +23,20 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
-import com.google.android.gms.maps.model.PolygonOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.maps.android.heatmaps.Gradient;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
-import com.google.maps.android.heatmaps.WeightedLatLng;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link FragmentMainMap#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class FragmentMainMap extends Fragment implements OnMapReadyCallback, GoogleMap.OnCameraMoveStartedListener, GoogleMap.OnCameraMoveListener, GoogleMap.OnCameraIdleListener {
     protected GoogleMap map;
     protected FloatingActionButton orientationButton;
@@ -65,14 +50,6 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         // Required empty public constructor
     }
 
-
-    public static FragmentMainMap newInstance(String param1, String param2) {
-        FragmentMainMap fragment = new FragmentMainMap();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,7 +60,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_main_map, container, false);
 
-        FloatingActionButton layerButton = (FloatingActionButton) view.findViewById(R.id.layerButton);
+        FloatingActionButton layerButton = view.findViewById(R.id.layerButton);
         layerSelector = new FragmentLayerSelector();
         layerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,18 +110,18 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         });
 
         // hides default compass button and creates another one with the same use (just an aesthetic thing)
-        View defalutOrientationButton = getView().findViewById((int) 5); // "5" is the id of google maps compass button
+        View defaultOrientationButton = requireView().findViewById((int) 5); // "5" is the id of google maps compass button
         // Change the visibility of compass button
-        if (defalutOrientationButton != null) {
-            defalutOrientationButton.setVisibility(View.GONE);
+        if (defaultOrientationButton != null) {
+            defaultOrientationButton.setVisibility(View.GONE);
         }
 
-        orientationButton = (FloatingActionButton) getView().findViewById(R.id.orientationButton);
+        orientationButton = requireView().findViewById(R.id.orientationButton);
         orientationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (defalutOrientationButton != null) {
-                    defalutOrientationButton.callOnClick();
+                if (defaultOrientationButton != null) {
+                    defaultOrientationButton.callOnClick();
                 }
             }
         });
@@ -211,7 +188,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         Longitude positiveLeft = truncateLongitudeToEasternHemisphere(topLeftX, bottomRightX) != null ? truncateLongitudeToEasternHemisphere(topLeftX, bottomRightX)[0] : null;
         Longitude positiveRight = truncateLongitudeToEasternHemisphere(topLeftX, bottomRightX) != null ? truncateLongitudeToEasternHemisphere(topLeftX, bottomRightX)[1] : null;
 
-        String typeOfData = PreferenceManager.getDefaultSharedPreferences(getContext()).getString("type_of_data", "None");
+        String typeOfData = PreferenceManager.getDefaultSharedPreferences(requireContext()).getString("type_of_data", "None");
 
         new Thread(() -> {
             lastDrawnSquares = new ArrayList<>();
@@ -234,7 +211,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         Longitude positiveLeft = truncateLongitudeToEasternHemisphere(topLeftX, bottomRightX) != null ? truncateLongitudeToEasternHemisphere(topLeftX, bottomRightX)[0] : null;
         Longitude positiveRight = truncateLongitudeToEasternHemisphere(topLeftX, bottomRightX) != null ? truncateLongitudeToEasternHemisphere(topLeftX, bottomRightX)[1] : null;
 
-        String typeOfData = PreferenceManager.getDefaultSharedPreferences(getContext()).getString("type_of_data", "None");
+        String typeOfData = PreferenceManager.getDefaultSharedPreferences(requireContext()).getString("type_of_data", "None");
 
         new Thread(() -> {
             Map<String, Square> squaresWithData = new HashMap<>();
@@ -252,9 +229,9 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
                 switch (typeOfData) {
                     case "Noise":
                         if (square.getNoise() >= 0) {
-                            if (square.getNoise() <= getContext().getResources().getInteger(R.integer.noise_low_upper_bound)) {
+                            if (square.getNoise() <= requireContext().getResources().getInteger(R.integer.noise_low_upper_bound)) {
                                 heatmapPointsLow.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
-                            } else if (square.getNoise() <= getContext().getResources().getInteger(R.integer.noise_medium_upper_bound)) {
+                            } else if (square.getNoise() <= requireContext().getResources().getInteger(R.integer.noise_medium_upper_bound)) {
                                 heatmapPointsLow.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
                                 heatmapPointsMedium.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
                             } else {
@@ -266,9 +243,9 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
                         break;
                     case "Network":
                         if (square.getNetwork() >= 0) {
-                            if (square.getNetwork() <= getContext().getResources().getInteger(R.integer.network_low_upper_bound)) {
+                            if (square.getNetwork() <= requireContext().getResources().getInteger(R.integer.network_low_upper_bound)) {
                                 heatmapPointsLow.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
-                            } else if (square.getNetwork() <= getContext().getResources().getInteger(R.integer.network_medium_upper_bound)) {
+                            } else if (square.getNetwork() <= requireContext().getResources().getInteger(R.integer.network_medium_upper_bound)) {
                                 heatmapPointsLow.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
                                 heatmapPointsMedium.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
                             } else {
@@ -280,9 +257,9 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
                         break;
                     case "Wi-fi":
                         if (square.getWifi() >= 0) {
-                            if (square.getWifi() <= getContext().getResources().getInteger(R.integer.wifi_low_upper_bound)) {
+                            if (square.getWifi() <= requireContext().getResources().getInteger(R.integer.wifi_low_upper_bound)) {
                                 heatmapPointsLow.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
-                            } else if (square.getWifi() <= getContext().getResources().getInteger(R.integer.wifi_medium_upper_bound)) {
+                            } else if (square.getWifi() <= requireContext().getResources().getInteger(R.integer.wifi_medium_upper_bound)) {
                                 heatmapPointsLow.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
                                 heatmapPointsMedium.add(new LatLng(square.latitude.getValue(), square.longitude.getValue()));
                             } else {
@@ -295,19 +272,19 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
                 }
             });
 
-            Gradient gradientLow = new Gradient(new int[]{ContextCompat.getColor(getContext(), R.color.low_intensity_border)}, new float[]{0.50f}, 3);
-            Gradient gradientMedium = new Gradient(new int[]{ContextCompat.getColor(getContext(), R.color.medium_intensity_border)}, new float[]{0.50f}, 3);
-            Gradient gradientHigh = new Gradient(new int[]{ContextCompat.getColor(getContext(), R.color.high_intensity_border)}, new float[]{0.50f}, 3);
+            Gradient gradientLow = new Gradient(new int[]{ContextCompat.getColor(requireContext(), R.color.low_intensity_border)}, new float[]{0.50f}, 3);
+            Gradient gradientMedium = new Gradient(new int[]{ContextCompat.getColor(requireContext(), R.color.medium_intensity_border)}, new float[]{0.50f}, 3);
+            Gradient gradientHigh = new Gradient(new int[]{ContextCompat.getColor(requireContext(), R.color.high_intensity_border)}, new float[]{0.50f}, 3);
 
 
-            getActivity().runOnUiThread(new Runnable() {
+            requireActivity().runOnUiThread(new Runnable() {
                 public void run() {
                     if (!heatmapPointsLow.isEmpty()) {
                         heatmapProvider = new HeatmapTileProvider.Builder().data(heatmapPointsLow).build();
                         heatmapProvider.setRadius(calculateProperHeatmapRadiusBasedOnZoom(map.getCameraPosition().zoom)); // HeatmapTileProvider.Builder().radius() accepts only values between 0 and 50, provider.setRadius() instead accepts every value
                         heatmapProvider.setMaxIntensity(1);
                         heatmapProvider.setGradient(gradientLow);
-                        TileOverlay overlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(heatmapProvider));
+                        map.addTileOverlay(new TileOverlayOptions().tileProvider(heatmapProvider));
                     }
 
                     if (!heatmapPointsMedium.isEmpty()) {
@@ -315,7 +292,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
                         heatmapProvider.setRadius(calculateProperHeatmapRadiusBasedOnZoom(map.getCameraPosition().zoom)); // HeatmapTileProvider.Builder().radius() accepts only values between 0 and 50, provider.setRadius() instead accepts every value
                         heatmapProvider.setMaxIntensity(1);
                         heatmapProvider.setGradient(gradientMedium);
-                        TileOverlay overlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(heatmapProvider));
+                        map.addTileOverlay(new TileOverlayOptions().tileProvider(heatmapProvider));
 
                     }
 
@@ -324,7 +301,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
                         heatmapProvider.setRadius(calculateProperHeatmapRadiusBasedOnZoom(map.getCameraPosition().zoom)); // HeatmapTileProvider.Builder().radius() accepts only values between 0 and 50, provider.setRadius() instead accepts every value
                         heatmapProvider.setMaxIntensity(1);
                         heatmapProvider.setGradient(gradientHigh);
-                        TileOverlay overlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(heatmapProvider));
+                        map.addTileOverlay(new TileOverlayOptions().tileProvider(heatmapProvider));
 
                     }
 
@@ -388,13 +365,13 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
     protected Polygon drawSquareOfType(String typeOfData, Square squareToDraw) {
         switch (typeOfData) {
             case "Noise":
-                return squareToDraw.drawNoiseTile(map, getContext());
+                return squareToDraw.drawNoiseTile(map, requireContext());
             case "Network":
-                return squareToDraw.drawNetworkTile(map, getContext());
+                return squareToDraw.drawNetworkTile(map, requireContext());
             case "Wi-fi":
-                return squareToDraw.drawWifiTile(map, getContext());
+                return squareToDraw.drawWifiTile(map, requireContext());
             default:
-                return squareToDraw.drawEmptyTile(map, getContext());
+                return squareToDraw.drawEmptyTile(map, requireContext());
         }
     }
 
@@ -412,7 +389,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
                 }
 
                 Square tileToDraw = squaresToDraw[i][j];
-                getActivity().runOnUiThread(new Runnable() {
+                requireActivity().runOnUiThread(new Runnable() {
                     public void run() {
                         Polygon drawnSquare = drawSquareOfType(typeOfData, tileToDraw);
                         if(getValueOfType(typeOfData, tileToDraw) >= 0){
@@ -435,7 +412,6 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         Point p2 = map.getProjection().toScreenLocation(new LatLng(new Latitude(map.getCameraPosition().target.latitude).add(Square.SIDE_LENGTH).getValue(), new Longitude(map.getCameraPosition().target.longitude).add(Square.SIDE_LENGTH).getValue()));
         int distanceInPixel = (int) (Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2)) / 2);
         if (distanceInPixel > minClusterDimensionInPixel && distanceInPixel <= 500) {
-            Log.println(Log.ASSERT, "", "" + distanceInPixel);
             return distanceInPixel;
         } else if (distanceInPixel > 500) { // NEVER use the heatmap with this zoom level or higher: an OutOfMemoryError may occur
             return 500;
@@ -446,9 +422,9 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
 
     protected List<String> getActiveMapNames() {
         List<String> ret = new ArrayList<>();
-        String[] dbList = getContext().databaseList();
+        String[] dbList = requireContext().databaseList();
         for (String s : dbList) {
-            if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(s, false)) {
+            if (PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean(s, false)) {
                 ret.add(s);
             }
         }
@@ -463,7 +439,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         Map<String, Integer> numberOfWifi = new HashMap<>();
         // gets the squares from all the active databases
         for (String name : mapNames) {
-            SquareDatabase squaredb = Room.databaseBuilder(getActivity(), SquareDatabase.class, name).addMigrations(SquareDatabase.migration).build();
+            SquareDatabase squaredb = Room.databaseBuilder(requireContext(), SquareDatabase.class, name).addMigrations(SquareDatabase.migration).build();
             List<Square> list = squaredb.getSquareDAO().getAllSquaresInPositiveHemisphereRange(topLeftX.getValue(), topLeftY.getValue(), bottomRightX.getValue(), bottomRightY.getValue());
             list.forEach(square -> {
                 if (easternSquaresWithData.containsKey(square.getSquareId())) {
@@ -509,7 +485,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         Map<String, Integer> numberOfWifi = new HashMap<>();
         // gets the squares from all the active databases
         for (String name : mapNames) {
-            SquareDatabase squaredb = Room.databaseBuilder(getActivity(), SquareDatabase.class, name).addMigrations(SquareDatabase.migration).build();
+            SquareDatabase squaredb = Room.databaseBuilder(requireContext(), SquareDatabase.class, name).addMigrations(SquareDatabase.migration).build();
             List<Square> list = squaredb.getSquareDAO().getAllSquaresInNegativeHemisphereRange(topLeftX.getValue(), topLeftY.getValue(), bottomRightX.getValue(), bottomRightY.getValue());
             list.forEach(square -> {
                 if (westernSquaresWithData.containsKey(square.getSquareId())) {

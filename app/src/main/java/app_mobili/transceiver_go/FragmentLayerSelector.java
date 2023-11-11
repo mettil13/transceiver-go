@@ -3,7 +3,6 @@ package app_mobili.transceiver_go;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.Xml;
 
 import androidx.preference.CheckBoxPreference;
@@ -62,7 +61,6 @@ public class FragmentLayerSelector extends PreferenceFragmentCompat {
                 List<String> toDeleteList = new ArrayList<>();
                 for (String s : dbList) {
                     if (!s.endsWith("-wal") && !s.endsWith("-shm") && !PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean(s, true)) {
-                        Log.println(Log.ASSERT, "", "I should delete " + s);
                         toDeleteList.add(s);
                     }
                 }

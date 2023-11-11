@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.Locale;
 
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 
@@ -57,9 +56,6 @@ public class MeasurementService extends Service {
             if(noise_measurement) {
                 measurementSingleton.takeNoiseMeasurement(null);
             }
-
-            // Perform your task here
-            Log.d("LuizoMeasure", "Task executed at: " + System.currentTimeMillis());
 
             // Reschedule the task to run again in X minutes if needed
             if (automatic_measurements) {
@@ -101,7 +97,6 @@ public class MeasurementService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // Start the task when the service is started
-        Log.d("LuizoMeasure", "Service started");
         handler.post(measuringRun);
 
         handler.post(updateTimeRunnable);

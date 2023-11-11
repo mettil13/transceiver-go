@@ -1,7 +1,6 @@
 package app_mobili.transceiver_go;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -136,7 +135,6 @@ public class Square {
     }
 
     public void updateNetwork(Context context, int network) {
-        Log.println(Log.ASSERT, "", "network: " + network);
         float measurementWeight = convertMeasurementWeightToDecimal(PreferenceManager.getDefaultSharedPreferences(context).getInt("num_kept_measurements", 50));
         if (this.network < 0) {
             this.network = network;
@@ -164,7 +162,7 @@ public class Square {
             this.noise = noise;
         } else {
             // newMeasurement * measurementWeight + oldMeasurements * ( 1 - measurementWeight )
-            this.noise = ((float) noise) * measurementWeight + ((float) this.noise) * (1f - measurementWeight);
+            this.noise = ((float) noise) * measurementWeight + this.noise * (1f - measurementWeight);
         }
         lastNoiseMeasurement = System.currentTimeMillis();
     }

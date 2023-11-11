@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.Settings;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -112,7 +111,6 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
 
-        Log.d("Luizo", "preference changed:" + s);
         switch (s) {
             case "automatic_measurements":
                 automaticMeasurements(sharedPreferences);
