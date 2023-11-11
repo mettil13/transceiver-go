@@ -34,6 +34,8 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
 
     private ActivityResultLauncher<String> requestPermissionForImport;
 
+    private SharedPreferences prefs;
+
     public FragmentSettings() {
         // Required empty public constructor
     }
@@ -43,7 +45,7 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
         prefs.registerOnSharedPreferenceChangeListener(this);
 
         // needed for the importing process
@@ -205,5 +207,11 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
                     dialog.dismiss();
                 })
                 .show();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        prefs.unregisterOnSharedPreferenceChangeListener(this);
     }
 }

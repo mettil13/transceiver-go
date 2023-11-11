@@ -207,6 +207,12 @@ public class FragmentAccountSettings extends Fragment implements SharedPreferenc
     }
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+        PreferenceManager.getDefaultSharedPreferences(requireContext()).unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         hats.recycle();

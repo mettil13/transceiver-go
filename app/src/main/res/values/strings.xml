@@ -70,7 +70,7 @@
 
     <!-- Merge DB message -->
     <string name="merge_msg_title">Databases will merge</string>
-    <string name="merge_msg_text">A database generated with this username already exist, so choosing this username will merge its data with the ones from your database. Do you want to continue? Canceling will revert your username to the old one.</string>
+    <string name="merge_msg_text">A database generated with this username already exist, so choosing this username will destroy it and replace it with your database. Do you want to continue? Canceling will revert your username to the old one.</string>
 
     <!-- Layer Preferences -->
     <string name="list_title">Type of data</string>

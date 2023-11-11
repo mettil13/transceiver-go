@@ -72,7 +72,7 @@
 
     <!-- Merge DB message -->
     <string name="merge_msg_title">Unione database</string>
-    <string name="merge_msg_text">Esiste già un database generato con questo nome utente, quindi scegliere questo nome utente i suoi dati con quelli del tuo database personale.
+    <string name="merge_msg_text">Esiste già un database generato con questo nome utente, quindi scegliere questo nome utente lo distruggerà e lo sostituirà con il tuo database personale.
         Desideri continuare? Annullare ripristinerà il tuo nome utente precedente.</string>
 
     <!-- Layer Preferences -->
