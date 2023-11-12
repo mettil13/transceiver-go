@@ -1,6 +1,7 @@
 package app_mobili.transceiver_go;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Xml;
@@ -37,14 +38,17 @@ public class FragmentLayerSelector extends PreferenceFragmentCompat {
         if (count != 0) {
 
             new Thread(() -> {
-                String[] dbList = requireContext().databaseList();
-                for (String s : dbList) {
-                    if (!s.endsWith("-wal") && !s.endsWith("-shm")) {
-                        Preference pref = new CheckBoxPreference(requireContext(), attr);
-                        pref.setKey(s);
-                        pref.setTitle(s);
-                        assert category != null;
-                        category.addPreference(pref);
+                Context context = getContext();
+                if (context != null) {
+                    String[] dbList = context.databaseList();
+                    for (String s : dbList) {
+                        if (!s.endsWith("-wal") && !s.endsWith("-shm")) {
+                            Preference pref = new CheckBoxPreference(context, attr);
+                            pref.setKey(s);
+                            pref.setTitle(s);
+                            assert category != null;
+                            category.addPreference(pref);
+                        }
                     }
                 }
             }).start();
@@ -56,30 +60,38 @@ public class FragmentLayerSelector extends PreferenceFragmentCompat {
         assert deleteDBs != null;
         deleteDBs.setOnPreferenceClickListener(preference -> {
             new Thread(() -> {
-                String[] dbList = requireContext().databaseList();
-                List<String> toDeleteList = new ArrayList<>();
-                for (String s : dbList) {
-                    if (!s.endsWith("-wal") && !s.endsWith("-shm") && !PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean(s, true)) {
-                        toDeleteList.add(s);
+                Context context = getContext();
+                if(context != null){
+                    String[] dbList = context.databaseList();
+                    List<String> toDeleteList = new ArrayList<>();
+                    for (String s : dbList) {
+                        if (!s.endsWith("-wal") && !s.endsWith("-shm") && !PreferenceManager.getDefaultSharedPreferences(context).getBoolean(s, true)) {
+                            toDeleteList.add(s);
+                        }
                     }
+
+                    requireActivity().runOnUiThread(() -> {
+
+                        Context contextForUI = getContext();
+                        if(contextForUI != null){
+                            AlertDialog.Builder builder = new AlertDialog.Builder(contextForUI);
+                            builder.setTitle(R.string.delete_maps_dialog_title)
+                                    .setMessage(getResources().getString(R.string.delete_maps_dialog_text) + "\n" + toDeleteList)
+                                    .setPositiveButton(R.string.yes, (dialog, which) -> {
+                                        for (String s : toDeleteList) {
+                                            SquareDatabase db = Room.databaseBuilder(requireActivity(), SquareDatabase.class, s).addMigrations(SquareDatabase.migration).build();
+                                            DatabaseImportExportUtil.deleteDatabase(db, contextForUI);
+                                        }
+                                        onCreatePreferences(null, null);
+                                    })
+                                    .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
+                                    .show();
+                        }
+
+
+                    });
                 }
 
-                requireActivity().runOnUiThread(() -> {
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                    builder.setTitle(R.string.delete_maps_dialog_title)
-                        .setMessage(getResources().getString(R.string.delete_maps_dialog_text) + "\n" + toDeleteList)
-                        .setPositiveButton(R.string.yes, (dialog, which) -> {
-                            for (String s : toDeleteList) {
-                                SquareDatabase db = Room.databaseBuilder(requireActivity(), SquareDatabase.class, s).addMigrations(SquareDatabase.migration).build();
-                                DatabaseImportExportUtil.deleteDatabase(db, requireContext());
-                            }
-                            onCreatePreferences(null, null);
-                        })
-                        .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
-                        .show();
-
-                });
 
 
             }).start();

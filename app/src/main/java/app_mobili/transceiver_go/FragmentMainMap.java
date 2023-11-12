@@ -2,6 +2,7 @@ package app_mobili.transceiver_go;
 
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Point;
 import android.os.Bundle;
 
@@ -115,7 +116,6 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         if (defaultOrientationButton != null) {
             defaultOrientationButton.setVisibility(View.GONE);
         }
-
         orientationButton = requireView().findViewById(R.id.orientationButton);
         orientationButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,10 +140,12 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         ObjectAnimator.ofFloat(orientationButton, "rotation", bearing - 45).setDuration(0).start(); // the icon has a 45° initial rotation
     }
 
+    // clears the map and redraws everything
     @Override
     public void onCameraIdle() {
         map.clear();
 
+        // calculates the area on the map that the user can see
         VisibleRegion viewPort = map.getProjection().getVisibleRegion();
         Longitude topLeftX = new Longitude(Math.min(viewPort.farLeft.longitude, Math.min(viewPort.farRight.longitude, Math.min(viewPort.nearLeft.longitude, viewPort.nearRight.longitude))));
         Latitude topLeftY = new Latitude(Math.max(viewPort.farLeft.latitude, Math.max(viewPort.farRight.latitude, Math.max(viewPort.nearLeft.latitude, viewPort.nearRight.latitude))));
@@ -183,6 +185,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
     }
 
     protected void retrieveAndDrawSquares(Longitude topLeftX, Latitude topLeftY, Longitude bottomRightX, Latitude bottomRightY) {
+        // divides the area into two parts: the one with positive longitude and the one with negative longitude
         Longitude negativeLeft = truncateLongitudeToWesternHemisphere(topLeftX, bottomRightX) != null ? truncateLongitudeToWesternHemisphere(topLeftX, bottomRightX)[0] : null;
         Longitude negativeRight = truncateLongitudeToWesternHemisphere(topLeftX, bottomRightX) != null ? truncateLongitudeToWesternHemisphere(topLeftX, bottomRightX)[1] : null;
         Longitude positiveLeft = truncateLongitudeToEasternHemisphere(topLeftX, bottomRightX) != null ? truncateLongitudeToEasternHemisphere(topLeftX, bottomRightX)[0] : null;
@@ -191,6 +194,11 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         String typeOfData = PreferenceManager.getDefaultSharedPreferences(requireContext()).getString("type_of_data", "None");
 
         new Thread(() -> {
+            Context context = getContext();
+            if(context == null){
+                return;
+            }
+
             lastDrawnSquares = new ArrayList<>();
             if (positiveLeft != null && positiveRight != null) {
                 Map<String, Square> easternSquaresWithData = retrieveEasternSquares(getActiveMapNames(), positiveLeft, topLeftY, positiveRight, bottomRightY);
@@ -206,6 +214,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
     }
 
     protected void retrieveSquaresAndDrawHeatmap(Longitude topLeftX, Latitude topLeftY, Longitude bottomRightX, Latitude bottomRightY) {
+        // divides the area into two parts: the one with positive longitude and the one with negative longitude
         Longitude negativeLeft = truncateLongitudeToWesternHemisphere(topLeftX, bottomRightX) != null ? truncateLongitudeToWesternHemisphere(topLeftX, bottomRightX)[0] : null;
         Longitude negativeRight = truncateLongitudeToWesternHemisphere(topLeftX, bottomRightX) != null ? truncateLongitudeToWesternHemisphere(topLeftX, bottomRightX)[1] : null;
         Longitude positiveLeft = truncateLongitudeToEasternHemisphere(topLeftX, bottomRightX) != null ? truncateLongitudeToEasternHemisphere(topLeftX, bottomRightX)[0] : null;
@@ -214,6 +223,11 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         String typeOfData = PreferenceManager.getDefaultSharedPreferences(requireContext()).getString("type_of_data", "None");
 
         new Thread(() -> {
+            Context context = getContext();
+            if(context == null){
+                return;
+            }
+
             Map<String, Square> squaresWithData = new HashMap<>();
             if (positiveLeft != null && positiveRight != null) {
                 squaresWithData.putAll(retrieveEasternSquares(getActiveMapNames(), positiveLeft, topLeftY, positiveRight, bottomRightY));
@@ -222,6 +236,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
                 squaresWithData.putAll(retrieveWesternSquares(getActiveMapNames(), negativeLeft, topLeftY, negativeRight, bottomRightY));
             }
 
+            // creates the three heatmaps (low, medium and high heatmaps)
             List<LatLng> heatmapPointsLow = new ArrayList<>();
             List<LatLng> heatmapPointsMedium = new ArrayList<>();
             List<LatLng> heatmapPointsHigh = new ArrayList<>();
@@ -276,7 +291,7 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
             Gradient gradientMedium = new Gradient(new int[]{ContextCompat.getColor(requireContext(), R.color.medium_intensity_border)}, new float[]{0.50f}, 3);
             Gradient gradientHigh = new Gradient(new int[]{ContextCompat.getColor(requireContext(), R.color.high_intensity_border)}, new float[]{0.50f}, 3);
 
-
+            // displays the three heatmaps
             requireActivity().runOnUiThread(new Runnable() {
                 public void run() {
                     if (!heatmapPointsLow.isEmpty()) {
@@ -363,15 +378,20 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
     }
 
     protected Polygon drawSquareOfType(String typeOfData, Square squareToDraw) {
-        switch (typeOfData) {
-            case "Noise":
-                return squareToDraw.drawNoiseTile(map, requireContext());
-            case "Network":
-                return squareToDraw.drawNetworkTile(map, requireContext());
-            case "Wi-fi":
-                return squareToDraw.drawWifiTile(map, requireContext());
-            default:
-                return squareToDraw.drawEmptyTile(map, requireContext());
+        Context context = getContext();
+        if (context != null) {
+            switch (typeOfData) {
+                case "Noise":
+                    return squareToDraw.drawNoiseTile(map, context);
+                case "Network":
+                    return squareToDraw.drawNetworkTile(map, context);
+                case "Wi-fi":
+                    return squareToDraw.drawWifiTile(map, context);
+                default:
+                    return squareToDraw.drawEmptyTile(map, context);
+            }
+        } else{
+            return null;
         }
     }
 
@@ -420,12 +440,17 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         }
     }
 
+    // returns a list of the name of the databases that FragmentLayerSelector marked as active
     protected List<String> getActiveMapNames() {
         List<String> ret = new ArrayList<>();
-        String[] dbList = requireContext().databaseList();
-        for (String s : dbList) {
-            if (PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean(s, false)) {
-                ret.add(s);
+
+        Context context = getContext();
+        if (context != null) {
+            String[] dbList = context.databaseList();
+            for (String s : dbList) {
+                if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(s, false)) {
+                    ret.add(s);
+                }
             }
         }
 
@@ -437,43 +462,47 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         Map<String, Integer> numberOfNoise = new HashMap<>();
         Map<String, Integer> numberOfNetwork = new HashMap<>();
         Map<String, Integer> numberOfWifi = new HashMap<>();
-        // gets the squares from all the active databases
-        for (String name : mapNames) {
-            SquareDatabase squaredb = Room.databaseBuilder(requireContext(), SquareDatabase.class, name).addMigrations(SquareDatabase.migration).build();
-            List<Square> list = squaredb.getSquareDAO().getAllSquaresInPositiveHemisphereRange(topLeftX.getValue(), topLeftY.getValue(), bottomRightX.getValue(), bottomRightY.getValue());
-            list.forEach(square -> {
-                if (easternSquaresWithData.containsKey(square.getSquareId())) {
 
-                    Square oldSquare = easternSquaresWithData.get(square.getSquareId());
-                    if (oldSquare.getNoise() >= 0 && square.getNoise() >= 0) {
-                        oldSquare.setNoise(oldSquare.getNoise() + square.getNoise());
-                        numberOfNoise.put(square.getSquareId(), numberOfNoise.get(square.getSquareId()) + 1);
-                    }
-                    if (oldSquare.getNetwork() >= 0 && square.getNetwork() >= 0) {
-                        oldSquare.setNetwork(oldSquare.getNetwork() + square.getNetwork());
-                        numberOfNetwork.put(square.getSquareId(), numberOfNetwork.get(square.getSquareId()) + 1);
-                    }
-                    if (oldSquare.getWifi() >= 0 && square.getWifi() >= 0) {
-                        oldSquare.setWifi(oldSquare.getWifi() + square.getWifi());
-                        numberOfWifi.put(square.getSquareId(), numberOfWifi.get(square.getSquareId()) + 1);
-                    }
+        Context context = getContext();
+        if (context != null) {
+            // gets the squares from all the active databases
+            for (String name : mapNames) {
+                SquareDatabase squaredb = Room.databaseBuilder(context, SquareDatabase.class, name).addMigrations(SquareDatabase.migration).build();
+                List<Square> list = squaredb.getSquareDAO().getAllSquaresInPositiveHemisphereRange(topLeftX.getValue(), topLeftY.getValue(), bottomRightX.getValue(), bottomRightY.getValue());
+                list.forEach(square -> {
+                    if (easternSquaresWithData.containsKey(square.getSquareId())) {
 
-                } else {
-                    easternSquaresWithData.put(square.getSquareId(), square);
-                    numberOfNoise.put(square.getSquareId(), 1);
-                    numberOfNetwork.put(square.getSquareId(), 1);
-                    numberOfWifi.put(square.getSquareId(), 1);
-                }
+                        Square oldSquare = easternSquaresWithData.get(square.getSquareId());
+                        if (oldSquare.getNoise() >= 0 && square.getNoise() >= 0) {
+                            oldSquare.setNoise(oldSquare.getNoise() + square.getNoise());
+                            numberOfNoise.put(square.getSquareId(), numberOfNoise.get(square.getSquareId()) + 1);
+                        }
+                        if (oldSquare.getNetwork() >= 0 && square.getNetwork() >= 0) {
+                            oldSquare.setNetwork(oldSquare.getNetwork() + square.getNetwork());
+                            numberOfNetwork.put(square.getSquareId(), numberOfNetwork.get(square.getSquareId()) + 1);
+                        }
+                        if (oldSquare.getWifi() >= 0 && square.getWifi() >= 0) {
+                            oldSquare.setWifi(oldSquare.getWifi() + square.getWifi());
+                            numberOfWifi.put(square.getSquareId(), numberOfWifi.get(square.getSquareId()) + 1);
+                        }
+
+                    } else {
+                        easternSquaresWithData.put(square.getSquareId(), square);
+                        numberOfNoise.put(square.getSquareId(), 1);
+                        numberOfNetwork.put(square.getSquareId(), 1);
+                        numberOfWifi.put(square.getSquareId(), 1);
+                    }
+                });
+                squaredb.close();
+            }
+
+            // divides the values to make average values
+            easternSquaresWithData.forEach((id, square) -> {
+                square.setNoise(square.getNoise() / numberOfNoise.get(id));
+                square.setNetwork(square.getNetwork() / numberOfNetwork.get(id));
+                square.setWifi(square.getWifi() / numberOfWifi.get(id));
             });
-            squaredb.close();
         }
-
-        // divides the values to make average values
-        easternSquaresWithData.forEach((id, square) -> {
-            square.setNoise(square.getNoise() / numberOfNoise.get(id));
-            square.setNetwork(square.getNetwork() / numberOfNetwork.get(id));
-            square.setWifi(square.getWifi() / numberOfWifi.get(id));
-        });
 
         return easternSquaresWithData;
     }
@@ -483,43 +512,47 @@ public class FragmentMainMap extends Fragment implements OnMapReadyCallback, Goo
         Map<String, Integer> numberOfNoise = new HashMap<>();
         Map<String, Integer> numberOfNetwork = new HashMap<>();
         Map<String, Integer> numberOfWifi = new HashMap<>();
-        // gets the squares from all the active databases
-        for (String name : mapNames) {
-            SquareDatabase squaredb = Room.databaseBuilder(requireContext(), SquareDatabase.class, name).addMigrations(SquareDatabase.migration).build();
-            List<Square> list = squaredb.getSquareDAO().getAllSquaresInNegativeHemisphereRange(topLeftX.getValue(), topLeftY.getValue(), bottomRightX.getValue(), bottomRightY.getValue());
-            list.forEach(square -> {
-                if (westernSquaresWithData.containsKey(square.getSquareId())) {
 
-                    Square oldSquare = westernSquaresWithData.get(square.getSquareId());
-                    if (oldSquare.getNoise() >= 0 && square.getNoise() >= 0) {
-                        oldSquare.setNoise(oldSquare.getNoise() + square.getNoise());
-                        numberOfNoise.put(square.getSquareId(), numberOfNoise.get(square.getSquareId()) + 1);
-                    }
-                    if (oldSquare.getNetwork() >= 0 && square.getNetwork() >= 0) {
-                        oldSquare.setNetwork(oldSquare.getNetwork() + square.getNetwork());
-                        numberOfNetwork.put(square.getSquareId(), numberOfNetwork.get(square.getSquareId()) + 1);
-                    }
-                    if (oldSquare.getWifi() >= 0 && square.getWifi() >= 0) {
-                        oldSquare.setWifi(oldSquare.getWifi() + square.getWifi());
-                        numberOfWifi.put(square.getSquareId(), numberOfWifi.get(square.getSquareId()) + 1);
-                    }
+        Context context = getContext();
+        if (context != null) {
+            // gets the squares from all the active databases
+            for (String name : mapNames) {
+                SquareDatabase squaredb = Room.databaseBuilder(context, SquareDatabase.class, name).addMigrations(SquareDatabase.migration).build();
+                List<Square> list = squaredb.getSquareDAO().getAllSquaresInNegativeHemisphereRange(topLeftX.getValue(), topLeftY.getValue(), bottomRightX.getValue(), bottomRightY.getValue());
+                list.forEach(square -> {
+                    if (westernSquaresWithData.containsKey(square.getSquareId())) {
 
-                } else {
-                    westernSquaresWithData.put(square.getSquareId(), square);
-                    numberOfNoise.put(square.getSquareId(), 1);
-                    numberOfNetwork.put(square.getSquareId(), 1);
-                    numberOfWifi.put(square.getSquareId(), 1);
-                }
+                        Square oldSquare = westernSquaresWithData.get(square.getSquareId());
+                        if (oldSquare.getNoise() >= 0 && square.getNoise() >= 0) {
+                            oldSquare.setNoise(oldSquare.getNoise() + square.getNoise());
+                            numberOfNoise.put(square.getSquareId(), numberOfNoise.get(square.getSquareId()) + 1);
+                        }
+                        if (oldSquare.getNetwork() >= 0 && square.getNetwork() >= 0) {
+                            oldSquare.setNetwork(oldSquare.getNetwork() + square.getNetwork());
+                            numberOfNetwork.put(square.getSquareId(), numberOfNetwork.get(square.getSquareId()) + 1);
+                        }
+                        if (oldSquare.getWifi() >= 0 && square.getWifi() >= 0) {
+                            oldSquare.setWifi(oldSquare.getWifi() + square.getWifi());
+                            numberOfWifi.put(square.getSquareId(), numberOfWifi.get(square.getSquareId()) + 1);
+                        }
+
+                    } else {
+                        westernSquaresWithData.put(square.getSquareId(), square);
+                        numberOfNoise.put(square.getSquareId(), 1);
+                        numberOfNetwork.put(square.getSquareId(), 1);
+                        numberOfWifi.put(square.getSquareId(), 1);
+                    }
+                });
+                squaredb.close();
+            }
+
+            // divides the values to make average values
+            westernSquaresWithData.forEach((id, square) -> {
+                square.setNoise(square.getNoise() / numberOfNoise.get(id));
+                square.setNetwork(square.getNetwork() / numberOfNetwork.get(id));
+                square.setWifi(square.getWifi() / numberOfWifi.get(id));
             });
-            squaredb.close();
         }
-
-        // divides the values to make average values
-        westernSquaresWithData.forEach((id, square) -> {
-            square.setNoise(square.getNoise() / numberOfNoise.get(id));
-            square.setNetwork(square.getNetwork() / numberOfNetwork.get(id));
-            square.setWifi(square.getWifi() / numberOfWifi.get(id));
-        });
 
         return westernSquaresWithData;
     }

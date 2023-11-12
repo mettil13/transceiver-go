@@ -100,6 +100,7 @@ public class FragmentGameMap extends FragmentMainMap {
             return;
         }
 
+        // starts listening for coordinates
         if (requireActivity() instanceof MainActivity) {
             ((MainActivity) requireActivity()).startListenForCoordinates(new CoordinateListener() {
                 @Override
@@ -120,6 +121,7 @@ public class FragmentGameMap extends FragmentMainMap {
                     myLocationLongitude = new Longitude(location.getLongitude());
                     myLocationBearing = location.getBearing();
 
+                    // creates an animation between myLocation and oldLocation
                     ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, 1);
                     valueAnimator.setDuration(1000); // duration 1 second
                     valueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
@@ -147,7 +149,7 @@ public class FragmentGameMap extends FragmentMainMap {
                                 myAvatarSkin.setVisibility(View.VISIBLE);
                                 myAvatarClothes.setVisibility(View.VISIBLE);
                                 myAvatarHat.setVisibility(View.VISIBLE);
-                                ((AnimatedVectorDrawable) myAvatarSkin.getDrawable()).start();
+                                ((AnimatedVectorDrawable) myAvatarSkin.getDrawable()).start(); // starts the walking animation
                                 ((AnimatedVectorDrawable) myAvatarClothes.getDrawable()).start();
 
                                 orientationButton.callOnClick();
@@ -169,6 +171,7 @@ public class FragmentGameMap extends FragmentMainMap {
 
     }
 
+    // as the camera moves, it also updates the positions on screen of avatar and gameMarker
     @Override
     public void onCameraMove() {
         super.onCameraMove();
@@ -184,11 +187,11 @@ public class FragmentGameMap extends FragmentMainMap {
     public void onCameraIdle() {
         super.onCameraIdle();
         CameraPosition pos = map.getCameraPosition();
-        if (pos.tilt != getMaximumTilt(pos.zoom)) {
+        if (pos.tilt != getMaximumTilt(pos.zoom)) { // the camera must always be as tilted as possible
             map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().target(pos.target).tilt(getMaximumTilt(pos.zoom)).bearing(pos.bearing).zoom(pos.zoom).build()));
         }
 
-        updateGameInstance();
+        updateGameInstance(); // updates the gameMarker
     }
 
     private void setUpMyAvatar(ImageView avatarSkin, ImageView avatarClothes, ImageView avatarHat) {
@@ -224,7 +227,7 @@ public class FragmentGameMap extends FragmentMainMap {
         myAvatarClothes.setTranslationX(myPositionOnScreen.x - myAvatarClothes.getLayoutParams().width / 2f);
         myAvatarClothes.setTranslationY(myPositionOnScreen.y - myAvatarClothes.getLayoutParams().height);
         myAvatarHat.setTranslationX(myPositionOnScreen.x - myAvatarHat.getLayoutParams().width / 2f);
-        myAvatarHat.setTranslationY(myPositionOnScreen.y - myAvatarHat.getLayoutParams().height - (myAvatarSkin.getLayoutParams().height * 0.1f));
+        myAvatarHat.setTranslationY(myPositionOnScreen.y - myAvatarHat.getLayoutParams().height - (myAvatarSkin.getLayoutParams().height * 0.1f)); // the avatarHat pivot is slightly different
     }
 
     private void setUpGameMarker(ImageView gameMarker) {
@@ -284,7 +287,7 @@ public class FragmentGameMap extends FragmentMainMap {
         gameMarker.setTranslationY(myPositionOnScreen.y - gameMarker.getLayoutParams().height);
     }
 
-    //returns true if there is an overflow, false otherwise
+    // returns true if there is an overflow, false otherwise
     private boolean checkForPositionOnScreenOverflow(Latitude targetLatitude, Longitude targetLongitude, Point targetPositionOnScreen) {
         int precision = 1; // Higher precisions increase false positives
         LatLng targetPosition = new LatLng(targetLatitude.getValue(), targetLongitude.getValue());
@@ -383,7 +386,7 @@ public class FragmentGameMap extends FragmentMainMap {
     }
 
     private void createGameMeasurementDialog(String typeOfData) {
-        List<String> selectedItems = new ArrayList<>();  // selected items
+        List<String> selectedItems = new ArrayList<>();  // list of measurement that the user wants to do
 
         String[] entries = Arrays.stream(getResources().getStringArray(R.array.type_of_data_entries)).skip(1).toArray(size -> new String[size]); // skip the first element of the array, which is "None"
         int indexOfMandatoryType = Arrays.asList(getResources().getStringArray(R.array.type_of_data_values)).indexOf(typeOfData) - 1; // skip the first element of the array, which is "None"
@@ -419,7 +422,7 @@ public class FragmentGameMap extends FragmentMainMap {
                                     public void onStatusChanged(String provider, int status, Bundle extras) {
                                     }
                                 });
-                                int coinsReward = 0;
+                                int coinsReward = 0; // for each measurement a reward is granted
                                 if (selectedItems.contains("Noise")) {
                                     measurementSingleton.takeNoiseMeasurement((MainActivity) currentActivity);
                                     coinsReward += getResources().getInteger(R.integer.square_single_measurement_reward);
@@ -435,7 +438,7 @@ public class FragmentGameMap extends FragmentMainMap {
                                 addCoins(coinsReward);
                                 Toast.makeText(requireContext(), getResources().getText(R.string.you_earned) + " " + coinsReward + " " + getResources().getString(R.string.coins), Toast.LENGTH_LONG).show();
                                 gameInstance.generateNewTarget(lastDrawnSquares, typeOfData);
-                                onCameraIdle();
+                                onCameraIdle(); // refresh the map to show the position of the gameMarker
                             }
 
                         } else {
