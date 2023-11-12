@@ -71,9 +71,8 @@
         Ignorare questo messaggio farà in modo che le misurazioni funzionino solo quando l\'app è in primo piano.</string>
 
     <!-- Merge DB message -->
-    <string name="merge_msg_title">Unione database</string>
-    <string name="merge_msg_text">Esiste già un database generato con questo nome utente, quindi scegliere questo nome utente lo distruggerà e lo sostituirà con il tuo database personale.
-        Desideri continuare? Annullare ripristinerà il tuo nome utente precedente.</string>
+    <string name="merge_msg_title">Impossibile cambiare nome utente</string>
+    <string name="merge_msg_text">Esiste già un database generato con questo nome utente, scegli un altro nome utente oppure cancella il database con questo nome.</string>
 
     <!-- Layer Preferences -->
     <string name="list_title">Tipologia dei dati</string>

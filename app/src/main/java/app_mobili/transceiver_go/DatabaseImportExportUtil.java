@@ -86,6 +86,9 @@ public class DatabaseImportExportUtil {
             File oldDbFile = context.getDatabasePath(oldName);
             File newDbFile = context.getDatabasePath(newName);
 
+            Log.d("dbName", "old: " + oldDbFile.toString());
+            Log.d("dbName", "new: " + newDbFile.toString());
+
             // Rename the old database file to the new name
             if (oldDbFile.renameTo(newDbFile)) {
                 // Reopen the database with the new name
@@ -207,7 +210,7 @@ public class DatabaseImportExportUtil {
 
     // deletes the database given in input, requires a context
     // returns true if successfully deleted, false otherwise
-    public static void deleteDatabase(SquareDatabase db, Context context) {
+    public static boolean deleteDatabase(SquareDatabase db, Context context) {
 
         // Close the database if it's open
         db.close();
@@ -219,11 +222,14 @@ public class DatabaseImportExportUtil {
         if (dbFile.exists()) {
             if (dbFile.delete()) {
                 Log.d("DatabaseDeletion", "Database deleted successfully");
+                return true;
             } else {
                 Log.e("DatabaseDeletion", "Failed to delete database");
+                return false;
             }
         } else {
             Log.d("DatabaseDeletion", "Database file does not exist");
+            return false;
         }
     }
 }

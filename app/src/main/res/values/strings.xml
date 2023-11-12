@@ -69,8 +69,8 @@
     <string name="battery_msg_text">To make sure background measurements are taken, please disable battery optimization for this app. Dismissing this message will enable automatic measurements only while the app is in foreground.</string>
 
     <!-- Merge DB message -->
-    <string name="merge_msg_title">Databases will merge</string>
-    <string name="merge_msg_text">A database generated with this username already exist, so choosing this username will destroy it and replace it with your database. Do you want to continue? Canceling will revert your username to the old one.</string>
+    <string name="merge_msg_title">Cannot change username</string>
+    <string name="merge_msg_text">A database generated with this username already exist, please choose another username or delete the conflicting database.</string>
 
     <!-- Layer Preferences -->
     <string name="list_title">Type of data</string>

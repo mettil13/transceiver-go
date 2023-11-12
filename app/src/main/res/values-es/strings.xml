@@ -70,9 +70,9 @@
     <string name="battery_msg_text">Para garantizar el correcto funcionamento de las mediciones en segundo plano, desactivar la optimización de bateria para esta app. Ignorar este mensaje activará las mediciones automáticas solo con la app en primer plano.</string>
 
     <!-- Merge DB message -->
-    <string name="merge_msg_title">Unificación base de datos</string>
-    <string name="merge_msg_text">Ya existe una base de datos generada con este nombre de usuario, elegir este nombre de usuario la destruirá reemplazándola con tu base de datos. ¿Deseas continuar? Cancelar restaurará tu nombre de usuario anterior.</string>
-
+    <string name="merge_msg_title">No se puede cambiar el nombre de usuario</string>
+    <string name="merge_msg_text">Ya existe una base de datos generada con este nombre de usuario. Por favor, elige otro nombre de usuario o elimina la base de datos en conflicto.</string>
+    
     <!-- Layer Preferences -->
     <string name="list_title">Tipo de datos</string>
     <string name="list_dialog_title">Selecciona los datos para mostrar</string>
