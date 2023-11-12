@@ -86,9 +86,6 @@ public class DatabaseImportExportUtil {
             File oldDbFile = context.getDatabasePath(oldName);
             File newDbFile = context.getDatabasePath(newName);
 
-            Log.d("dbName", "old: " + oldDbFile.toString());
-            Log.d("dbName", "new: " + newDbFile.toString());
-
             // Rename the old database file to the new name
             if (oldDbFile.renameTo(newDbFile)) {
                 // Reopen the database with the new name
