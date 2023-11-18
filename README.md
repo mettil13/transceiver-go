@@ -1,0 +1,2 @@
+TransceiverGo is an Android mobile app for collecting data about network connectivity, wifi signal and noise level.
+It is developed for the course Laboratorio di Applicazioni Mobili of the university of Bologna, AA 2022/2023.
